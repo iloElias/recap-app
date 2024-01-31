@@ -1,7 +1,8 @@
 import BottomOptions from './Components/BottomOptions/BottomOptions';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from 'react';
 import Login from './Pages/Login/Login';
 import './App.css';
-import { useEffect, useState } from 'react';
 
 import axios from 'axios';
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
@@ -11,18 +12,29 @@ const api = axios.create({
     baseURL: 'https://recap-backend-production.up.railway.app/public',
 });
 
-const localDefinedLanguage = localStorage.getItem('definedLanguage');
+const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
+const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
+
+function PageTemplate({ children, profile, messages, setLanguage, logoutHandler }) {
+
+    return (
+        <>
+            {children}
+            <BottomOptions profile={profile} onClick={e => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
+        </>
+    );
+}
 
 function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
     const [user, setUser] = useState([]);
-    const [profile, setProfile] = useState();
+    const [profile, setProfile] = useState(JSON.parse(localUserProfile));
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => setUser(codeResponse),
-        onError: (error) => console.log('Login Failed:')
+        onError: (error) => console.log('Login Failed:', error)
     });
 
     const oneTapLogin = (credentialResponse) => {
@@ -37,7 +49,7 @@ function App() {
                 console.error("Ops, an error has ocurred on language set");
             });
 
-        localStorage.setItem('definedLanguage', language)
+        localStorage.setItem('recap@definedLanguage', language)
     }, [language]);
 
     useEffect(
@@ -51,51 +63,54 @@ function App() {
                         }
                     })
                     .then((res) => {
-                        console.log(res.data);
                         setProfile(res.data);
+                        localStorage.setItem("recap@localUserProfile", JSON.stringify(res.data));
                     })
                     .catch((err) => console.log(err));
             } else if (user.credential) {
                 const decodedUserData = jwtDecode(user.credential);
                 setProfile(decodedUserData);
+                localStorage.setItem("recap@localUserProfile", JSON.stringify(decodedUserData));
             }
         },
         [user]
     );
 
-    const logOut = () => {
+    const logoutHandler = () => {
         googleLogout();
         setProfile(null);
+        localStorage.removeItem("recap@localUserProfile")
     };
 
     return (
         <>
             <div className="App">
-                {profile ? (
-                    <>
-                        <h2>
-                            {messages.hello_user.replace(':str', profile.name)}
-                        </h2>
-                        <img src={`${profile.picture}`} alt='' ></img>
-                    </>
-                ) : (
-                    <Login messages={messages} loginHandler={login} />
-                )}
-
-                <BottomOptions profile={profile} onClick={e => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logOut} />
+                <PageTemplate profile={profile} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                    {profile ? (
+                        <>
+                            <h2>
+                                {/* {messages.hello_user.replace(':str', profile.name)} */}
+                            </h2>
+                            <img src={`${profile.picture}`} alt='' ></img>
+                        </>
+                    ) : (
+                        <Login messages={messages} loginHandler={login} />
+                    )}
+                </PageTemplate>
             </div>
 
             <div style={{ display: "none" }}>
-                <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                        oneTapLogin(credentialResponse);
-                        console.log(credentialResponse);
-                    }}
-                    onError={() => {
-                        console.log('One tap login Failed');
-                    }}
-                    useOneTap
-                />
+                {!profile && (
+                    <GoogleLogin
+                        onSuccess={(credentialResponse) => {
+                            oneTapLogin(credentialResponse);
+                        }}
+                        onError={() => {
+                            console.log('One tap login Failed');
+                        }}
+                        useOneTap
+                    />
+                )}
             </div>
         </>
     );
