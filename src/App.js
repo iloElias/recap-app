@@ -1,5 +1,5 @@
 import BottomOptions from './Components/BottomOptions/BottomOptions';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import Login from './Pages/Login/Login';
 import './App.css';
@@ -32,6 +32,8 @@ function App() {
     const [user, setUser] = useState([]);
     const [profile, setProfile] = useState(JSON.parse(localUserProfile));
 
+    const navigate = useNavigate();
+
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => setUser(codeResponse),
         onError: (error) => console.log('Login Failed:', error)
@@ -51,6 +53,13 @@ function App() {
 
         localStorage.setItem('recap@definedLanguage', language)
     }, [language]);
+
+    useEffect(() => {
+        if (!profile) {
+            navigate("/login")
+        }
+        console.log(profile);
+    }, [profile]);
 
     useEffect(
         () => {
@@ -72,6 +81,8 @@ function App() {
                 setProfile(decodedUserData);
                 localStorage.setItem("recap@localUserProfile", JSON.stringify(decodedUserData));
             }
+
+            navigate("/");
         },
         [user]
     );
@@ -85,18 +96,15 @@ function App() {
     return (
         <>
             <div className="App">
-                <PageTemplate profile={profile} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                    {profile ? (
-                        <>
-                            <h2>
-                                {/* {messages.hello_user.replace(':str', profile.name)} */}
-                            </h2>
-                            <img src={`${profile.picture}`} alt='' ></img>
-                        </>
-                    ) : (
-                        <Login messages={messages} loginHandler={login} />
-                    )}
-                </PageTemplate>
+                <Routes>
+                    <Route path='/'>
+                        <Route index element={<PageTemplate profile={profile} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
+                        </PageTemplate>} />
+                        <Route path='login' element={
+                            <Login messages={messages} loginHandler={login} />
+                        } />
+                    </Route>
+                </Routes>
             </div>
 
             <div style={{ display: "none" }}>

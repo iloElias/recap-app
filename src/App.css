@@ -12,3 +12,9 @@
   flex-direction: column;
   align-items: center;
 }
+
+.circular-image {
+  height: 10dvh;
+
+  border-radius: 50%;
+}
