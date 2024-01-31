@@ -8,8 +8,10 @@ import axios from 'axios';
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
+
+
 const api = axios.create({
-    baseURL: 'https://recap-backend-production.up.railway.app/public',
+    baseURL: process.env.API_URL,
 });
 
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
