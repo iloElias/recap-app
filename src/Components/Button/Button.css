@@ -1,0 +1,32 @@
+.component-button {
+    width: 30dvh;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 1.2dvh;
+    padding: 1dvh 3.4dvh;
+
+    border-radius: 1dvh;
+    outline: none;
+    border: none;
+    background: #212121;
+
+    font-size: 2dvh;
+
+    color: #FAFAFA;
+    user-select: none;
+}
+
+.component-button:hover {
+    cursor: pointer;
+    background: #3b3b3b;
+    transition: transform 0.2s;
+    transform: translateY(-0.2dvh);
+}
+
+.component-button:active {
+    transform: translateY(0.1dvh);
+}

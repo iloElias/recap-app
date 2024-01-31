@@ -1,0 +1,9 @@
+.modal-body {
+    width: 100dvw;
+    height: 100dvh;
+
+    position: fixed;
+    z-index: 100;
+
+    top: 0%;
+}

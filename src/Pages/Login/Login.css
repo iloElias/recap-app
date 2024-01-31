@@ -1,0 +1,35 @@
+.container-login {
+    display: flex;
+    padding-top: 30dvh;
+}
+
+.login-static-message {
+    margin: 1dvh 0 3.8dvh;
+    color: #9E9E9E;
+
+    user-select: none;
+
+    font-family: Inter;
+    font-size: 1.7dvh;
+    font-style: normal;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    overflow: visible;
+
+    width: 7.5dvh;
+    height: 7.5dvh;
+}
+
+.network-static-message {
+    margin: 2dvh 0 3.8dvh;
+    color: #9E9E9E;
+
+    font-family: Inter;
+    font-size: 1.7dvh;
+    font-style: normal;
+}
