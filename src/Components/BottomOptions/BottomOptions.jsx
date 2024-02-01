@@ -65,7 +65,7 @@ function Option({ optionName, optionIcon, onClick, children }) {
     );
 }
 
-export default function BottomOptions({ messages, setLanguage, profile, logoutHandler }) {
+export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler }) {
     const [showCategory, setShowCategory] = useState(false);
     const [showPanel, setShowPanel] = useState(false);
 
@@ -101,7 +101,7 @@ export default function BottomOptions({ messages, setLanguage, profile, logoutHa
                 <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>
                     <Option optionName={messages.languages_button_title} optionIcon={<GlobeIcon />} onClick={toggleLanguagePanel} >
                         <OptionPanel showPanel={showPanel} title={messages.languages_button_title}>
-                            <select onChange={onLanguageChange} value={localStorage.getItem('definedLanguage') ? localStorage.getItem('definedLanguage') : 'en'}>
+                            <select onChange={onLanguageChange} value={language}>
                                 <option value="en">English</option>
                                 <option value="pt-BR">Português</option>
                             </select>

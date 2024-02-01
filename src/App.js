@@ -8,6 +8,7 @@ import './App.css';
 import axios from 'axios';
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import Cards from './Pages/Cards/Cards';
 
 const api = axios.create({
     baseURL: env.API_URL,
@@ -20,12 +21,12 @@ if (env.LOCALHOST) {
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
 
-function PageTemplate({ children, profile, messages, setLanguage, logoutHandler }) {
+function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler }) {
 
     return (
         <>
             {children}
-            <BottomOptions profile={profile} onClick={e => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
+            <BottomOptions profile={profile} language={language} onClick={e => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
         </>
     );
 }
@@ -104,12 +105,12 @@ function App() {
             <div className="App">
                 <Routes>
                     <Route path='/'>
-                        <Route index element={<PageTemplate profile={profile} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
-                            <h1>teste</h1>
+                        <Route index element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
+                            <Cards messages={messages} />
                         </PageTemplate>} />
-                        <Route path='login' element={
+                        <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                             <Login messages={messages} loginHandler={login} />
-                        } />
+                        </PageTemplate>} />
                     </Route>
                 </Routes>
             </div>

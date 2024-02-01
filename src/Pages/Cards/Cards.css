@@ -1,0 +1,113 @@
+.flex-column {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.cards-page-title {
+    width: 90dvw;
+    height: min-content;
+
+
+    text-align: start;
+
+    margin: 5.65dvh 0 0 0;
+
+    font-size: 2.7dvh;
+}
+
+.cards-page {
+    height: max-content;
+
+    display: flex;
+
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.cards-container {
+    width: 90dvw;
+
+    margin-top: 2.25rem;
+    margin-bottom: 5dvh;
+
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.card-container {
+    aspect-ratio: 1/1;
+    min-width: 180px;
+    width: min-content;
+
+    display: flex;
+    justify-content: flex-end;
+
+    /* border: dashed 1px red; */
+}
+
+.card-paper {
+    aspect-ratio: 1/1;
+
+    z-index: 5;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 170px;
+
+    transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
+
+    position: absolute;
+    background-color: #fafafa;
+    transition: 0.2s transform;
+}
+
+.card-paper-text {
+    max-width: 150px;
+    max-height: 150px;
+
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    font-family: 'Covered By Your Grace', cursive;
+    font-size: 25.41px;
+    line-height: 25px;
+
+    user-select: none;
+    text-align: center;
+}
+
+.card-paper-shadow {
+    z-index: 4;
+
+    min-width: 170px;
+    min-height: 180px;
+
+    transform: rotate(3.56deg) translateX(-5px) translateY(-5px);
+
+    position: absolute;
+    background-color: #D8D8D8;
+    transition: 0.2s all;
+}
+
+.card-container:hover .card-paper {
+    transform: rotate(4deg) translateX(-5.3px) translateY(-6px);
+}
+
+.card-container:hover .card-paper-shadow {
+    min-height: 173px;
+    transform: rotate(1.56deg) translateX(-2px) translateY(-2px);
+}
+
+.card-container:active .card-paper {
+    transform: rotate(1deg) translateX(0px) translateY(-2px);
+}
+
+.card-container:active .card-paper-shadow {
+    min-height: 170px;
+    transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
+}
