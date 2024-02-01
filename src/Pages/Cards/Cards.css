@@ -91,10 +91,10 @@
 .card-paper-shadow {
     z-index: 4;
 
-    min-width: 170px;
+    min-width: 167px;
     min-height: 180px;
 
-    transform: rotate(3.56deg) translateX(-5px) translateY(-5px);
+    transform: rotate(3.56deg) translateX(-5px) translateY(-4.86px);
 
     position: absolute;
     background-color: #D8D8D8;
