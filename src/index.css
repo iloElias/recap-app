@@ -3,6 +3,7 @@
   padding: 0;
   min-width: 0;
 
+  touch-action: none;
   /* border: dashed 1px red; */
 
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
