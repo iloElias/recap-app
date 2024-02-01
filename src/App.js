@@ -13,6 +13,10 @@ const api = axios.create({
     baseURL: env.API_URL,
 });
 
+if (env.LOCALHOST) {
+    document.getElementById("page-title").innerText = "Recap - Test"
+}
+
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
 

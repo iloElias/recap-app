@@ -47,7 +47,8 @@
   "react-dotenv": {
     "whitelist": [
       "API_URL",
-      "GOOGLE_API_KEY"
+      "GOOGLE_API_KEY",
+      "LOCALHOST"
     ]
   }
 }
