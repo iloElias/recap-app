@@ -2,16 +2,15 @@ import BottomOptions from './Components/BottomOptions/BottomOptions';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useEffect, useState } from 'react';
 import Login from './Pages/Login/Login';
+import env from "react-dotenv";
 import './App.css';
 
 import axios from 'axios';
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 
-
-
 const api = axios.create({
-    baseURL: process.env.API_URL,
+    baseURL: env.API_URL,
 });
 
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
@@ -61,7 +60,7 @@ function App() {
             navigate("/login")
         }
         console.log(profile);
-    }, [profile]);
+    }, [profile, navigate]);
 
     useEffect(
         () => {
@@ -78,21 +77,23 @@ function App() {
                         localStorage.setItem("recap@localUserProfile", JSON.stringify(res.data));
                     })
                     .catch((err) => console.log(err));
-            } else if (user.credential) {
+                navigate("/");
+            } else if (user && user.credential) {
                 const decodedUserData = jwtDecode(user.credential);
                 setProfile(decodedUserData);
                 localStorage.setItem("recap@localUserProfile", JSON.stringify(decodedUserData));
+                navigate("/");
             }
 
-            navigate("/");
         },
-        [user]
+        [user, navigate]
     );
 
     const logoutHandler = () => {
         googleLogout();
+        setUser(null);
         setProfile(null);
-        localStorage.removeItem("recap@localUserProfile")
+        localStorage.removeItem("recap@localUserProfile");
     };
 
     return (
@@ -101,6 +102,7 @@ function App() {
                 <Routes>
                     <Route path='/'>
                         <Route index element={<PageTemplate profile={profile} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
+                            <h1>teste</h1>
                         </PageTemplate>} />
                         <Route path='login' element={
                             <Login messages={messages} loginHandler={login} />
