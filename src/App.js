@@ -63,7 +63,6 @@ function App() {
         if (!profile) {
             navigate("/login")
         }
-        console.log(profile);
     }, [profile, navigate]);
 
     useEffect(
