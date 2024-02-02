@@ -1,10 +1,10 @@
 import React from "react";
 import "./Modal.css";
 
-export default function Modal(props) {
+export default function Modal({ children, className, onClick, style }) {
     return (
-        <div className="modal-body">
-            {props.children}
+        <div className={className ? className : "modal-body"} style={style} onClick={onClick}>
+            {children}
         </div>
     );
 }

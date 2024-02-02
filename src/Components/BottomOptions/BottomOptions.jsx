@@ -94,7 +94,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     return messages.languages_button_title ? (
         <>
             <div style={{ display: (showCategory ? "flex" : "none") }} className="user-select-background" onClick={disableAll} />
-            <div className="bottom-modal" onClick={e => e.stopPropagation()} >
+            <div className="bottom-modal" onClick={(e) => e.stopPropagation()} >
                 <Button id="bottom-button" onClick={toggleCategories}>
                     <TreeDotsIcon />
                 </Button>

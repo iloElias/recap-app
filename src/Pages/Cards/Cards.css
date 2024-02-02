@@ -56,8 +56,6 @@
 .card-paper {
     aspect-ratio: 1/1;
 
-    z-index: 5;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -89,8 +87,6 @@
 }
 
 .card-paper-shadow {
-    z-index: 4;
-
     min-width: 167px;
     min-height: 180px;
 
@@ -120,4 +116,19 @@
     min-width: 167px;
     opacity: 0.75;
     transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
+}
+
+.create-card-container {
+    display: flex;
+
+    flex-direction: column;
+
+    padding: 5dvh;
+    height: min-content;
+
+    max-width: 90dvw;
+    max-height: 90dvh;
+
+    background-color: #fafafa;
+    border-radius: 1dvh;
 }

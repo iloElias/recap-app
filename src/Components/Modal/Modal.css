@@ -3,7 +3,12 @@
     height: 100dvh;
 
     position: fixed;
-    z-index: 100;
+
+    display: grid;
+    place-items: center;
+
+    background-color: rgba(0, 0, 0, 0.22);
 
     top: 0%;
+    left: 0%;
 }

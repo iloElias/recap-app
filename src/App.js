@@ -26,7 +26,7 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
     return (
         <>
             {children}
-            <BottomOptions profile={profile} language={language} onClick={e => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
+            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
         </>
     );
 }
