@@ -11,7 +11,6 @@ import env from "react-dotenv";
 import axios from 'axios';
 import './App.css';
 
-
 const api = axios.create({
     baseURL: env.API_URL,
 });
@@ -33,12 +32,31 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
     );
 }
 
+const sendUserData = async (data) => {
+    const preparedData = {
+        email: (data.email),
+        preferred_lang: (data.locale),
+        name: (data.given_name),
+        username: ("" + data.email).split("@")[0],
+        picture_path: (data.picture)
+    }
+
+    try {
+        const { response } = await api.post(`?about=user`, preparedData)
+
+        console.log("API response: ", response);
+    } catch (error) {
+        console.log("An error ocurred on login: ", error);
+    }
+}
+
 function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
     const [user, setUser] = useState([]);
     const [profile, setProfile] = useState(JSON.parse(localUserProfile));
+    const [userCards, setUserCards] = useState([]);
 
     const navigate = useNavigate();
 
@@ -70,35 +88,50 @@ function App() {
 
     useEffect(
         () => {
-            if (user && user.access_token) {
-                axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-                    headers: {
-                        Authorization: `Bearer ${user.access_token}`,
-                        Accept: 'application/json'
-                    }
-                })
-                    .then((res) => {
-                        setProfile(res.data);
-                        localStorage.setItem("recap@localUserProfile", JSON.stringify(res.data));
+            if (user) {
+                let profile = null;
+                if (user.access_token) {
+                    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+                        headers: {
+                            Authorization: `Bearer ${user.access_token}`,
+                            Accept: 'application/json'
+                        }
                     })
-                    .catch((err) => console.log(err));
-                navigate("/");
-            } else if (user && user.credential) {
-                const decodedUserData = jwtDecode(user.credential);
-                setProfile(decodedUserData);
-                localStorage.setItem("recap@localUserProfile", JSON.stringify(decodedUserData));
-                navigate("/");
-            }
+                        .then((res) => {
+                            profile = res.data;
+                            setProfile(res.data);
+                        })
+                        .catch((err) => console.log(err));
+                    navigate("/");
+                } else if (user.credential) {
+                    const decodedUserData = jwtDecode(user.credential);
+                    profile = decodedUserData;
+                    setProfile(decodedUserData);
+                    navigate("/");
+                }
 
+                if (profile) {
+                    const userData = {
+                        email: (profile.email),
+                        preferred_lang: (profile.locale),
+                        name: (profile.given_name),
+                        username: ("" + profile.email).split("@")[0],
+                        picture_path: (profile.picture),
+                        id: 0
+                    }
+                    localStorage.setItem("recap@localUserProfile", JSON.stringify(userData));
+                    sendUserData(userData);
+                }
+            }
         },
         [user, navigate]
     );
 
     const logoutHandler = () => {
-        googleLogout();
+        localStorage.removeItem("recap@localUserProfile");
         setUser(null);
         setProfile(null);
-        localStorage.removeItem("recap@localUserProfile");
+        googleLogout();
     };
 
     const maybeAnError = useSpring({
@@ -126,7 +159,7 @@ function App() {
                         <Routes>
                             <Route path='/'>
                                 <Route index element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
-                                    <Cards messages={messages} />
+                                    <Cards messages={messages} cards={userCards} />
                                 </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
