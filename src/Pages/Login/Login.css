@@ -26,10 +26,11 @@
 }
 
 .network-static-message {
-    margin: 2dvh 0 3.8dvh;
+    margin: 2dvh 5dvh 3.8dvh;
     color: #9E9E9E;
 
     font-family: Inter;
     font-size: 1.7dvh;
+    text-align: center;
     font-style: normal;
 }

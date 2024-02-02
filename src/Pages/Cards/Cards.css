@@ -53,23 +53,6 @@
     color: #212121;
 }
 
-.card-paper {
-    aspect-ratio: 1/1;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    min-width: 170px;
-
-    transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
-
-    position: absolute;
-    background-color: #fafafa;
-    transition: 0.2s transform;
-    cursor: pointer;
-}
-
 .card-paper-text {
     max-width: 150px;
     max-height: 150px;
@@ -86,16 +69,32 @@
     text-align: center;
 }
 
+.card-paper {
+    aspect-ratio: 1/1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-width: 160px;
+
+    transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
+
+    position: absolute;
+    background-color: #fafafa;
+    transition: 0.2s transform;
+    cursor: pointer;
+}
+
 .card-paper-shadow {
-    min-width: 167px;
-    min-height: 180px;
+    min-width: 157px;
+    min-height: 170px;
 
     transform: rotate(3.56deg) translateX(-5px) translateY(-4.86px);
 
     position: absolute;
     background-color: #D8D8D8;
-    transition: 0.2s all;
-
+    transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
 }
 
 .card-container:hover .card-paper {
@@ -103,7 +102,7 @@
 }
 
 .card-container:hover .card-paper-shadow {
-    min-height: 173px;
+    min-height: 167px;
     transform: rotate(1.56deg) translateX(-2px) translateY(-2px);
 }
 
@@ -112,18 +111,19 @@
 }
 
 .card-container:active .card-paper-shadow {
-    min-height: 167px;
-    min-width: 167px;
+    min-height: 157px;
+    min-width: 157px;
     opacity: 0.75;
     transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
 }
 
 .create-card-container {
     display: flex;
+    gap: 1dvh;
 
     flex-direction: column;
 
-    padding: 5dvh;
+    padding: 2.5dvh 4dvh 4dvh 4dvh;
     height: min-content;
 
     max-width: 90dvw;
@@ -131,4 +131,108 @@
 
     background-color: #fafafa;
     border-radius: 1dvh;
+}
+
+.create-card-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 1dvh
+}
+
+.create-card-container input {
+    user-select: none;
+    touch-action: none;
+
+    padding: 0.9dvh 0.5dvh;
+
+    border-radius: 1dvh;
+    outline: none;
+    border: none;
+
+    background: #fafafa;
+
+    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+
+    font-size: 2dvh;
+
+    color: #212121;
+}
+
+
+@media (max-width: 460px) {
+    .cards-container {
+        width: 90dvw;
+
+        position: relative;
+        left: 1.75dvh;
+
+        margin-top: 2.25rem;
+        margin-bottom: 5dvh;
+
+        display: grid;
+        place-items: center;
+        gap: 2rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-container {
+        aspect-ratio: 1/1;
+        min-width: 40dvw;
+        width: min-content;
+
+        display: flex;
+        justify-content: flex-end;
+
+        cursor: pointer;
+    }
+
+    .card-paper {
+        aspect-ratio: 1/1;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        min-width: 40dvw;
+
+        transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
+
+        position: absolute;
+        background-color: #fafafa;
+        transition: 0.2s transform;
+        cursor: pointer;
+    }
+
+    .card-paper-shadow {
+        min-width: 40dvw;
+        min-height: 41dvw;
+
+        transform: rotate(3.56deg) translateX(-5px) translateY(-4.86px);
+
+        position: absolute;
+        background-color: #D8D8D8;
+        transition: 0.2s transform;
+    }
+
+    .card-container:hover .card-paper {
+        transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
+        transform: rotate(4deg) translateX(-5.3px) translateY(-6px);
+    }
+
+    .card-container:hover .card-paper-shadow {
+        transition: 0.2s;
+        min-height: 41dvw;
+        transform: rotate(1.56deg) translateX(-2px) translateY(-2px);
+    }
+
+    .card-container:active .card-paper {
+        transform: rotate(1deg) translateX(0px) translateY(-2px);
+    }
+
+    .card-container:active .card-paper-shadow {
+        min-height: 39dvw;
+        min-width: 39dvw;
+        opacity: 0.75;
+        transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
+    }
 }

@@ -7,6 +7,7 @@ import "./Cards.css"
 import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
+import Input from "../../Components/Input/Input";
 
 const api = axios.create({
     baseURL: env.API_URL,
@@ -21,9 +22,10 @@ export default function Cards({ userId, messages }) {
     // eslint-disable-next-line
     const [cards, setCards] = useState([]);
     const [showModal, setShowModal] = useState(false);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [required, setRequired] = useState(false);
 
     const containerAnimation = useSpring({
+        zIndex: showModal ? "5" : "-1",
         transform: showModal ? "translateY(0%)" : "translateY(125%)",
         config: showModal ? {
             mass: 0.1,
@@ -61,18 +63,20 @@ export default function Cards({ userId, messages }) {
                         <Card isLink cardTitle={"Cartão aula de estrutura de dados"} />
                         <Card isLink cardTitle={"abobrinha"} />
 
-                        <Card cardTitle={"+ " + messages.card_item_new_card} isCreate onClick={toggleModal} />
+                        <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
                     </div>
                 </div>
             </div>
 
-            <animated.div style={modalAnimation} >
-                <Modal onClick={() => { showModal && toggleModal() }} >
-                    <animated.div style={containerAnimation} className="create-card-container" onClick={(e) => e.stopPropagation}>
-                        <div>{messages.form_title_new_card || "New card"}</div>
-                        <form action="">
-                            <input type="text" name="cardName" placeholder={messages.label_card_name || "Card name"} />
-                            <Button>{messages.form_button_new_card || "Create new card"}</Button>
+            <animated.div onClick={() => { showModal && toggleModal() }} style={modalAnimation} >
+                <Modal >
+                    <animated.div style={containerAnimation} className="create-card-container" onClick={e => e.stopPropagation()}>
+                        <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh" }}>{messages.form_title_new_card}</div>
+                        <form onSubmit={e => {
+                            e.preventDefault()
+                        }}>
+                            <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} />
+                            <Button style={{ minWidth: "100%" }} onClick={() => { setRequired(true) }} >{messages.form_button_new_card}</Button>
                         </form>
                     </animated.div>
                 </Modal>

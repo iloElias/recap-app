@@ -18,3 +18,12 @@
 
   border-radius: 50%;
 }
+
+.not-loading-page {
+  min-height: "100dvh";
+  min-width: "100dvw";
+  display: 'flex';
+  flex-direction: "column";
+  justify-content: "center";
+  align-items: "center";
+}

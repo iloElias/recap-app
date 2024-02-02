@@ -1,0 +1,22 @@
+.input-container {
+    display: flex;
+    flex-direction: column;
+    min-height: max-content;
+}
+
+.display-error-message {
+    max-width: min-content;
+
+    padding: 0 0.25dvh 0 0.25;
+    margin-left: 0.25dvh;
+
+    background-color: #fafafa;
+
+    color: red;
+    text-align: start;
+    font-size: 1.7dvh;
+
+    position: absolute;
+
+    transform: translateX(0.25dvh) translateY(-0.9dvh);
+}
