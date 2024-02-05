@@ -7,20 +7,24 @@ import "./Cards.css"
 import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
-import Input from "../../Components/Input/Input";
+import Input, { TextArea } from "../../Components/Input/Input";
 
 const api = axios.create({
     baseURL: env.API_URL,
 });
 
 // eslint-disable-next-line
-async function getUserProjects(userId) {
-    api.get(`?about=$project&`);
+const createNewProject = (cardData) => {
+    const cardId = api.post(`?about=card`, { synopsis: cardData.synopsis })
+
+
 }
 
 export default function Cards({ userId, cards, messages }) {
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
+
+    const [newCardData, setNewCardData] = useState({});
 
     const containerAnimation = useSpring({
         zIndex: showModal ? "5" : "-1",
@@ -49,6 +53,11 @@ export default function Cards({ userId, cards, messages }) {
         setShowModal(!showModal);
     }
 
+
+    const onCreateCardHandler = () => {
+        setRequired(true)
+    }
+
     return (
         <>
             <div className="flex-column">
@@ -61,7 +70,7 @@ export default function Cards({ userId, cards, messages }) {
                         <Card isLink cardTitle={"Cartão aula de estrutura de dados"} />
                         <Card isLink cardTitle={"abobrinha"} /> */}
 
-                        {cards.map((card) => {
+                        {cards[0] && cards.map((card) => {
                             <Card isLink={card.id} cardTitle={card.title} />
                         })}
 
@@ -73,12 +82,11 @@ export default function Cards({ userId, cards, messages }) {
             <animated.div onClick={() => { showModal && toggleModal() }} style={modalAnimation} >
                 <Modal >
                     <animated.div style={containerAnimation} className="create-card-container" onClick={e => e.stopPropagation()}>
-                        <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh" }}>{messages.form_title_new_card}</div>
-                        <form onSubmit={e => {
-                            e.preventDefault()
-                        }}>
-                            <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} />
-                            <Button style={{ minWidth: "100%" }} onClick={() => { setRequired(true) }} >{messages.form_button_new_card}</Button>
+                        <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
+                        <form onSubmit={e => { e.preventDefault() }}>
+                            <Input name="title" type="text" messages={messages} placeholder={messages.label_card_name} required={required} updateValue={newCardData} />
+                            <TextArea name="synopsis" messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return value.length < 3 ? messages.invalid_synopsis_length : true }} updateValue={newCardData} />
+                            <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
                         </form>
                     </animated.div>
                 </Modal>

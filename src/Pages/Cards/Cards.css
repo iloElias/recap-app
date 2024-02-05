@@ -139,9 +139,12 @@
     gap: 1dvh
 }
 
-.create-card-container input {
+.create-card-container input,
+.create-card-container textarea {
     user-select: none;
     touch-action: none;
+
+    resize: none;
 
     padding: 0.9dvh 0.5dvh;
 

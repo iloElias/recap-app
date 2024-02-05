@@ -23,8 +23,6 @@ const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (n
 const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
 
 function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler }) {
-    const navigate = useNavigate();
-
     return (
         <>
             {children}
@@ -46,6 +44,7 @@ const sendUserData = async (data) => {
         const { response } = await api.post(`?about=user`, preparedData)
 
         console.log("API response: ", response);
+        return response;
     } catch (error) {
         console.log("An error ocurred on login: ", error);
     }
@@ -57,6 +56,7 @@ function App() {
 
     const [user, setUser] = useState([]);
     const [profile, setProfile] = useState(JSON.parse(localUserProfile));
+    // eslint-disable-next-line
     const [userCards, setUserCards] = useState([]);
 
     const navigate = useNavigate();
@@ -115,7 +115,7 @@ function App() {
                         id: 0
                     }
                     localStorage.setItem("recap@localUserProfile", JSON.stringify(userData));
-                    sendUserData(userData);
+                    setUserCards(sendUserData(userData));
                 }
             }
         },
@@ -128,7 +128,7 @@ function App() {
             return;
         }
 
-        sendUserData(profile);
+        setUserCards(sendUserData(profile));
     }, [profile, navigate]);
 
     const logoutHandler = () => {
