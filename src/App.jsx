@@ -23,6 +23,7 @@ const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (n
 const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
 
 function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler }) {
+    const navigate = useNavigate();
 
     return (
         <>
@@ -77,14 +78,8 @@ function App() {
                 console.error("Ops, an error has ocurred on language set");
             });
 
-        localStorage.setItem('recap@definedLanguage', language)
+        localStorage.setItem('recap@definedLanguage', language);
     }, [language]);
-
-    useEffect(() => {
-        if (!profile) {
-            navigate("/login")
-        }
-    }, [profile, navigate]);
 
     useEffect(
         () => {
@@ -126,6 +121,15 @@ function App() {
         },
         [user, navigate]
     );
+
+    useEffect(() => {
+        if (!profile) {
+            navigate("/login");
+            return;
+        }
+
+        sendUserData(profile);
+    }, [profile, navigate]);
 
     const logoutHandler = () => {
         localStorage.removeItem("recap@localUserProfile");

@@ -18,9 +18,7 @@ async function getUserProjects(userId) {
     api.get(`?about=$project&`);
 }
 
-export default function Cards({ userId, messages }) {
-    // eslint-disable-next-line
-    const [cards, setCards] = useState([]);
+export default function Cards({ userId, cards, messages }) {
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
 
@@ -58,10 +56,14 @@ export default function Cards({ userId, messages }) {
                 <div className="cards-page">
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
                     <div className="cards-container">
-                        <Card isLink cardTitle={"Estudo javascript"} />
+                        {/* <Card isLink cardTitle={"Estudo javascript"} />
                         <Card isLink cardTitle={"Novo mapa"} />
                         <Card isLink cardTitle={"Cartão aula de estrutura de dados"} />
-                        <Card isLink cardTitle={"abobrinha"} />
+                        <Card isLink cardTitle={"abobrinha"} /> */}
+
+                        {cards.map((card) => {
+                            <Card isLink={card.id} cardTitle={card.title} />
+                        })}
 
                         <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
                     </div>

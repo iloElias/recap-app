@@ -4,7 +4,7 @@ import reportWebVitals from './reportWebVitals';
 import ReactDOM from 'react-dom/client';
 import env from "react-dotenv";
 import React from 'react';
-import App from './App';
+import App from './App.jsx';
 import './index.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
