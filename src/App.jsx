@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 import env from "react-dotenv";
 import axios from 'axios';
 import './App.css';
+import Modal from './Components/Modal/Modal';
 
 const api = axios.create({
     baseURL: env.API_URL,
@@ -31,7 +32,7 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
     );
 }
 
-const sendUserData = async (data) => {
+const getUserData = async (data) => {
     const preparedData = {
         email: (data.email),
         preferred_lang: (data.locale),
@@ -41,38 +42,41 @@ const sendUserData = async (data) => {
     }
 
     try {
-        const { response } = await api.post(`?about=user`, preparedData)
-
-        console.log("API response: ", response);
-        return response;
+        return await fetch(env.API_URL + `?about=user`, preparedData);
     } catch (error) {
         console.log("An error ocurred on login: ", error);
     }
 }
+
 
 function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
     const [user, setUser] = useState([]);
+    const [userData, setUserData] = useState();
     const [profile, setProfile] = useState(JSON.parse(localUserProfile));
-    // eslint-disable-next-line
     const [userCards, setUserCards] = useState([]);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
 
     const login = useGoogleLogin({
-        onSuccess: (codeResponse) => setUser(codeResponse),
+        onSuccess: (codeResponse) => {
+            setIsLoading(true);
+            setUser(codeResponse);
+        },
         onError: (error) => console.log('Login Failed:', error)
     });
 
     const oneTapLogin = (credentialResponse) => {
+        setIsLoading(true);
         setUser(credentialResponse);
     }
 
     useEffect(() => {
-        api
-            .get(`?lang=${language}&message=all`)
+        axios.get(`${env.API_URL}?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
             .catch((err) => {
                 console.error("Ops, an error has ocurred on language set");
@@ -95,47 +99,89 @@ function App() {
                         .then((res) => {
                             profile = res.data;
                             setProfile(res.data);
+
+                            const preparedData = {
+                                google_id: (profile.user_id || profile.sub),
+                                email: profile.email,
+                                preferred_lang: profile.locale,
+                                name: profile.given_name,
+                                username: ("" + profile.email).split("@")[0],
+                                picture_path: profile.picture
+                            };
+
+                            api.get(`?about=user&google_id=${preparedData.google_id}`)
+                                .then(data => {
+                                    if (data.google_id && data.google_id === preparedData.google_id) {
+                                        localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
+                                    } else {
+                                        api.post((env.API_URL + `?about=user`), [preparedData])
+                                            .then(data => {
+                                                localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
+                                                setUserData(data.data[0]);
+                                                setProfile(data.data[0]);
+                                            })
+                                    }
+                                })
                         })
-                        .catch((err) => console.log(err));
-                    navigate("/");
                 } else if (user.credential) {
                     const decodedUserData = jwtDecode(user.credential);
                     profile = decodedUserData;
-                    setProfile(decodedUserData);
-                    navigate("/");
-                }
 
-                if (profile) {
-                    const userData = {
-                        email: (profile.email),
-                        preferred_lang: (profile.locale),
-                        name: (profile.given_name),
+                    const preparedData = {
+                        google_id: (profile.user_id || profile.sub),
+                        email: profile.email,
+                        preferred_lang: profile.locale,
+                        name: profile.given_name,
                         username: ("" + profile.email).split("@")[0],
-                        picture_path: (profile.picture),
-                        id: 0
-                    }
-                    localStorage.setItem("recap@localUserProfile", JSON.stringify(userData));
-                    setUserCards(sendUserData(userData));
+                        picture_path: profile.picture
+                    };
+
+                    api.get(`?about=user&google_id=${preparedData.google_id}`)
+                        .then(data => {
+                            if (data.google_id && data.google_id === preparedData.google_id) {
+                                localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
+                            } else {
+                                api.post((env.API_URL + `?about=user`), [preparedData])
+                                    .then(data => {
+                                        localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
+                                        setUserData(data.data[0]);
+                                        setProfile(data.data[0]);
+                                    })
+                            }
+                        })
+
                 }
             }
         },
-        [user, navigate]
+        [user, setProfile]
     );
+
+    useEffect(() => {
+        if (userData) {
+            localStorage.setItem("recap@localUserProfile", JSON.stringify(userData))
+            setIsLoading(false);
+            navigate('/')
+        }
+    }, [userData, navigate, setIsLoading]);
 
     useEffect(() => {
         if (!profile) {
             navigate("/login");
             return;
         }
-
-        setUserCards(sendUserData(profile));
     }, [profile, navigate]);
 
+    useEffect(() => {
+
+    }, [userCards]);
+
     const logoutHandler = () => {
-        localStorage.removeItem("recap@localUserProfile");
-        setUser(null);
-        setProfile(null);
         googleLogout();
+        setUserData(null)
+        setProfile(null);
+        setUser(null);
+        navigate('/login');
+        localStorage.removeItem("recap@localUserProfile");
     };
 
     const maybeAnError = useSpring({
@@ -155,6 +201,16 @@ function App() {
         gap: "5dvh"
     }
 
+    const loadingAnimation = useSpring({
+        zIndex: isLoading ? 20 : -1,
+        opacity: isLoading ? 1 : 0,
+        config: {
+            mass: 0.1,
+            tension: 314
+        },
+        immediate: (key) => key === (isLoading ? "zIndex" : "")
+    });
+
     return (
         <>
             {messages.loaded ? (
@@ -162,15 +218,16 @@ function App() {
                     <div className="App">
                         <Routes>
                             <Route path='/'>
-                                <Route index element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} >
-                                    <Cards messages={messages} cards={userCards} />
-                                </PageTemplate>} />
+                                <Route index element={
+                                    <PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                        <Cards userId={0} messages={messages} cards={userCards} />
+                                    </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                            </Route>
-                        </Routes>
-                    </div>
+                            </Route >
+                        </Routes >
+                    </div >
 
                     <div style={{ display: "none" }}>
                         {!profile && (
@@ -185,6 +242,13 @@ function App() {
                             />
                         )}
                     </div>
+                    {isLoading &&
+                        (<animated.div style={loadingAnimation}>
+                            <Modal style={{ backdropFilter: "blur(25%)" }}>
+                                <ReactLoading type='spinningBubbles' />
+                            </Modal>
+                        </animated.div>)
+                    }
                 </>
             ) : (
                 <div style={centerStyle}>
@@ -195,7 +259,8 @@ function App() {
                         {(localStorage.getItem('definedLanguage') && localStorage.getItem('definedLanguage') === "pt-BR") ? ("O tempo de resposta foi excedido, talvez nossos serviços não estejam disponíveis") : ("The response time has expired, our service may be unavailable")}
                     </animated.div>
                 </div>
-            )}
+            )
+            }
         </>
     );
 }

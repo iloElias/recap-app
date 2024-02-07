@@ -46,7 +46,7 @@ export default function Cards({ userId, cards, messages }) {
             mass: 0.1,
             tension: 314
         },
-        immediate: (key) => key === (showModal ? "zIndex" : "") // Isso aqui foi uma gambiarra que só XD
+        immediate: (key) => key === (showModal ? "zIndex" : "")
     });
 
     const toggleModal = () => {

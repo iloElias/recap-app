@@ -31,7 +31,7 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
     );
 }
 
-export function TextArea({ messages, required, onSubmit, placeholder, value, submitRule }) {
+export function TextArea({ required, onSubmit, placeholder, value, submitRule }) {
     const [inputValue, setInputValue] = useState("");
     const invalidMessage = submitRule('');
 
