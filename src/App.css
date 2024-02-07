@@ -28,8 +28,23 @@
   align-items: "center";
 }
 
-.beaver-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+.popup-container {
+  user-select: none;
+  touch-action: none;
+
+  resize: none;
+
+  padding: 0.9dvh 0.5dvh;
+
+  border-radius: 1dvh;
+  outline: none;
+  border: none;
+
+  background: #fafafa;
+
+  border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+
+  font-size: 2dvh;
+
+  color: #212121;
 }

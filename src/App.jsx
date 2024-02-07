@@ -204,37 +204,6 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                                <Route path='motivational' element={<div className='beaver-grid'>
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
-                                </div>} />
                             </Route >
                         </Routes >
                     </div >
