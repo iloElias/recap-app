@@ -32,23 +32,6 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
     );
 }
 
-const getUserData = async (data) => {
-    const preparedData = {
-        email: (data.email),
-        preferred_lang: (data.locale),
-        name: (data.given_name),
-        username: ("" + data.email).split("@")[0],
-        picture_path: (data.picture)
-    }
-
-    try {
-        return await fetch(env.API_URL + `?about=user`, preparedData);
-    } catch (error) {
-        console.log("An error ocurred on login: ", error);
-    }
-}
-
-
 function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
@@ -56,7 +39,6 @@ function App() {
     const [user, setUser] = useState([]);
     const [userData, setUserData] = useState();
     const [profile, setProfile] = useState(JSON.parse(localUserProfile));
-    const [userCards, setUserCards] = useState([]);
 
     const [isLoading, setIsLoading] = useState(false);
 
@@ -111,7 +93,7 @@ function App() {
 
                             api.get(`?about=user&google_id=${preparedData.google_id}`)
                                 .then(data => {
-                                    if (data.google_id && data.google_id === preparedData.google_id) {
+                                    if (data.google_id) {
                                         localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
                                     } else {
                                         api.post((env.API_URL + `?about=user`), [preparedData])
@@ -138,7 +120,7 @@ function App() {
 
                     api.get(`?about=user&google_id=${preparedData.google_id}`)
                         .then(data => {
-                            if (data.google_id && data.google_id === preparedData.google_id) {
+                            if (data.google_id) {
                                 localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
                             } else {
                                 api.post((env.API_URL + `?about=user`), [preparedData])
@@ -171,10 +153,6 @@ function App() {
         }
     }, [profile, navigate]);
 
-    useEffect(() => {
-
-    }, [userCards]);
-
     const logoutHandler = () => {
         googleLogout();
         setUserData(null)
@@ -202,7 +180,7 @@ function App() {
     }
 
     const loadingAnimation = useSpring({
-        zIndex: isLoading ? 20 : -1,
+        zIndex: isLoading ? 50 : -1,
         opacity: isLoading ? 1 : 0,
         config: {
             mass: 0.1,
@@ -221,11 +199,42 @@ function App() {
                             <Route path='/'>
                                 <Route index element={
                                     <PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                        <Cards userId={0} messages={messages} cards={userCards} />
+                                        <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} />
                                     </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
+                                <Route path='motivational' element={<div className='beaver-grid'>
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                    <img alt="" src="https://c.tenor.com/aZMygWr3eBgAAAAC/tenor.gif" />
+                                </div>} />
                             </Route >
                         </Routes >
                     </div >
@@ -245,8 +254,8 @@ function App() {
                     </div>
                     {isLoading &&
                         (<animated.div style={loadingAnimation}>
-                            <Modal style={{ backdropFilter: "blur(25%)" }}>
-                                <ReactLoading type='spinningBubbles' />
+                            <Modal>
+                                <ReactLoading type='spinningBubbles' height={'7.5dvh'} width={'7.5dvh'} />
                             </Modal>
                         </animated.div>)
                     }

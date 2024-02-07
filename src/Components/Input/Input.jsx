@@ -3,7 +3,7 @@ import "./Input.css";
 import { useSpring, animated } from "react-spring";
 
 
-export default function Input({ type, messages, required, onSubmit, placeholder, value }) {
+export default function Input({ type, messages, required, onSubmit, placeholder, value, update }) {
     const [inputValue, setInputValue] = useState();
 
     const requiredAnimation = useSpring({
@@ -18,9 +18,14 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
     const inputSubmitHandler = (targetValue) => {
         setInputValue(targetValue)
 
+        if (update) {
+            update(inputValue);
+        }
+
         if (onSubmit) {
             onSubmit(inputValue);
         }
+        targetValue = "";
     }
 
     return (
@@ -31,7 +36,7 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
     );
 }
 
-export function TextArea({ required, onSubmit, placeholder, value, submitRule }) {
+export function TextArea({ required, onSubmit, placeholder, value, submitRule, update }) {
     const [inputValue, setInputValue] = useState("");
     const invalidMessage = submitRule('');
 
@@ -47,8 +52,13 @@ export function TextArea({ required, onSubmit, placeholder, value, submitRule })
     const inputSubmitHandler = (targetValue) => {
         setInputValue(targetValue)
 
+        if (update) {
+            update(inputValue);
+        }
+
         if (onSubmit) {
             onSubmit(inputValue);
+            targetValue = "";
         }
     }
 

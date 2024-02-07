@@ -1,5 +1,5 @@
 import { RecapLogo } from "../../Components/Icons/Icons";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import env from "react-dotenv";
 import axios from "axios";
 import Card from "./Card";
@@ -13,18 +13,15 @@ const api = axios.create({
     baseURL: env.API_URL,
 });
 
-// eslint-disable-next-line
-const createNewProject = (cardData) => {
-    const cardId = api.post(`?about=card`, { synopsis: cardData.synopsis })
-
-
-}
-
-export default function Cards({ userId, cards, messages }) {
+export default function Cards({ userId, messages, setLoading }) {
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
 
-    const [newCardData, setNewCardData] = useState({});
+    const [userCards, setUserCards] = useState();
+
+    const [cardName, setCardName] = useState();
+    const [cardSynopses, setCardSynopses] = useState();
+    const [newCard, setNewCard] = useState();
 
     const containerAnimation = useSpring({
         zIndex: showModal ? "5" : "-1",
@@ -40,7 +37,6 @@ export default function Cards({ userId, cards, messages }) {
 
     const modalAnimation = useSpring({
         zIndex: showModal ? 4 : -1,
-
         opacity: showModal ? 1 : 0,
         config: {
             mass: 0.1,
@@ -56,7 +52,28 @@ export default function Cards({ userId, cards, messages }) {
 
     const onCreateCardHandler = () => {
         setRequired(true)
+
+        if (cardName && cardSynopses && cardSynopses.length >= 3) {
+            setLoading(true);
+            setNewCard({ name: cardName, synopsis: cardSynopses });
+
+            setCardName(null);
+            setCardSynopses(null);
+        }
     }
+
+    useEffect(() => {
+        if (newCard) {
+            api.post(`?about=card`, [{ synopsis: newCard.synopsis }])
+                .then(data => {
+                    api.post(`?about=project`, [{ card_id: data.data[0].id, name: newCard.name }])
+                        .then(pData => {
+                            api.post(`?about=userProjects`, [{ project_id: pData.data[0].id, user_id: userId, user_permissions: 'own' }]);
+                            setLoading(false);
+                        });
+                })
+        }
+    }, [newCard, setLoading, userId]);
 
     return (
         <>
@@ -70,8 +87,8 @@ export default function Cards({ userId, cards, messages }) {
                         <Card isLink cardTitle={"Cartão aula de estrutura de dados"} />
                         <Card isLink cardTitle={"abobrinha"} /> */}
 
-                        {cards[0] && cards.map((card) => {
-                            <Card isLink={card.id} cardTitle={card.title} />
+                        {userCards && userCards.map((card) => {
+                            return (<Card isLink={card.id} cardTitle={card.title} />);
                         })}
 
                         <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
@@ -84,8 +101,8 @@ export default function Cards({ userId, cards, messages }) {
                     <animated.div style={containerAnimation} className="create-card-container" onClick={e => e.stopPropagation()}>
                         <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
                         <form onSubmit={e => { e.preventDefault() }}>
-                            <Input name="title" type="text" messages={messages} placeholder={messages.label_card_name} required={required} updateValue={newCardData} />
-                            <TextArea name="synopsis" messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return value.length < 3 ? messages.invalid_synopsis_length : true }} updateValue={newCardData} />
+                            <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} update={setCardName} />
+                            <TextArea messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return value.length < 3 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
                             <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
                         </form>
                     </animated.div>
