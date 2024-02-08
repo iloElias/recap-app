@@ -157,12 +157,27 @@
     border: solid 0.1dvh rgba(146, 146, 146, 0.719);
 
     font-size: 2dvh;
-
     color: #212121;
 }
 
 
 @media (max-width: 460px) {
+    .card-paper-text {
+        max-width: 100%;
+        max-height: 100%;
+
+        text-overflow: ellipsis;
+        overflow: hidden;
+
+        font-family: 'Covered By Your Grace', cursive;
+        font-size: 4dvh;
+        line-height: 25px;
+        color: #212121;
+
+        user-select: none;
+        text-align: center;
+    }
+
     .cards-container {
         width: 90dvw;
 
@@ -197,6 +212,7 @@
         align-items: center;
 
         min-width: 40dvw;
+        max-width: 40dvw;
 
         transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
 

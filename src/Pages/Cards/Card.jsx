@@ -8,13 +8,13 @@ export default function Card({ cardTitle, cardId, onClick, isCreate, isLink }) {
         <>
             {isLink ? (
                 <Link to={cardId ? ("/card/" + cardId) : "/"} >
-                    <div draggable className="card-container" onClick={onClick}>
+                    <div className="card-container" onClick={onClick}>
                         <div className="card-paper-shadow"></div>
                         <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
                     </div>
                 </Link>
             ) : (
-                <div draggable className="card-container" onClick={onClick}>
+                <div className="card-container" onClick={onClick}>
                     <div className="card-paper-shadow"></div>
                     <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
                 </div>

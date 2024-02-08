@@ -9,6 +9,7 @@ import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
 import { Alert, Snackbar } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
     baseURL: env.API_URL,
@@ -19,16 +20,17 @@ export default function Cards({ userId, messages, setLoading }) {
     const [required, setRequired] = useState(false);
 
     const [userCards, setUserCards] = useState();
-
     const [cardName, setCardName] = useState('');
     const [cardSynopses, setCardSynopses] = useState('');
     const [newCard, setNewCard] = useState();
 
-    const [resetValues, setResetValues] = useState(false);
-
     const [alertMessage, setAlertMessage] = useState();
     const [alert, openAlert] = useState();
     const [alertSeverity, setAlertSeverity] = useState('success');
+    const [notification, setNotification] = useState();
+    const [notificationMessage, setNotificationMessage] = useState();
+
+    const navigate = useNavigate();
 
     const containerAnimation = useSpring({
         zIndex: showModal ? "5" : "-1",
@@ -56,11 +58,9 @@ export default function Cards({ userId, messages, setLoading }) {
         setShowModal(!showModal);
     }
 
-
     const onCreateCardHandler = () => {
         setRequired(true)
-
-        if (cardName !== "" && `${cardName}`.length >= 3 && cardSynopses !== "" && `${cardSynopses}`.length >= 3) {
+        if (cardName !== "" && `${cardName}`.length >= 4 && cardSynopses !== "" && `${cardSynopses}`.length >= 4) {
             setLoading(true);
             setNewCard({ name: cardName, synopsis: cardSynopses });
 
@@ -70,35 +70,50 @@ export default function Cards({ userId, messages, setLoading }) {
     }
 
     useEffect(() => {
+        const fetchUserCards = async () => {
+            if (!userId) return
+            setNotificationMessage(messages.loading_your_cards)
+            setNotification(true);
+            setLoading(true);
+            await api.get(`?about=userProjects&field=user_id:${userId}`)
+                .then((data) => {
+                    setUserCards(data.data);
+                    setNotification(false);
+                    setLoading(false)
+                }).catch((err => {
+                    setNotification(false);
+                    setLoading(false);
+                }));
+        }
+        fetchUserCards();
+    }, [userId, setLoading]);
+
+
+    useEffect(() => {
         const createCardAndProject = async () => {
             if (!newCard) return;
+
+            const newCardRef = newCard;
+
+            setNewCard(null);
 
             setShowModal(false);
 
             try {
-                const cardData = await api.post(`?about=card`, [{ synopsis: newCard.synopsis }]);
+                const cardData = await api.post(`?about=card`, [{ synopsis: newCardRef.synopsis }]);
                 const cardId = cardData.data[0].id;
 
-                const projectData = await api.post(`?about=project`, [{ card_id: cardId, name: newCard.name }]);
+                const projectData = await api.post(`?about=project`, [{ card_id: cardId, name: newCardRef.name }]);
                 const projectId = projectData.data[0].id;
 
                 await api.post(`?about=userProjects`, [{ project_id: projectId, user_id: userId, user_permissions: 'own' }]);
 
                 setAlertSeverity('success');
+                setUserCards([...userCards, { id: projectId, name: newCardRef.name }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
-
-                const inputs = document.getElementsByClassName('form_input')
-                inputs.forEach(element => {
-                    element.value = '';
-                });
-
             } catch (error) {
-                let errorMessage = messages.item_creation_error.replace(':str', messages.card);
-                if (error.response && error.response.data && error.response.data.message) {
-                    errorMessage = error.response.data.message;
-                }
                 setAlertSeverity('error');
-                setAlertMessage(errorMessage);
+                setAlertMessage(messages.item_creation_error.replace(':str', messages.card));
             } finally {
                 setLoading(false);
                 openAlert(true);
@@ -106,8 +121,7 @@ export default function Cards({ userId, messages, setLoading }) {
         };
 
         createCardAndProject();
-    }, [newCard, openAlert, setAlertMessage, setLoading, userId, messages]);
-
+    }, [newCard, userCards, navigate, openAlert, setAlertMessage, setLoading, userId, messages]);
 
     return (
         <>
@@ -117,7 +131,7 @@ export default function Cards({ userId, messages, setLoading }) {
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
                     <div className="cards-container">
                         {userCards && userCards.map((card) => {
-                            return (<Card isLink={card.id} cardTitle={card.title} />);
+                            return (<Card key={card.id} cardId={card.id} isLink={card.id} cardTitle={card.name} />);
                         })}
 
                         <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
@@ -137,6 +151,14 @@ export default function Cards({ userId, messages, setLoading }) {
                     </animated.div>
                 </Modal>
             </animated.div>
+
+            <Snackbar
+                open={notification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                autoHideDuration={5000}
+                onClose={() => { setNotification(false) }}
+                message={notificationMessage}
+            />
 
             <Snackbar open={alert} autoHideDuration={5000} onClose={() => { openAlert(false) }}>
                 <Alert

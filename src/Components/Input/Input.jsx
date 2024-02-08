@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import "./Input.css";
 import { useSpring, animated } from "react-spring";
-import { useNavigate } from "react-router-dom";
-
 
 export default function Input({ type, messages, required, onSubmit, placeholder, submitRule, value, update }) {
-    const [inputValue, setInputValue] = useState();
+    const [inputValue, setInputValue] = useState('');
     const invalidMessage = submitRule('');
 
     const requiredAnimation = useSpring({
@@ -17,8 +15,6 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
         immediate: (key) => key === (required ? "backgroundColor" : "")
     });
 
-
-
     const inputSubmitHandler = (targetValue) => {
         setInputValue(targetValue)
 
@@ -28,19 +24,20 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
 
         if (onSubmit) {
             onSubmit(inputValue);
+            setInputValue('')
         }
     }
 
     return (
         <div className="input-container">
-            <input className="form_input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} value={value} />
+            <input className="form_input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} value={value || inputValue} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );
 }
 
 export function TextArea({ required, onSubmit, placeholder, value, submitRule, update }) {
-    const [inputValue, setInputValue] = useState("");
+    const [inputValue, setInputValue] = useState('');
     const invalidMessage = submitRule('');
 
     const requiredAnimation = useSpring({
@@ -61,13 +58,13 @@ export function TextArea({ required, onSubmit, placeholder, value, submitRule, u
 
         if (onSubmit) {
             onSubmit(inputValue);
-            targetValue = "";
+            setInputValue('')
         }
     }
 
     return (
         <div className="input-container">
-            <textarea className="form_input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder}  >{value}</textarea>
+            <textarea className="form_input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} value={value || inputValue} ></textarea>
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );
