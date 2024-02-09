@@ -17,7 +17,7 @@ const api = axios.create({
 });
 
 if (env.LOCALHOST) {
-    document.getElementById("page-title").innerText = "Recap - Test"
+    document.getElementById("page-title").innerText = `Recap - ${env.LOCALHOST}`
 }
 
 if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
