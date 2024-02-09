@@ -20,8 +20,12 @@ if (env.LOCALHOST) {
     document.getElementById("page-title").innerText = "Recap - Test"
 }
 
+if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
+    localStorage.removeItem('recap@localUserProfile');
+}
+
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
-const localUserProfile = localStorage.getItem('recap@localUserProfile') || null
+const localUserProfile = localStorage.getItem('recap@localUserProfile');
 
 function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler }) {
     return (
@@ -41,16 +45,22 @@ const getCurrentDateAsString = () => {
 }
 
 function App() {
+    const navigate = useNavigate();
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
     const [user, setUser] = useState([]);
     const [userData, setUserData] = useState();
-    const [profile, setProfile] = useState(JSON.parse(localUserProfile));
+    const [profile, setProfile] = useState(() => {
+        try {
+            return JSON.parse(localUserProfile)
+        } catch (err) {
+            navigate('/login');
+        }
+    });
 
     const [isLoading, setIsLoading] = useState(false);
 
-    const navigate = useNavigate();
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -181,12 +191,16 @@ function App() {
             return;
         }
 
-        const currentDate = new Date();
-        const profileDate = new Date(profile.logged_in);
-        const timeDifference = currentDate - profileDate;
+        if (profile) {
+            if (!profile.logged_in) logoutHandler();
 
-        if (timeDifference > 86400000) {
-            logoutHandler();
+            const currentDate = new Date();
+            const profileDate = new Date(profile.logged_in);
+            const timeDifference = currentDate - profileDate;
+
+            if (timeDifference > 86400000) {
+                logoutHandler();
+            }
         }
     }, [profile, navigate, logoutHandler]);
 

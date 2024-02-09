@@ -12,7 +12,7 @@ export default function Login({ messages, loginHandler }) {
         if (localStorage.getItem('recap@localUserProfile')) {
             navigate('/')
         }
-    });
+    }, [navigate]);
 
     const recapAnimation = useSpring({
         delay: 250,
