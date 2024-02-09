@@ -30,3 +30,8 @@
 .component-button:active {
     transform: translateY(0.1dvh);
 }
+
+.component-button:focus {
+    background-color: #3b3b3b;
+    outline: double 0.4dvh #9f9f9f;
+}

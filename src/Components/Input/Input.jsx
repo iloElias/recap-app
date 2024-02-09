@@ -33,7 +33,7 @@ export default function Input({ type, required, onSubmit, placeholder, submitRul
 
     return (
         <div className="input-container">
-            <input value={inputValue} className="form_input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
+            <input value={inputValue} className="form-input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );
@@ -71,7 +71,7 @@ export function TextArea({ required, onSubmit, placeholder, value, submitRule, u
 
     return (
         <div className="input-container">
-            <textarea value={inputValue} className="form_input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
+            <textarea value={inputValue} className="form-input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );

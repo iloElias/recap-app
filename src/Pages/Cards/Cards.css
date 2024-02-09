@@ -49,8 +49,18 @@
     cursor: pointer;
 }
 
-.card-container a {
+.cards-container a {
     color: #212121;
+    outline: none;
+}
+
+.cards-container a:focus {
+    transform: scale(1.05);
+}
+
+.cards-container a:focus .card-container .card-paper {
+    border-top: solid 0.2dvh #212121;
+    border-left: solid 0.2dvh #212121;
 }
 
 .card-paper-text {

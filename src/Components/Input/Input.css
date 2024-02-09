@@ -4,6 +4,11 @@
     min-height: max-content;
 }
 
+.form-input:focus {
+    border-color: #212121;
+}
+
+
 .display-error-message {
     min-width: min-content;
 
