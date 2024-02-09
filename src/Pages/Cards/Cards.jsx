@@ -1,5 +1,5 @@
 import { RecapLogo } from "../../Components/Icons/Icons";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import env from "react-dotenv";
 import axios from "axios";
 import Card from "./Card";
@@ -22,7 +22,11 @@ export default function Cards({ userId, messages, setLoading }) {
     const [userCards, setUserCards] = useState();
     const [cardName, setCardName] = useState('');
     const [cardSynopses, setCardSynopses] = useState('');
+
+    const [resetValues, setResetValues] = useState();
+
     const [newCard, setNewCard] = useState();
+    const [userDataWasLoaded, setUserDataWasLoaded] = useState(false);
 
     const [alertMessage, setAlertMessage] = useState();
     const [alert, openAlert] = useState();
@@ -58,6 +62,10 @@ export default function Cards({ userId, messages, setLoading }) {
         setShowModal(!showModal);
     }
 
+    const toggleResetValues = useCallback(() => {
+        setResetValues(!resetValues);
+    }, [resetValues, setResetValues]);
+
     const onCreateCardHandler = () => {
         setRequired(true)
         if (cardName !== "" && `${cardName}`.length >= 4 && cardSynopses !== "" && `${cardSynopses}`.length >= 4) {
@@ -66,27 +74,36 @@ export default function Cards({ userId, messages, setLoading }) {
 
             setCardName(null);
             setCardSynopses(null);
+            toggleResetValues();
+            setRequired(false);
         }
     }
 
     useEffect(() => {
+        if (userDataWasLoaded) return
         const fetchUserCards = async () => {
             if (!userId) return
             setNotificationMessage(messages.loading_your_cards)
             setNotification(true);
             setLoading(true);
-            await api.get(`?about=userProjects&field=user_id:${userId}`)
-                .then((data) => {
-                    setUserCards(data.data);
-                    setNotification(false);
-                    setLoading(false)
-                }).catch((err => {
-                    setNotification(false);
-                    setLoading(false);
-                }));
+
+            try {
+                const userCardsData = await api.get(`?about=userProjects&field=user_id:${userId}`)
+
+                setUserCards(userCardsData.data);
+                setNotification(false);
+                setLoading(false)
+                setUserDataWasLoaded(true)
+            } catch (err) {
+                setNotification(false);
+                openAlert(true);
+                setAlertSeverity('error');
+                setAlertMessage(messages.problem_when_loading);
+                setLoading(false);
+            }
         }
         fetchUserCards();
-    }, [userId, setLoading]);
+    }, [userId, setLoading, setNotificationMessage, openAlert, userDataWasLoaded, setUserDataWasLoaded, messages]);
 
 
     useEffect(() => {
@@ -96,32 +113,32 @@ export default function Cards({ userId, messages, setLoading }) {
             const newCardRef = newCard;
 
             setNewCard(null);
+            setCardName('');
+            setCardSynopses('');
 
             setShowModal(false);
-
             try {
-                const cardData = await api.post(`?about=card`, [{ synopsis: newCardRef.synopsis }]);
-                const cardId = cardData.data[0].id;
-
-                const projectData = await api.post(`?about=project`, [{ card_id: cardId, name: newCardRef.name }]);
-                const projectId = projectData.data[0].id;
-
-                await api.post(`?about=userProjects`, [{ project_id: projectId, user_id: userId, user_permissions: 'own' }]);
+                const project = await api.post(`?about=newProject`, [{
+                    card: { synopsis: newCardRef.synopsis },
+                    project: { name: newCardRef.name },
+                    user: { id: userId }
+                }])
 
                 setAlertSeverity('success');
-                setUserCards([...userCards, { id: projectId, name: newCardRef.name }])
+                setUserCards([...userCards, { id: project.data[0].id, name: newCardRef.name }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
-            } catch (error) {
+            } catch (err) {
                 setAlertSeverity('error');
                 setAlertMessage(messages.item_creation_error.replace(':str', messages.card));
             } finally {
+                toggleResetValues();
                 setLoading(false);
                 openAlert(true);
             }
         };
 
         createCardAndProject();
-    }, [newCard, userCards, navigate, openAlert, setAlertMessage, setLoading, userId, messages]);
+    }, [newCard, userCards, navigate, toggleResetValues, setLoading, userId, messages]);
 
     return (
         <>
@@ -144,8 +161,8 @@ export default function Cards({ userId, messages, setLoading }) {
                     <animated.div style={containerAnimation} className="create-card-container" onClick={e => e.stopPropagation()}>
                         <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
                         <form onSubmit={e => { e.preventDefault() }}>
-                            <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
-                            <TextArea messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
+                            <Input resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
+                            <TextArea resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
                             <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
                         </form>
                     </animated.div>

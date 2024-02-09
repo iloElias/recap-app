@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Input.css";
 import { useSpring, animated } from "react-spring";
 
-export default function Input({ type, messages, required, onSubmit, placeholder, submitRule, value, update }) {
-    const [inputValue, setInputValue] = useState('');
+export default function Input({ type, required, onSubmit, placeholder, submitRule, value, update, resetValue }) {
+    const [inputValue, setInputValue] = useState(value || '');
     const invalidMessage = submitRule('');
 
     const requiredAnimation = useSpring({
@@ -15,6 +15,10 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
         immediate: (key) => key === (required ? "backgroundColor" : "")
     });
 
+    useEffect(() => {
+        setInputValue('')
+    }, [resetValue]);
+
     const inputSubmitHandler = (targetValue) => {
         setInputValue(targetValue)
 
@@ -24,20 +28,19 @@ export default function Input({ type, messages, required, onSubmit, placeholder,
 
         if (onSubmit) {
             onSubmit(inputValue);
-            setInputValue('')
         }
     }
 
     return (
         <div className="input-container">
-            <input className="form_input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} value={value || inputValue} />
+            <input value={inputValue} className="form_input" type={type || "text"} onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );
 }
 
-export function TextArea({ required, onSubmit, placeholder, value, submitRule, update }) {
-    const [inputValue, setInputValue] = useState('');
+export function TextArea({ required, onSubmit, placeholder, value, submitRule, update, resetValue }) {
+    const [inputValue, setInputValue] = useState(value || '');
     const invalidMessage = submitRule('');
 
     const requiredAnimation = useSpring({
@@ -48,6 +51,10 @@ export function TextArea({ required, onSubmit, placeholder, value, submitRule, u
         },
         immediate: (key) => key === (required ? "backgroundColor" : "")
     });
+
+    useEffect(() => {
+        setInputValue('')
+    }, [resetValue]);
 
     const inputSubmitHandler = (targetValue) => {
         setInputValue(targetValue)
@@ -64,7 +71,7 @@ export function TextArea({ required, onSubmit, placeholder, value, submitRule, u
 
     return (
         <div className="input-container">
-            <textarea className="form_input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} value={value || inputValue} ></textarea>
+            <textarea value={inputValue} className="form_input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', 4)}</animated.div>
         </div>
     );
