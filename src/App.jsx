@@ -91,7 +91,7 @@ function App() {
                                 picture_path: profile.picture
                             };
 
-                            api.get(`?about=user&google_id=${preparedData.google_id}`)
+                            api.get(`?about=user&field=google_id:${preparedData.google_id}`)
                                 .then(data => {
                                     if (data.google_id) {
                                         localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
@@ -118,7 +118,7 @@ function App() {
                         picture_path: profile.picture
                     };
 
-                    api.get(`?about=user&google_id=${preparedData.google_id}`)
+                    api.get(`?about=user&field=google_id:${preparedData.google_id}`)
                         .then(data => {
                             if (data.google_id) {
                                 localStorage.setItem("recap@localUserProfile", JSON.stringify(data));
