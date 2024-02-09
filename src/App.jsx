@@ -83,7 +83,7 @@ function App() {
                             setProfile(res.data);
 
                             const preparedData = {
-                                google_id: (profile.user_id || profile.sub),
+                                google_id: (profile.id || profile.sub),
                                 email: profile.email,
                                 preferred_lang: profile.locale,
                                 name: profile.given_name,
@@ -112,7 +112,7 @@ function App() {
                     profile = decodedUserData;
 
                     const preparedData = {
-                        google_id: (profile.user_id || profile.sub),
+                        google_id: (profile.id || profile.sub),
                         email: profile.email,
                         preferred_lang: profile.locale,
                         name: profile.given_name,
