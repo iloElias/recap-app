@@ -95,6 +95,8 @@ function App() {
                                 .then(data => {
                                     if (data.data[0].google_id) {
                                         localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
+                                        setUserData(data.data[0]);
+                                        setProfile(data.data[0]);
                                     } else {
                                         api.post((env.API_URL + `?about=user`), [preparedData])
                                             .then(data => {
@@ -122,6 +124,8 @@ function App() {
                         .then(data => {
                             if (data.data[0].google_id) {
                                 localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
+                                setUserData(data.data[0]);
+                                setProfile(data.data[0]);
                             } else {
                                 api.post((env.API_URL + `?about=user`), [preparedData])
                                     .then(data => {
