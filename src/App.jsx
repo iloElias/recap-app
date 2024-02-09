@@ -246,6 +246,9 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
+                                <Route path='card/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                    <>a</>
+                                </PageTemplate>} />
                             </Route >
                         </Routes >
                     </div >
