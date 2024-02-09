@@ -2,7 +2,7 @@ import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import BottomOptions from './Components/BottomOptions/BottomOptions';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { useSpring, animated } from 'react-spring';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import ReactLoading from 'react-loading';
 import Login from './Pages/Login/Login';
 import Cards from './Pages/Cards/Cards';
@@ -32,6 +32,14 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
     );
 }
 
+const getCurrentDateAsString = () => {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const day = String(currentDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
@@ -56,6 +64,15 @@ function App() {
         setIsLoading(true);
         setUser(credentialResponse);
     }
+
+    const logoutHandler = useCallback(() => {
+        googleLogout();
+        setUserData(null)
+        setProfile(null);
+        setUser(null);
+        navigate('/login');
+        localStorage.removeItem("recap@localUserProfile");
+    }, [setUserData, setProfile, setUser, navigate]);
 
     useEffect(() => {
         axios.get(`${env.API_URL}?lang=${language}&message=all`)
@@ -93,10 +110,14 @@ function App() {
 
                             api.get(`?about=user&field=google_id:${preparedData.google_id}`)
                                 .then(data => {
-                                    if (data.data[0].google_id) {
+                                    if (data.data[0] && data.data[0].google_id) {
                                         localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
                                         setUserData(data.data[0]);
                                         setProfile(data.data[0]);
+
+                                        api.put(`?about=user&field=id:${data.data[0].id}`, [{
+                                            logged_in: getCurrentDateAsString()
+                                        }])
                                     } else {
                                         api.post((env.API_URL + `?about=user`), [preparedData])
                                             .then(data => {
@@ -122,10 +143,14 @@ function App() {
 
                     api.get(`?about=user&field=google_id:${preparedData.google_id}`)
                         .then(data => {
-                            if (data.data[0].google_id) {
+                            if (data.data[0] && data.data[0].google_id) {
                                 localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
                                 setUserData(data.data[0]);
                                 setProfile(data.data[0]);
+
+                                api.put(`?about=user&field=id:${data.data[0].id}`, [{
+                                    logged_in: getCurrentDateAsString()
+                                }])
                             } else {
                                 api.post((env.API_URL + `?about=user`), [preparedData])
                                     .then(data => {
@@ -155,16 +180,15 @@ function App() {
             navigate("/login");
             return;
         }
-    }, [profile, navigate]);
 
-    const logoutHandler = () => {
-        googleLogout();
-        setUserData(null)
-        setProfile(null);
-        setUser(null);
-        navigate('/login');
-        localStorage.removeItem("recap@localUserProfile");
-    };
+        const currentDate = new Date();
+        const profileDate = new Date(profile.logged_in);
+        const timeDifference = currentDate - profileDate;
+
+        if (timeDifference > 86400000) {
+            logoutHandler();
+        }
+    }, [profile, navigate, logoutHandler]);
 
     const maybeAnError = useSpring({
         delay: 4000,
