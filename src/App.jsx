@@ -125,7 +125,7 @@ function App() {
                                         setUserData(data.data[0]);
                                         setProfile(data.data[0]);
 
-                                        axios.put(`${env.API_URL}?about=user&field=id:${data.data[0].id}`, [{
+                                        api.post(`?about=user&field=id:${data.data[0].id}`, [{
                                             logged_in: getCurrentDateAsString()
                                         }])
                                     } else {
@@ -158,7 +158,7 @@ function App() {
                                 setUserData(data.data[0]);
                                 setProfile(data.data[0]);
 
-                                axios.put(`${env.API_URL}?about=user&field=id:${data.data[0].id}`, [{
+                                api.post(`?about=user&field=id:${data.data[0].id}`, [{
                                     logged_in: getCurrentDateAsString()
                                 }])
                             } else {
