@@ -12,7 +12,7 @@ import { Alert, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
-    baseURL: env.API_URL,
+    baseURL: `${env.CORS_URL}${env.API_URL}`,
 });
 
 export default function Cards({ userId, messages, setLoading }) {

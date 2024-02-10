@@ -85,7 +85,7 @@ function App() {
     }, [setUserData, setProfile, setUser, navigate]);
 
     useEffect(() => {
-        axios.get(`${env.API_URL}?lang=${language}&message=all`)
+        api.get(`?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
             .catch((err) => {
                 console.error("Ops, an error has ocurred on language set");
