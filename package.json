@@ -50,6 +50,7 @@
   "react-dotenv": {
     "whitelist": [
       "API_URL",
+      "CORS_URL",
       "GOOGLE_API_KEY",
       "LOCALHOST"
     ]
