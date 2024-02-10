@@ -13,7 +13,7 @@ import './App.css';
 import Modal from './Components/Modal/Modal';
 
 const api = axios.create({
-    baseURL: env.API_URL,
+    baseURL: `${env.CORS_URL}${env.API_URL}`,
 });
 
 if (env.LOCALHOST) {
@@ -125,7 +125,7 @@ function App() {
                                         setUserData(data.data[0]);
                                         setProfile(data.data[0]);
 
-                                        api.put(`?about=user&field=id:${data.data[0].id}`, [{
+                                        axios.put(`${env.API_URL}?about=user&field=id:${data.data[0].id}`, [{
                                             logged_in: getCurrentDateAsString()
                                         }])
                                     } else {
@@ -158,7 +158,7 @@ function App() {
                                 setUserData(data.data[0]);
                                 setProfile(data.data[0]);
 
-                                api.put(`?about=user&field=id:${data.data[0].id}`, [{
+                                axios.put(`${env.API_URL}?about=user&field=id:${data.data[0].id}`, [{
                                     logged_in: getCurrentDateAsString()
                                 }])
                             } else {
