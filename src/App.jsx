@@ -125,9 +125,7 @@ function App() {
                                         setUserData(data.data[0]);
                                         setProfile(data.data[0]);
 
-                                        api.post(`?about=user&field=id:${data.data[0].id}`, [{
-                                            logged_in: getCurrentDateAsString()
-                                        }])
+                                        api.post(`?about=user&field=id:${data.data[0].id}`, [preparedData])
                                     } else {
                                         api.post((env.API_URL + `?about=user`), [preparedData])
                                             .then(data => {
@@ -158,9 +156,7 @@ function App() {
                                 setUserData(data.data[0]);
                                 setProfile(data.data[0]);
 
-                                api.post(`?about=user&field=id:${data.data[0].id}`, [{
-                                    logged_in: getCurrentDateAsString()
-                                }])
+                                api.post(`?about=user&field=id:${data.data[0].id}`, [preparedData])
                             } else {
                                 api.post((env.API_URL + `?about=user`), [preparedData])
                                     .then(data => {
