@@ -14,10 +14,12 @@ export default function Card({ cardTitle, cardId, onClick, isCreate, isLink }) {
                     </div>
                 </Link>
             ) : (
-                <div className="card-container" onClick={onClick}>
-                    <div className="card-paper-shadow"></div>
-                    <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
-                </div>
+                <Link to="">
+                    <div className="card-container" onClick={onClick}>
+                        <div className="card-paper-shadow"></div>
+                        <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                    </div>
+                </Link>
             )}
         </>
     );
