@@ -13,7 +13,7 @@ import './App.css';
 import Modal from './Components/Modal/Modal';
 
 const api = axios.create({
-    baseURL: `${env.CORS_URL}${env.API_URL}`,
+    baseURL: `${env.API_URL}`,
 });
 
 if (env.LOCALHOST) {
@@ -88,7 +88,7 @@ function App() {
         api.get(`?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
             .catch((err) => {
-                console.error("Ops, an error has ocurred on language set");
+                console.error("Ops, an error has ocurred on language set", err);
             });
 
         localStorage.setItem('recap@definedLanguage', language);
