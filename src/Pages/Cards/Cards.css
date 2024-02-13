@@ -55,12 +55,18 @@
 }
 
 .cards-container a:focus {
+    transition: 0.2s all;
     transform: scale(1.05);
 }
 
 .cards-container a:focus .card-container .card-paper {
-    border-top: solid 0.2dvh #212121;
-    border-left: solid 0.2dvh #212121;
+    transition: 0.1s border;
+    border: solid 0.4dvh #212121;
+}
+
+.cards-container a:focus .card-container .card-paper-shadow {
+    transition: 0.1s border;
+    border: solid 0.4dvh #212121;
 }
 
 .card-paper-text {
