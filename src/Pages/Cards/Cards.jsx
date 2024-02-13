@@ -12,7 +12,7 @@ import { Alert, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const api = axios.create({
-    baseURL: `${env.CORS_URL}${env.API_URL}`,
+    baseURL: `${env.API_URL}`,
 });
 
 export default function Cards({ userId, messages, setLoading }) {
@@ -98,7 +98,9 @@ export default function Cards({ userId, messages, setLoading }) {
                 setNotification(false);
                 openAlert(true);
                 setAlertSeverity('error');
+                console.log(err);
                 setAlertMessage(messages.problem_when_loading);
+
                 setLoading(false);
             }
         }
@@ -129,6 +131,7 @@ export default function Cards({ userId, messages, setLoading }) {
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
             } catch (err) {
                 setAlertSeverity('error');
+                console.log(err);
                 setAlertMessage(messages.item_creation_error.replace(':str', messages.card));
             } finally {
                 toggleResetValues();
