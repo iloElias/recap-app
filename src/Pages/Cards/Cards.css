@@ -59,16 +59,6 @@
     transform: scale(1.05);
 }
 
-.cards-container a:focus .card-container .card-paper {
-    transition: 0.1s border;
-    border: solid 0.4dvh #212121;
-}
-
-.cards-container a:focus .card-container .card-paper-shadow {
-    transition: 0.1s border;
-    border: solid 0.4dvh #212121;
-}
-
 .card-paper-text {
     max-width: 150px;
     max-height: 150px;
