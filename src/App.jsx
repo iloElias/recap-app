@@ -84,6 +84,38 @@ function App() {
         localStorage.removeItem("recap@localUserProfile");
     }, [setUserData, setProfile, setUser, navigate]);
 
+
+    const handleUser = useCallback((data, preparedData) => {
+        const receivedToken = data.data;
+        console.log(receivedToken);
+        const decodedData = jwtDecode(receivedToken);
+
+        if (decodedData && decodedData.google_id) {
+            api.put(`/user/&field=id:${decodedData.id}`, {
+                headers: {
+                    Authorization: `Bearer ${receivedToken}`,
+                },
+                body: [{ logged_in: getCurrentDateAsString() }]
+            }).then(() => {
+                localStorage.setItem("recap@localUserProfile", receivedToken);
+                setUserData(decodedData);
+                setProfile(decodedData);
+            });
+
+        } else {
+            api.post((env.API_URL + `/user/`), {
+                headers: {
+                    Authorization: `Bearer ${receivedToken}`,
+                },
+                body: [preparedData]
+            }).then(() => {
+                localStorage.setItem("recap@localUserProfile", receivedToken);
+                setUserData(decodedData);
+                setProfile(decodedData);
+            });
+        }
+    }, []);
+
     useEffect(() => {
         api.get(`?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
@@ -98,45 +130,32 @@ function App() {
         () => {
             if (user) {
                 let profile = null;
-                if (user.access_token) {
+                if (user.access_token) { // Normal redirect Login
                     axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
                         headers: {
                             Authorization: `Bearer ${user.access_token}`,
                             Accept: 'application/json'
                         }
+                    }).then((res) => {
+                        profile = res.data;
+                        setProfile(res.data);
+
+                        const preparedData = {
+                            google_id: (profile.id || profile.sub),
+                            email: profile.email,
+                            preferred_lang: profile.locale,
+                            name: profile.given_name,
+                            username: ("" + profile.email).split("@")[0],
+                            picture_path: profile.picture
+                        };
+
+                        api.post(`user/&field=google_id:${preparedData.google_id}`)
+                            .then(data => {
+                                handleUser(data, preparedData);
+                            })
                     })
-                        .then((res) => {
-                            profile = res.data;
-                            setProfile(res.data);
-
-                            const preparedData = {
-                                google_id: (profile.id || profile.sub),
-                                email: profile.email,
-                                preferred_lang: profile.locale,
-                                name: profile.given_name,
-                                username: ("" + profile.email).split("@")[0],
-                                picture_path: profile.picture
-                            };
-
-                            api.get(`?about=user&field=google_id:${preparedData.google_id}`)
-                                .then(data => {
-                                    if (data.data[0] && data.data[0].google_id) {
-                                        localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
-                                        setUserData(data.data[0]);
-                                        setProfile(data.data[0]);
-
-                                        api.put(`?about=user&field=id:${data.data[0].id}`, [preparedData])
-                                    } else {
-                                        api.post((env.API_URL + `?about=user`), [preparedData])
-                                            .then(data => {
-                                                localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
-                                                setUserData(data.data[0]);
-                                                setProfile(data.data[0]);
-                                            })
-                                    }
-                                })
-                        })
-                } else if (user.credential) {
+                } else if (user.credential) { // One tap Login
+                    console.log("OneTap");
                     const decodedUserData = jwtDecode(user.credential);
                     profile = decodedUserData;
 
@@ -149,33 +168,19 @@ function App() {
                         picture_path: profile.picture
                     };
 
-                    api.get(`?about=user&field=google_id:${preparedData.google_id}`)
+                    api.post(`user/&field=google_id:${preparedData.google_id}`)
                         .then(data => {
-                            if (data.data[0] && data.data[0].google_id) {
-                                localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
-                                setUserData(data.data[0]);
-                                setProfile(data.data[0]);
-
-                                api.put(`?about=user&field=id:${data.data[0].id}`, [preparedData])
-                            } else {
-                                api.post((env.API_URL + `?about=user`), [preparedData])
-                                    .then(data => {
-                                        localStorage.setItem("recap@localUserProfile", JSON.stringify(data.data[0]));
-                                        setUserData(data.data[0]);
-                                        setProfile(data.data[0]);
-                                    })
-                            }
+                            handleUser(data, preparedData);
                         })
 
                 }
             }
         },
-        [user, setProfile]
+        [user, setProfile, handleUser]
     );
 
     useEffect(() => {
         if (userData) {
-            localStorage.setItem("recap@localUserProfile", JSON.stringify(userData))
             setIsLoading(false);
             navigate('/')
         }
