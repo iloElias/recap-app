@@ -88,14 +88,14 @@ function App() {
     const handleUser = useCallback((data, preparedData) => {
         const receivedToken = data.data;
         console.log(receivedToken);
-        const decodedData = jwtDecode(receivedToken);
+        const decodedData = jwtDecode(receivedToken)[0];
+        console.log(decodedData);
 
         if (decodedData && decodedData.google_id) {
-            api.put(`/user/&field=id:${decodedData.id}`, {
+            api.put(`/user/?field=id:${decodedData.id}`, [{ logged_in: getCurrentDateAsString() }], {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
-                },
-                body: [{ logged_in: getCurrentDateAsString() }]
+                }
             }).then(() => {
                 localStorage.setItem("recap@localUserProfile", receivedToken);
                 setUserData(decodedData);
@@ -103,11 +103,10 @@ function App() {
             });
 
         } else {
-            api.post((env.API_URL + `/user/`), {
+            api.post((env.API_URL + `/user/`), [preparedData], {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
-                },
-                body: [preparedData]
+                }
             }).then(() => {
                 localStorage.setItem("recap@localUserProfile", receivedToken);
                 setUserData(decodedData);
@@ -117,7 +116,7 @@ function App() {
     }, []);
 
     useEffect(() => {
-        api.get(`?lang=${language}&message=all`)
+        api.get(`language/?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
             .catch((err) => {
                 console.error("Ops, an error has ocurred on language set", err);
@@ -149,13 +148,12 @@ function App() {
                             picture_path: profile.picture
                         };
 
-                        api.post(`user/&field=google_id:${preparedData.google_id}`)
+                        api.post(`user/login/`, [preparedData])
                             .then(data => {
                                 handleUser(data, preparedData);
                             })
                     })
                 } else if (user.credential) { // One tap Login
-                    console.log("OneTap");
                     const decodedUserData = jwtDecode(user.credential);
                     profile = decodedUserData;
 
@@ -168,7 +166,7 @@ function App() {
                         picture_path: profile.picture
                     };
 
-                    api.post(`user/&field=google_id:${preparedData.google_id}`)
+                    api.post(`user/login/`, [preparedData])
                         .then(data => {
                             handleUser(data, preparedData);
                         })
