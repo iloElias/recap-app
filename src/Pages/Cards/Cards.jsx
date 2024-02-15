@@ -15,6 +15,8 @@ const api = axios.create({
     baseURL: `${env.API_URL}`,
 });
 
+const authenticationToken = localStorage.getItem('recap@localUserProfile');
+
 export default function Cards({ userId, messages, setLoading }) {
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
@@ -88,7 +90,11 @@ export default function Cards({ userId, messages, setLoading }) {
             setLoading(true);
 
             try {
-                const userCardsData = await api.get(`?about=userProjects&field=user_id:${userId}`)
+                const userCardsData = await api.get(`/project/?field=user_id:${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${authenticationToken}`,
+                    }
+                })
 
                 setUserCards(userCardsData.data);
                 setNotification(false);
@@ -120,11 +126,15 @@ export default function Cards({ userId, messages, setLoading }) {
 
             setShowModal(false);
             try {
-                const project = await api.post(`?about=newProject`, [{
+                const project = await api.post('/project/', [{
                     card: { synopsis: newCardRef.synopsis },
                     project: { name: newCardRef.name },
                     user: { id: userId }
-                }])
+                }], {
+                    headers: {
+                        Authorization: `Bearer ${authenticationToken}`,
+                    }
+                });
 
                 setAlertSeverity('success');
                 setUserCards([...userCards, { id: project.data[0].id, name: newCardRef.name }])
