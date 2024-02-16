@@ -11,10 +11,28 @@ import env from "react-dotenv";
 import axios from 'axios';
 import './App.css';
 import Modal from './Components/Modal/Modal';
+import { Alert, Snackbar } from '@mui/material';
 
 const api = axios.create({
     baseURL: `${env.API_URL}`,
 });
+
+
+
+const emergencyMessages = {
+    "en": {
+        request_timeout_excide: "The response time has expired, our service may be unavailable",
+        error_on_language_set: "An error has ocurred while setting the language",
+        reauthenticate_token_message: "There was a change on your access token, please log in again",
+        reauthenticate_logout_message: "O tempo de autenticação expirou, faça login novamente",
+    },
+    "pt-BR": {
+        request_timeout_excide: "O tempo de resposta foi excedido, talvez nossos serviços não estejam disponíveis",
+        error_on_language_set: "Um erro ocorreu durante o carregamento do idioma",
+        reauthenticate_token_message: "Houve uma alteração no token de acesso, faça login novamente",
+        reauthenticate_logout_message: "Authentication time has expired, please log in again",
+    }
+}
 
 if (env.LOCALHOST) {
     document.getElementById("page-title").innerText = `Recap - ${env.LOCALHOST}`
@@ -49,18 +67,41 @@ function App() {
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
+    const [previousSessionMessage, setPreviousSessionMessage] = useState(() => {
+        try {
+            return JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null
+        } catch (err) { }
+    });
+    const [alertMessage, setAlertMessage] = useState();
+    const [alert, openAlert] = useState();
+    const [alertSeverity, setAlertSeverity] = useState('success');
+    const [notification, setNotification] = useState();
+    const [notificationMessage, setNotificationMessage] = useState();
+
     const [user, setUser] = useState([]);
     const [userData, setUserData] = useState();
     const [profile, setProfile] = useState(() => {
+        if (!localUserProfile) return null;
         try {
-            return JSON.parse(localUserProfile)
+            const decodedData = jwtDecode(localUserProfile)[0];
+
+            return decodedData;
         } catch (err) {
+            googleLogout();
+
+            setUserData(null);
+            setUser(null);
+
+
             navigate('/login');
+            localStorage.removeItem("recap@localUserProfile");
+            setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || { message: emergencyMessages[localDefinedLanguage].reauthenticate_token_message, severity: 'error' });
+
+            navigate('/login');
+            return null;
         }
     });
-
     const [isLoading, setIsLoading] = useState(false);
-
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -77,19 +118,19 @@ function App() {
 
     const logoutHandler = useCallback(() => {
         googleLogout();
+
         setUserData(null)
         setProfile(null);
         setUser(null);
+
         navigate('/login');
         localStorage.removeItem("recap@localUserProfile");
-    }, [setUserData, setProfile, setUser, navigate]);
-
+        setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null);
+    }, [setUserData, setProfile, setUser, setPreviousSessionMessage, navigate]);
 
     const handleUser = useCallback((data, preparedData) => {
         const receivedToken = data.data;
-        console.log(receivedToken);
         const decodedData = jwtDecode(receivedToken)[0];
-        console.log(decodedData);
 
         if (decodedData && decodedData.google_id) {
             api.put(`/user/?field=id:${decodedData.id}`, [{ logged_in: getCurrentDateAsString() }], {
@@ -114,6 +155,20 @@ function App() {
             });
         }
     }, []);
+
+    useEffect(() => {
+        if (previousSessionMessage) {
+            if (previousSessionMessage.message && previousSessionMessage.severity) {
+                setAlertSeverity(previousSessionMessage.severity);
+                setAlertMessage(previousSessionMessage.message);
+                openAlert(true);
+            }
+            if (previousSessionMessage.notification) {
+                setNotificationMessage(previousSessionMessage.notification);
+                setNotification(true);
+            }
+        }
+    }, [previousSessionMessage, setAlertMessage, setAlertSeverity, setNotificationMessage]);
 
     useEffect(() => {
         api.get(`language/?lang=${language}&message=all`)
@@ -191,17 +246,21 @@ function App() {
         }
 
         if (profile) {
-            if (!profile.logged_in) logoutHandler();
+            if (!profile.logged_in) {
+                sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+                logoutHandler();
+            };
 
             const currentDate = new Date();
             const profileDate = new Date(profile.logged_in);
             const timeDifference = currentDate - profileDate;
 
             if (timeDifference > 86400000) {
+                sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
                 logoutHandler();
             }
         }
-    }, [profile, navigate, logoutHandler]);
+    }, [profile, navigate, logoutHandler, messages]);
 
     const maybeAnError = useSpring({
         delay: 4000,
@@ -240,7 +299,7 @@ function App() {
                             <Route path='/'>
                                 <Route index element={
                                     <PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                        <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} />
+                                        <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} logoutHandler={logoutHandler} />
                                     </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
@@ -279,11 +338,37 @@ function App() {
                         <ReactLoading type={"spinningBubbles"} color="#bbbbbb" height={'75%'} width={'75%'} />
                     </div >
                     <animated.div style={maybeAnError} className="network-static-message">
-                        {(localStorage.getItem('definedLanguage') && localStorage.getItem('definedLanguage') === "pt-BR") ? ("O tempo de resposta foi excedido, talvez nossos serviços não estejam disponíveis") : ("The response time has expired, our service may be unavailable")}
+                        {emergencyMessages[localDefinedLanguage].request_timeout_excide}
                     </animated.div>
                 </div>
-            )
-            }
+            )}
+            <Snackbar
+                open={notification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                autoHideDuration={5000}
+                onClose={() => {
+                    setNotification(false);
+                    previousSessionMessage && sessionStorage.removeItem('recap@previousSessionError');
+                }}
+                message={notificationMessage}
+            />
+
+            <Snackbar open={alert} autoHideDuration={5000} onClose={() => {
+                openAlert(false);
+                previousSessionMessage && sessionStorage.removeItem('recap@previousSessionError');
+            }}>
+                <Alert
+                    onClose={() => {
+                        openAlert(false);
+                        previousSessionMessage && sessionStorage.removeItem('recap@previousSessionError');
+                    }}
+                    severity={alertSeverity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

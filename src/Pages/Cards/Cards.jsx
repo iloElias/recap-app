@@ -10,14 +10,16 @@ import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
 import { Alert, Snackbar } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
     baseURL: `${env.API_URL}`,
 });
 
-const authenticationToken = localStorage.getItem('recap@localUserProfile');
 
-export default function Cards({ userId, messages, setLoading }) {
+export default function Cards({ userId, messages, setLoading, logoutHandler }) {
+    const authenticationToken = localStorage.getItem('recap@localUserProfile');
+
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
 
@@ -96,22 +98,26 @@ export default function Cards({ userId, messages, setLoading }) {
                     }
                 })
 
-                setUserCards(userCardsData.data);
+                setUserCards(jwtDecode(userCardsData.data));
                 setNotification(false);
                 setLoading(false)
                 setUserDataWasLoaded(true)
             } catch (err) {
+                if (err.response.status === 401) {
+                    sessionStorage.setItem("recap@previousSessionError", JSON.stringify({ message: messages.reauthenticate_token_message, severity: 'error' }))
+                    logoutHandler();
+                }
+
                 setNotification(false);
                 openAlert(true);
                 setAlertSeverity('error');
-                console.log(err);
-                setAlertMessage(messages.problem_when_loading);
 
+                setAlertMessage(messages.problem_when_loading);
                 setLoading(false);
             }
         }
         fetchUserCards();
-    }, [userId, setLoading, setNotificationMessage, openAlert, userDataWasLoaded, setUserDataWasLoaded, messages]);
+    }, [userId, setLoading, setNotificationMessage, openAlert, authenticationToken, userDataWasLoaded, setUserDataWasLoaded, logoutHandler, messages]);
 
 
     useEffect(() => {
@@ -136,12 +142,18 @@ export default function Cards({ userId, messages, setLoading }) {
                     }
                 });
 
+                const decodedResponse = jwtDecode(project.data);
+
                 setAlertSeverity('success');
-                setUserCards([...userCards, { id: project.data[0].id, name: newCardRef.name }])
+                setUserCards([...userCards, { id: decodedResponse.id, name: newCardRef.name }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
             } catch (err) {
+                if (err.response.status === 401) {
+                    sessionStorage.setItem('recap@previousSessionError', JSON.stringify(({ message: messages.reauthenticate_token_message, severity: 'error' })));
+                    logoutHandler();
+                }
+
                 setAlertSeverity('error');
-                console.log(err);
                 setAlertMessage(messages.item_creation_error.replace(':str', messages.card));
             } finally {
                 toggleResetValues();
@@ -151,7 +163,7 @@ export default function Cards({ userId, messages, setLoading }) {
         };
 
         createCardAndProject();
-    }, [newCard, userCards, navigate, toggleResetValues, setLoading, userId, messages]);
+    }, [newCard, userCards, authenticationToken, navigate, toggleResetValues, logoutHandler, setLoading, userId, messages]);
 
     return (
         <>
@@ -160,11 +172,11 @@ export default function Cards({ userId, messages, setLoading }) {
                 <div className="cards-page">
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
                     <div className="cards-container">
+                        <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
+
                         {userCards && userCards.map((card) => {
                             return (<Card key={card.id} cardId={card.id} isLink={card.id} cardTitle={card.name} />);
                         })}
-
-                        <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
                     </div>
                 </div>
             </div>
