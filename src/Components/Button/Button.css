@@ -35,3 +35,44 @@
     background-color: #3b3b3b;
     outline: double 0.4dvh #9f9f9f;
 }
+
+.option-button {
+    width: 100%;
+    min-width: 20dvh;
+    height: 5dvh;
+
+    justify-content: flex-start;
+
+    padding: 0.5dvh 1dvh;
+    color: #bcbcbc;
+}
+
+.selected-button {
+    color: #fafafa;
+}
+
+.file-export-button {
+    width: 100%;
+    color: #212121;
+    background-color: #fafafa;
+
+    text-align: start;
+    justify-content: flex-start;
+    padding: 0.5dvh 1dvh;
+}
+
+.file-export-button:hover {
+    cursor: pointer;
+    background: #dadada;
+    transition: transform 0.2s;
+    transform: translateY(-0.2dvh);
+}
+
+.file-export-button:active {
+    transform: translateY(0.1dvh);
+}
+
+.file-export-button:focus {
+    background-color: #ededed;
+    outline: double 0.4dvh #bebebe;
+}

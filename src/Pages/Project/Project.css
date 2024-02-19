@@ -1,0 +1,120 @@
+.project-editor-container {
+    width: 100%;
+
+    height: max-content;
+    min-height: 100%;
+
+    display: flex;
+}
+
+.project-visualizer {
+    margin: 2dvh 9dvh;
+    padding: 2dvh;
+
+    width: 100%;
+
+    min-height: 100%;
+
+    border: solid 0.15dvw rgba(180, 180, 180, 0.812);
+    border-radius: 1dvh;
+}
+
+.editor-tab {
+    position: fixed;
+    display: flex;
+    flex-direction: row;
+
+    height: 100%;
+}
+
+.code-editor {
+    width: 51.5dvh;
+
+    padding: 2vh 0;
+    display: flex;
+    background-color: #1e1e1e;
+}
+
+.editor-buttons {
+    position: absolute;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1dvh;
+
+    left: 51.5vh;
+}
+
+.close-button {
+    aspect-ratio: 1/1;
+
+    width: 5dvh;
+    margin: 0 2vh;
+
+    border-radius: 1dvh;
+    outline: none;
+    border: none;
+    background: #212121;
+
+    font-size: 2dvh;
+
+    cursor: pointer;
+
+    color: #FAFAFA;
+    user-select: none;
+}
+
+.close-button:hover {
+    cursor: pointer;
+    background: #3b3b3b;
+    transition: transform 0.2s;
+    transform: translateY(-0.2dvh);
+}
+
+.close-button:active {
+    transform: translateY(0.1dvh);
+}
+
+@media (max-width: 640px) {
+    .project-visualizer {
+        margin: 2dvh 3dvh;
+        padding: 2dvh;
+
+        width: 100%;
+    }
+
+    .editor-tab {
+        flex-direction: column-reverse;
+
+        bottom: 0;
+    }
+
+    .code-editor {
+        flex-direction: column;
+        height: 40%;
+        width: 100dvw;
+    }
+
+    .rotate-button {
+        rotate: -90deg;
+    }
+
+    .editor-buttons {
+        position: absolute;
+        width: 100%;
+        height: min-content;
+
+        left: initial;
+        bottom: 44vh;
+
+        gap: 1dvh;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    .close-button {
+        margin: 2vh 0;
+    }
+}

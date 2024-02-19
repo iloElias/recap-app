@@ -1,19 +1,17 @@
 import { RecapLogo } from "../../Components/Icons/Icons";
 import React, { useCallback, useEffect, useState } from "react";
-import env from "react-dotenv";
 import axios from "axios";
-import Card from "./Card";
 import "./Cards.css"
 import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
 import { Alert, Snackbar } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const api = axios.create({
-    baseURL: `${env.API_URL}`,
+    baseURL: `${process.env.REACT_APP_API_URL}`,
 });
 
 
@@ -212,6 +210,28 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                     {alertMessage}
                 </Alert>
             </Snackbar>
+        </>
+    );
+}
+
+export function Card({ cardTitle, cardId, onClick, isCreate, isLink }) {
+    return (
+        <>
+            {isLink ? (
+                <Link to={cardId ? ("/project/" + cardId) : "/"} >
+                    <div className="card-container" onClick={onClick}>
+                        <div className="card-paper-shadow"></div>
+                        <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                    </div>
+                </Link>
+            ) : (
+                <button>
+                    <div className="card-container" onClick={onClick}>
+                        <div className="card-paper-shadow"></div>
+                        <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                    </div>
+                </button>
+            )}
         </>
     );
 }

@@ -12,9 +12,10 @@ import axios from 'axios';
 import './App.css';
 import Modal from './Components/Modal/Modal';
 import { Alert, Snackbar } from '@mui/material';
+import Project from './Pages/Project/Project';
 
 const api = axios.create({
-    baseURL: `${env.API_URL}`,
+    baseURL: `${process.env.REACT_APP_API_URL}`,
 });
 
 
@@ -34,8 +35,8 @@ const emergencyMessages = {
     }
 }
 
-if (env.LOCALHOST) {
-    document.getElementById("page-title").innerText = `Recap - ${env.LOCALHOST}`
+if (process.env.REACT_APP_LOCALHOST) {
+    document.getElementById("page-title").innerText = `Recap - ${process.env.REACT_APP_LOCALHOST}`
 }
 
 if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
@@ -304,8 +305,8 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                                <Route path='card/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                    <>a</>
+                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                    <Project />
                                 </PageTemplate>} />
                             </Route >
                         </Routes >
