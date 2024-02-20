@@ -1,6 +1,6 @@
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import BottomOptions from './Components/BottomOptions/BottomOptions';
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
 import { useSpring, animated } from 'react-spring';
 import { useCallback, useEffect, useState } from 'react';
 import ReactLoading from 'react-loading';
@@ -12,6 +12,7 @@ import './App.css';
 import Modal from './Components/Modal/Modal';
 import { Alert, Snackbar } from '@mui/material';
 import Project from './Pages/Project/Project';
+import NotFound from './Components/NotFound/NotFound';
 
 const api = axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -50,14 +51,6 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
             <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
         </>
     );
-}
-
-const getCurrentDateAsString = () => {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-    const day = String(currentDate.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
 }
 
 function App() {
@@ -131,18 +124,7 @@ function App() {
         const receivedToken = data.data;
         const decodedData = jwtDecode(receivedToken)[0];
 
-        if (decodedData && decodedData.google_id) {
-            api.put(`/user/?field=id:${decodedData.id}`, [{ logged_in: getCurrentDateAsString() }], {
-                headers: {
-                    Authorization: `Bearer ${receivedToken}`,
-                }
-            }).then(() => {
-                localStorage.setItem("recap@localUserProfile", receivedToken);
-                setUserData(decodedData);
-                setProfile(decodedData);
-            });
-
-        } else {
+        if (decodedData && !decodedData.google_id) {
             api.post((process.env.REACT_APP_API_URL + `/user/`), [preparedData], {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
@@ -152,7 +134,12 @@ function App() {
                 setUserData(decodedData);
                 setProfile(decodedData);
             });
+        } else {
+            setUserData(decodedData);
+            setProfile(decodedData);
         }
+
+        localStorage.setItem("recap@localUserProfile", receivedToken);
     }, []);
 
     useEffect(() => {
@@ -234,7 +221,7 @@ function App() {
     useEffect(() => {
         if (userData) {
             setIsLoading(false);
-            navigate('/')
+            navigate('/project')
         }
     }, [userData, navigate, setIsLoading]);
 
@@ -253,9 +240,9 @@ function App() {
         const currentDate = new Date();
         const profileDate = new Date(profile.logged_in);
         const timeDifference = currentDate - profileDate;
-        const twoDays = 86400000 * 2;
+        const maxLoginTime = 86400000 * 1.5; // One and half a day
 
-        if (timeDifference > twoDays) {
+        if (timeDifference > maxLoginTime) {
             sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
             logoutHandler();
         }
@@ -296,16 +283,23 @@ function App() {
                     <div className="App">
                         <Routes>
                             <Route path='/'>
-                                <Route index element={
-                                    <PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                        <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} logoutHandler={logoutHandler} />
-                                    </PageTemplate>} />
+                                <Route index element={<Navigate to='/project' ></Navigate>} />
+                                <Route path='/project' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                    <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} logoutHandler={logoutHandler} />
+                                </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
                                 <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Project messages={messages} setLoading={setIsLoading} />
                                 </PageTemplate>} />
+                                <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                    <NotFound>
+                                        <p>{messages.not_found_page}</p>
+                                        <Link to='/'>{messages.go_back_home}</Link>
+                                    </NotFound>
+                                </PageTemplate>} />
+
                             </Route >
                         </Routes >
                     </div >

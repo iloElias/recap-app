@@ -19,6 +19,10 @@
     border-radius: 1dvh;
 }
 
+.transpiled-text-container {
+    margin: 2.5vh;
+}
+
 .editor-tab {
     position: fixed;
     display: flex;
@@ -118,4 +122,40 @@
     .close-button {
         margin: 2vh 0;
     }
+}
+
+.mobile .project-visualizer {
+    margin: 2dvh 2dvh;
+    padding: 2dvh;
+
+    width: 100%;
+}
+
+.mobile .editor-tab {
+    flex-direction: column-reverse;
+
+    bottom: 0;
+}
+
+.mobile>* .code-editor {
+    flex-direction: column;
+    height: 40%;
+    width: 100dvw;
+}
+
+.mobile>* .editor-buttons {
+    position: absolute;
+    width: 100%;
+    height: min-content;
+
+    left: initial;
+    bottom: 44vh;
+
+    gap: 1dvh;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.mobile>* .close-button {
+    margin: 2vh 0;
 }

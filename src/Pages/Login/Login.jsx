@@ -10,7 +10,7 @@ export default function Login({ messages, loginHandler }) {
 
     useEffect(() => {
         if (localStorage.getItem('recap@localUserProfile')) {
-            navigate('/')
+            navigate('/project')
         }
     }, [navigate]);
 

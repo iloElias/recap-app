@@ -4,7 +4,13 @@ import "./Project.css";
 import { useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 import axios from "axios";
+import { jwtDecode } from 'jwt-decode';
+
+import { Link } from 'react-router-dom'
+
 import { Alert, Snackbar } from "@mui/material";
+import NotFound from "../../Components/NotFound/NotFound";
+import Markdown from "react-markdown";
 
 const api = axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -27,6 +33,7 @@ const cooldownPeriod = 5000;
 
 export default function Project({ messages, setLoading }) {
     const [openEditor, setOpenEditor] = useState(true);
+    const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
     const [isMobile, setIsMobile] = useState(explodeMinSize());
 
     const [alertMessage, setAlertMessage] = useState();
@@ -35,13 +42,17 @@ export default function Project({ messages, setLoading }) {
     const [notification, setNotification] = useState();
     const [notificationMessage, setNotificationMessage] = useState();
 
+    const [notFoundProject, setNotFoundProject] = useState();
+
     const [markdownText, setMarkdownText] = useState('');
+    const [localMarkdownText, setLocalMarkdownText] = useState('');
     const [saveProject, setSaveProject] = useState(false);
     const urlParam = useParams('/project/:id');
     const [projectData, setProjectData] = useState({ pre_id: urlParam.id })
-    const [projectAccess, setProjectAccess] = useState('notDef')
+    const [projectAccess, setProjectAccess] = useState()
 
     window.addEventListener('resize', () => { setIsMobile(explodeMinSize()) });
+
 
 
     // Code editor animations
@@ -96,6 +107,8 @@ export default function Project({ messages, setLoading }) {
             } else if (e.response.status === 405) {
                 setAlertMessage(messages.not_allowed_to_edit);
                 setAlertSeverity('error')
+            } else if (e.response.status === 404) {
+                setNotFoundProject(true)
             } else if (e.response.status === 500) {
                 setAlertMessage(`${messages.item_update_error}`.replace(':str', messages.card));
                 setAlertSeverity('error')
@@ -113,76 +126,124 @@ export default function Project({ messages, setLoading }) {
 
     useEffect(() => {
         if (projectData.pre_id) {
-            // TODO
+            setNotificationMessage(messages.loading_your_project);
+            setNotification(true)
+            setLoading(true);
+
+            const receivedToken = localStorage.getItem("recap@localUserProfile");
+
+            api.get(`/project/file?project_id=${projectData.pre_id}`, {
+                headers: {
+                    Authorization: `Bearer ${receivedToken}`,
+                }
+            }).then((data) => {
+                const decodedData = jwtDecode(data.data);
+
+                setProjectData(decodedData[0]);
+                setLoading(false);
+            }).catch((e) => {
+                setLoading(false);
+                if (e.response.status === 404) {
+                    setNotFoundProject('notFound');
+                } else if (e.response.status === 405) {
+                    setNotFoundProject('notAllowed');
+                }
+            })
         }
-    }, [projectData]);
+        if (projectData.id) {
+            setMarkdownText(projectData.imd);
+            setLocalMarkdownText(projectData.imd);
+            setProjectAccess(projectData.user_permissions)
+        }
+    }, [projectData, messages, setProjectData, setLocalMarkdownText, setMarkdownText, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
     }
 
+    const handleReload = () => {
+        setLocalMarkdownText(markdownText);
+    }
+
+    const toggleMobile = () => {
+        setUserForceMobile(!userForceMobile);
+    }
+
     return (
-        projectAccess === 'own' ? (
-            <div className="project-editor-container">
-                <animated.div className="project-visualizer" style={!isMobile ? editorVisualizerAnimation : null} >
-                    {urlParam.id}
-                </animated.div>
-
-                <div className="editor-tab">
-                    <animated.div className="code-editor" style={!isMobile ? editorSideAnimation : editorBottomAnimation}>
-                        <div className="editor-buttons">
-                            <button className="close-button rotate-button" onClick={() => {
-                                setOpenEditor(!openEditor);
-                            }}><animated.div style={!isMobile ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
-                            <button className="close-button" onClick={() => { }}><i className="bi bi-arrow-clockwise"></i></button>
-                            <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+        <>
+            {projectAccess ? (
+                <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
+                    <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
+                        <div id="text-container" className="transpiled-text-container">
+                            <Markdown>{localMarkdownText}</Markdown>
                         </div>
-
-                        <Editor
-                            width="100%"
-                            height="100%"
-
-                            value={markdownText}
-                            language="markdown"
-                            theme="vs-dark"
-
-                            onChange={(value) => {
-                                setMarkdownText(value);
-                            }}
-
-                            options={{
-                                inlineSuggest: true,
-                                fontSize: (!isMobile ? "12px" : "8px"),
-                                formatOnType: true,
-                                autoClosingBrackets: true,
-                                minimap: {
-                                    enabled: false
-                                }
-                            }}
-                        />
                     </animated.div>
-                </div>
 
-                <Snackbar
-                    open={notification}
-                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                    autoHideDuration={5000}
-                    onClose={() => { setNotification(false) }}
-                    message={notificationMessage}
-                />
+                    <div className="editor-tab">
+                        <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
+                            <div className="editor-buttons">
+                                <button title={messages.legend_hide_code_editor} className="close-button rotate-button" onClick={() => {
+                                    setOpenEditor(!openEditor);
+                                }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
+                                <button title={messages.legend_reload_view} className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
+                                <button title={messages.legend_save_current_state} className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+                                {!explodeMinSize() &&
+                                    <button title={messages.legend_toggle_mobile_desktop} className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>}
+                            </div>
 
-                <Snackbar open={alert} autoHideDuration={5000} onClose={() => { openAlert(false) }}>
-                    <Alert
-                        onClose={() => { openAlert(false) }}
-                        severity={alertSeverity}
-                        variant="filled"
-                        sx={{ width: '100%' }}
-                    >
-                        {alertMessage}
-                    </Alert>
-                </Snackbar>
-            </div>) : (
-            <></>
-        )
+                            <Editor
+                                width="100%"
+                                height="100%"
+
+                                value={markdownText}
+                                language="markdown"
+                                theme="vs-dark"
+
+                                onChange={(value) => {
+                                    setMarkdownText(value);
+                                }}
+
+                                options={{
+                                    inlineSuggest: true,
+                                    fontSize: (!isMobile ? "12px" : "12px"),
+                                    formatOnType: true,
+                                    autoClosingBrackets: true,
+                                    minimap: {
+                                        enabled: false
+                                    }
+                                }}
+                            />
+                        </animated.div>
+                    </div >
+                </div >) : (
+                <>
+                </>
+            )}
+
+            {notFoundProject && <NotFound>
+                <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
+                <Link to="/">{messages.go_back_home}</Link>
+            </NotFound>}
+
+            < Snackbar
+                open={notification}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }
+                }
+                autoHideDuration={4000}
+                onClose={() => { setNotification(false) }}
+                message={notificationMessage}
+            />
+
+            <Snackbar open={alert} autoHideDuration={5000} onClose={() => { openAlert(false) }}>
+                <Alert
+                    onClose={() => { openAlert(false) }}
+                    severity={alertSeverity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {alertMessage}
+                </Alert>
+            </Snackbar>
+        </>
     );
 }
