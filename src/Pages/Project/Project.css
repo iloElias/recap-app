@@ -35,6 +35,11 @@
     background-color: #1e1e1e;
 }
 
+.view-line * {
+    font-family: "Fira Code", monospace;
+    font-weight: 500;
+}
+
 .editor-buttons {
     position: absolute;
 
@@ -95,10 +100,6 @@
         flex-direction: column;
         height: 40%;
         width: 100dvw;
-    }
-
-    .rotate-button {
-        rotate: -90deg;
     }
 
     .editor-buttons {

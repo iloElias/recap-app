@@ -7,7 +7,6 @@ import ReactLoading from 'react-loading';
 import Login from './Pages/Login/Login';
 import Cards from './Pages/Cards/Cards';
 import { jwtDecode } from 'jwt-decode';
-import env from "react-dotenv";
 import axios from 'axios';
 import './App.css';
 import Modal from './Components/Modal/Modal';
@@ -17,8 +16,6 @@ import Project from './Pages/Project/Project';
 const api = axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`,
 });
-
-
 
 const emergencyMessages = {
     "en": {
@@ -93,6 +90,7 @@ function App() {
             setUserData(null);
             setUser(null);
 
+            console.log(err);
 
             navigate('/login');
             localStorage.removeItem("recap@localUserProfile");
@@ -145,7 +143,7 @@ function App() {
             });
 
         } else {
-            api.post((env.API_URL + `/user/`), [preparedData], {
+            api.post((process.env.REACT_APP_API_URL + `/user/`), [preparedData], {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
                 }
@@ -246,20 +244,20 @@ function App() {
             return;
         }
 
-        if (profile) {
-            if (!profile.logged_in) {
-                sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
-                logoutHandler();
-            };
+        if (profile && !profile.logged_in) {
+            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+            logoutHandler();
+            return;
+        }
 
-            const currentDate = new Date();
-            const profileDate = new Date(profile.logged_in);
-            const timeDifference = currentDate - profileDate;
+        const currentDate = new Date();
+        const profileDate = new Date(profile.logged_in);
+        const timeDifference = currentDate - profileDate;
+        const twoDays = 86400000 * 2;
 
-            if (timeDifference > 86400000) {
-                sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
-                logoutHandler();
-            }
+        if (timeDifference > twoDays) {
+            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+            logoutHandler();
         }
     }, [profile, navigate, logoutHandler, messages]);
 
@@ -306,7 +304,7 @@ function App() {
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
                                 <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                    <Project />
+                                    <Project messages={messages} setLoading={setIsLoading} />
                                 </PageTemplate>} />
                             </Route >
                         </Routes >

@@ -20,9 +20,8 @@ function OptionsMenu({ showCategory, children }) {
         }
     });
 
-
     return (
-        <div className="visibility-container">
+        <div className="visibility-container" style={{ overflowY: showCategory ? "visible" : "clip" }}>
             <animated.div style={optionsAnimation} className="options-menu">
                 {children}
             </animated.div>
