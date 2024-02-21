@@ -53,7 +53,7 @@
     border: none;
 }
 
-.cards-container :is(a, button):focus {
+.cards-container :is(a, button):focus-visible {
     transition: 0.2s all;
     transform: scale(1.05);
 }
@@ -87,7 +87,8 @@
 
     position: absolute;
     background-color: #fafafa;
-    transition: 0.2s transform;
+
+    transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
     cursor: pointer;
 }
 
@@ -222,7 +223,7 @@
 
         position: absolute;
         background-color: #fafafa;
-        transition: 0.2s transform;
+        transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
         cursor: pointer;
     }
 
@@ -234,11 +235,10 @@
 
         position: absolute;
         background-color: #D8D8D8;
-        transition: 0.2s transform;
+        transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
     }
 
     .card-container:hover .card-paper {
-        transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
         transform: rotate(4deg) translateX(-5.3px) translateY(-6px);
     }
 

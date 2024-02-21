@@ -8,9 +8,10 @@ import { jwtDecode } from 'jwt-decode';
 
 import { Link } from 'react-router-dom'
 
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import NotFound from "../../Components/NotFound/NotFound";
 import Markdown from "react-markdown";
+import styled from "@emotion/styled";
 
 const api = axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -132,7 +133,7 @@ export default function Project({ messages, setLoading }) {
 
             const receivedToken = localStorage.getItem("recap@localUserProfile");
 
-            api.get(`/project/file?project_id=${projectData.pre_id}`, {
+            api.get(`/project/markdown?project_id=${projectData.pre_id}`, {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
                 }
@@ -169,6 +170,23 @@ export default function Project({ messages, setLoading }) {
         setUserForceMobile(!userForceMobile);
     }
 
+
+    const BootstrapTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.arrow}`]: {
+            color: '#212121',
+        },
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#212121',
+            color: '#fafafa',
+            border: 'none',
+            fontFamily: 'Inter',
+            fontSize: '2vh',
+            padding: '1vh'
+        },
+    }));
+
     return (
         <>
             {projectAccess ? (
@@ -182,13 +200,21 @@ export default function Project({ messages, setLoading }) {
                     <div className="editor-tab">
                         <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
                             <div className="editor-buttons">
-                                <button title={messages.legend_hide_code_editor} className="close-button rotate-button" onClick={() => {
-                                    setOpenEditor(!openEditor);
-                                }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
-                                <button title={messages.legend_reload_view} className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
-                                <button title={messages.legend_save_current_state} className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+                                <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button className="close-button rotate-button" onClick={() => {
+                                        setOpenEditor(!openEditor);
+                                    }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
+                                </BootstrapTooltip>
+                                <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
+                                </BootstrapTooltip>
+                                <BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+                                </BootstrapTooltip>
                                 {!explodeMinSize() &&
-                                    <button title={messages.legend_toggle_mobile_desktop} className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>}
+                                    <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                        <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
+                                    </BootstrapTooltip>}
                             </div>
 
                             <Editor

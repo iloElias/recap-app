@@ -6,9 +6,10 @@ import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import styled from "@emotion/styled";
 
 const api = axios.create({
     baseURL: `${process.env.REACT_APP_API_URL}`,
@@ -143,7 +144,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                 const decodedResponse = jwtDecode(project.data);
 
                 setAlertSeverity('success');
-                setUserCards([...userCards, { id: decodedResponse.id, name: newCardRef.name }])
+                setUserCards([...userCards, { id: decodedResponse.id, name: newCardRef.name, synopsis: newCardRef.synopsis }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
             } catch (err) {
                 if (err.response.status === 401) {
@@ -163,6 +164,9 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
         createCardAndProject();
     }, [newCard, userCards, authenticationToken, navigate, toggleResetValues, logoutHandler, setLoading, userId, messages]);
 
+
+
+
     return (
         <>
             <div className="flex-column">
@@ -170,10 +174,10 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                 <div className="cards-page">
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
                     <div className="cards-container">
-                        <Card cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
+                        <Card messages={messages} cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
 
                         {userCards && userCards.map((card) => {
-                            return (<Card key={card.id} cardId={card.id} isLink={card.id} cardTitle={card.name} />);
+                            return (<Card key={card.id} messages={messages} cardId={card.id} isLink={card.id} cardTitle={card.name} cardSynopsis={card.synopsis} />);
                         })}
                     </div>
                 </div>
@@ -214,22 +218,74 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     );
 }
 
-export function Card({ cardTitle, cardId, onClick, isCreate, isLink }) {
+export function Card({ cardTitle, cardId, cardSynopsis, onClick, isCreate, isLink, messages }) {
+    const navigate = useNavigate();
+
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip arrow {...props} placement="bottom" enterDelay={500} classes={{ popper: className }} slotProps={{
+            popper: {
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [0, -70],
+                        },
+                    },
+                ],
+            },
+        }}
+        />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#fafafa',
+            color: 'rgba(0, 0, 0, 0.87)',
+            fontSize: '10px',
+            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
+
+            minWidth: '170px',
+            maxWidth: '170px'
+        },
+    }));
+
+    const Title = ({ name, synopsis }) => {
+        return (<>
+            <h2>{name}</h2>
+            <p>{synopsis}</p>
+        </>);
+    }
+
+    const CardTitle = ({ name, synopsis }) => {
+        return (<>
+            <h2>{messages.label_card_name}:</h2>
+            <p>{name}</p>
+            <p><strong>{messages.label_card_synopsis}:</strong></p>
+            <p>{synopsis}</p>
+        </>);
+    }
+
     return (
         <>
             {isLink ? (
-                <Link to={cardId ? ("/project/" + cardId) : "/"} >
-                    <div className="card-container" onClick={onClick}>
-                        <div className="card-paper-shadow"></div>
-                        <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
-                    </div>
-                </Link>
+                <button onClick={() => { navigate(cardId ? ("/project/" + cardId) : "/") }} >
+                    <HtmlTooltip title={(
+                        <CardTitle name={cardTitle} synopsis={cardSynopsis} />
+                    )}>
+                        <div className="card-container" onClick={onClick}>
+                            <div className="card-paper-shadow"></div>
+                            <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                        </div>
+                    </HtmlTooltip>
+                </button>
             ) : (
                 <button>
-                    <div className="card-container" onClick={onClick}>
-                        <div className="card-paper-shadow"></div>
-                        <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
-                    </div>
+                    <HtmlTooltip title={(
+                        <Title name={messages.tooltip_create_card_label} synopsis={messages.tooltip_create_card_synopsis_label} />
+                    )}>
+                        <div className="card-container" onClick={onClick}>
+                            <div className="card-paper-shadow"></div>
+                            <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                        </div>
+                    </HtmlTooltip>
                 </button>
             )}
         </>
