@@ -75,11 +75,17 @@
     user-select: none;
 }
 
-.close-button:hover {
+.close-button:hover,
+.close-button:focus-visible {
     cursor: pointer;
-    background: #3b3b3b;
+    background-color: #3b3b3b;
     transition: transform 0.2s;
     transform: translateY(-0.2dvh);
+}
+
+.close-button:focus-visible {
+    background-color: #3b3b3b;
+    outline: solid 0.4dvh #9f9f9f;
 }
 
 .close-button:active {

@@ -3,19 +3,17 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./Project.css";
 import { useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
-import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
 
 import { Link } from 'react-router-dom'
 
-import { Alert, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
+import { Alert, Popper, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import NotFound from "../../Components/NotFound/NotFound";
 import Markdown from "react-markdown";
 import styled from "@emotion/styled";
+import getApi from "../../Api/api";
 
-const api = axios.create({
-    baseURL: `${process.env.REACT_APP_API_URL}`,
-});
+const api = getApi();
 
 const getWindowSize = () => {
     return { height: window.innerHeight, width: window.innerWidth };
@@ -30,7 +28,7 @@ const explodeMinSize = () => {
 
 let lastSavedValue = null;
 let lastSavedTime = null;
-const cooldownPeriod = 5000;
+const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading }) {
     const [openEditor, setOpenEditor] = useState(true);
@@ -53,8 +51,6 @@ export default function Project({ messages, setLoading }) {
     const [projectAccess, setProjectAccess] = useState()
 
     window.addEventListener('resize', () => { setIsMobile(explodeMinSize()) });
-
-
 
     // Code editor animations
     const editorSideAnimation = useSpring({
@@ -83,9 +79,9 @@ export default function Project({ messages, setLoading }) {
         }
 
         const currentTime = Date.now();
-        if (lastSavedTime && (currentTime - lastSavedTime < cooldownPeriod)) {
-            const remainingCooldown = cooldownPeriod - (currentTime - lastSavedTime);
-            return remainingCooldown;
+        if (lastSavedTime && (currentTime - lastSavedTime < saveMarkdownWaitTime)) {
+            const remainingWaitTime = saveMarkdownWaitTime - (currentTime - lastSavedTime);
+            return remainingWaitTime;
         }
 
         const receivedToken = localStorage.getItem("recap@localUserProfile");
@@ -96,6 +92,8 @@ export default function Project({ messages, setLoading }) {
                 Authorization: `Bearer ${receivedToken}`,
             }
         }).then((e) => {
+            lastSavedTime = Date.now();
+            lastSavedValue = fileValue;
             setLoading(false);
             setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
             setAlertSeverity('success')
@@ -189,7 +187,7 @@ export default function Project({ messages, setLoading }) {
 
     return (
         <>
-            {projectAccess ? (
+            {projectAccess || notFoundProject ? (
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div id="text-container" className="transpiled-text-container">
@@ -215,6 +213,12 @@ export default function Project({ messages, setLoading }) {
                                     <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                         <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
                                     </BootstrapTooltip>}
+                                <BootstrapTooltip title={messages.go_back_home} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button className="close-button"><i class="bi bi-door-open"></i></button>
+                                </BootstrapTooltip>
+                                <BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button style={{ color: "red" }} className="close-button"><i class="bi bi-trash3"></i></button>
+                                </BootstrapTooltip>
                             </div>
 
                             <Editor

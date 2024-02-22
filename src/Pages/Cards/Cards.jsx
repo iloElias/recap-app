@@ -1,20 +1,17 @@
 import { RecapLogo } from "../../Components/Icons/Icons";
 import React, { useCallback, useEffect, useState } from "react";
-import axios from "axios";
 import "./Cards.css"
 import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
 import { Alert, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import styled from "@emotion/styled";
+import getApi from "../../Api/api";
 
-const api = axios.create({
-    baseURL: `${process.env.REACT_APP_API_URL}`,
-});
-
+const api = getApi();
 
 export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     const authenticationToken = localStorage.getItem('recap@localUserProfile');
@@ -102,7 +99,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                 setLoading(false)
                 setUserDataWasLoaded(true)
             } catch (err) {
-                if (err.response.status === 401) {
+                if (err?.response?.status === 401) {
                     sessionStorage.setItem("recap@previousSessionError", JSON.stringify({ message: messages.reauthenticate_token_message, severity: 'error' }))
                     logoutHandler();
                 }

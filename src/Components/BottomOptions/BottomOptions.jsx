@@ -5,6 +5,7 @@ import Button from "../Button/Button";
 import "./BottomOptions.css";
 import { useParams } from "react-router-dom";
 
+import { ClickAwayListener } from '@mui/base';
 
 function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
@@ -102,9 +103,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     }
 
     return messages.languages_button_title ? (
-        <>
-            <div style={{ display: (showCategory ? "flex" : "none") }} className="user-select-background" onClick={hideOptions} />
-            <div className="bottom-modal" onClick={(e) => e.stopPropagation()} >
+        <ClickAwayListener onClickAway={hideOptions}>
+            <div className="bottom-modal" >
                 <Button id="bottom-button" onClick={toggleCategories}>
                     <TreeDotsIcon />
                 </Button>
@@ -146,6 +146,6 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     )}
                 </OptionsMenu>
             </div>
-        </>
+        </ClickAwayListener>
     ) : (<></>);
 }

@@ -33,7 +33,7 @@
 
 .component-button:focus {
     background-color: #3b3b3b;
-    outline: double 0.4dvh #9f9f9f;
+    outline: solid 0.4dvh #9f9f9f;
 }
 
 .option-button {

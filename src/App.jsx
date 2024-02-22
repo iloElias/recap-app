@@ -13,10 +13,7 @@ import Modal from './Components/Modal/Modal';
 import { Alert, Snackbar } from '@mui/material';
 import Project from './Pages/Project/Project';
 import NotFound from './Components/NotFound/NotFound';
-
-const api = axios.create({
-    baseURL: `${process.env.REACT_APP_API_URL}`,
-});
+import getApi from './Api/api';
 
 const emergencyMessages = {
     "en": {
@@ -32,6 +29,8 @@ const emergencyMessages = {
         reauthenticate_logout_message: "Authentication time has expired, please log in again",
     }
 }
+
+const api = getApi();
 
 if (process.env.REACT_APP_LOCALHOST) {
     document.getElementById("page-title").innerText = `Recap - ${process.env.REACT_APP_LOCALHOST}`
@@ -61,7 +60,9 @@ function App() {
     const [previousSessionMessage, setPreviousSessionMessage] = useState(() => {
         try {
             return JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null
-        } catch (err) { }
+        } catch (err) {
+            sessionStorage.removeItem('recap@previousSessionError')
+        }
     });
     const [alertMessage, setAlertMessage] = useState();
     const [alert, openAlert] = useState();
@@ -83,9 +84,6 @@ function App() {
             setUserData(null);
             setUser(null);
 
-            console.log(err);
-
-            navigate('/login');
             localStorage.removeItem("recap@localUserProfile");
             setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || { message: emergencyMessages[localDefinedLanguage].reauthenticate_token_message, severity: 'error' });
 
@@ -115,21 +113,28 @@ function App() {
         setProfile(null);
         setUser(null);
 
-        navigate('/login');
         localStorage.removeItem("recap@localUserProfile");
+        navigate('/login');
         setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null);
     }, [setUserData, setProfile, setUser, setPreviousSessionMessage, navigate]);
 
-    const handleUser = useCallback((data, preparedData) => {
+    const prepareData = useCallback((profile) => {
+        return {
+            google_id: (profile.id || profile.sub),
+            email: profile.email,
+            preferred_lang: profile.locale,
+            name: profile.given_name,
+            username: ("" + profile.email).split("@")[0],
+            picture_path: profile.picture
+        }
+    }, []);
+
+    const handleUser = useCallback((data) => {
         const receivedToken = data.data;
         const decodedData = jwtDecode(receivedToken)[0];
 
         if (decodedData && !decodedData.google_id) {
-            api.post((process.env.REACT_APP_API_URL + `/user/`), [preparedData], {
-                headers: {
-                    Authorization: `Bearer ${receivedToken}`,
-                }
-            }).then(() => {
+            api.post(('/user/')).then(() => {
                 localStorage.setItem("recap@localUserProfile", receivedToken);
                 setUserData(decodedData);
                 setProfile(decodedData);
@@ -180,42 +185,28 @@ function App() {
                         profile = res.data;
                         setProfile(res.data);
 
-                        const preparedData = {
-                            google_id: (profile.id || profile.sub),
-                            email: profile.email,
-                            preferred_lang: profile.locale,
-                            name: profile.given_name,
-                            username: ("" + profile.email).split("@")[0],
-                            picture_path: profile.picture
-                        };
+                        const preparedData = prepareData(profile);
 
                         api.post(`user/login/`, [preparedData])
                             .then(data => {
-                                handleUser(data, preparedData);
+                                handleUser(data);
                             })
                     })
                 } else if (user.credential) { // One tap Login
                     const decodedUserData = jwtDecode(user.credential);
                     profile = decodedUserData;
 
-                    const preparedData = {
-                        google_id: (profile.id || profile.sub),
-                        email: profile.email,
-                        preferred_lang: profile.locale,
-                        name: profile.given_name,
-                        username: ("" + profile.email).split("@")[0],
-                        picture_path: profile.picture
-                    };
+                    const preparedData = prepareData(profile);
 
                     api.post(`user/login/`, [preparedData])
                         .then(data => {
-                            handleUser(data, preparedData);
+                            handleUser(data);
                         })
 
                 }
             }
         },
-        [user, setProfile, handleUser]
+        [user, setProfile, handleUser, prepareData]
     );
 
     useEffect(() => {
