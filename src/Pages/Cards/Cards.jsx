@@ -5,7 +5,7 @@ import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
-import { Alert, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
+import { Alert, Paper, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import styled from "@emotion/styled";
@@ -182,13 +182,15 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
 
             <animated.div onClick={() => { showModal && toggleModal() }} style={modalAnimation} >
                 <Modal >
-                    <animated.div style={containerAnimation} className="create-card-container" onClick={e => e.stopPropagation()}>
-                        <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
-                        <form onSubmit={e => { e.preventDefault() }}>
-                            <Input resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
-                            <TextArea resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
-                            <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
-                        </form>
+                    <animated.div style={containerAnimation} onClick={e => e.stopPropagation()}>
+                        <Paper className="create-card-container">
+                            <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
+                            <form onSubmit={e => { e.preventDefault() }}>
+                                <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
+                                <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
+                                <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
+                            </form>
+                        </Paper>
                     </animated.div>
                 </Modal>
             </animated.div>

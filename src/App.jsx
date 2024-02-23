@@ -212,7 +212,7 @@ function App() {
     useEffect(() => {
         if (userData) {
             setIsLoading(false);
-            navigate('/project')
+            navigate('/projects')
         }
     }, [userData, navigate, setIsLoading]);
 
@@ -274,8 +274,8 @@ function App() {
                     <div className="App">
                         <Routes>
                             <Route path='/'>
-                                <Route index element={<Navigate to='/project' ></Navigate>} />
-                                <Route path='/project' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                <Route index element={<Navigate to='/projects' ></Navigate>} />
+                                <Route path='/projects' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} logoutHandler={logoutHandler} />
                                 </PageTemplate>} />
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>

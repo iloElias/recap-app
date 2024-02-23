@@ -45,6 +45,9 @@
 
     padding: 0.5dvh;
 
+    min-width: 33px;
+    min-height: 33px;
+
     max-width: 5dvh;
     height: 5dvh;
 }

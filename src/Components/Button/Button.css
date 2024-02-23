@@ -11,12 +11,35 @@
 
     border-radius: 1dvh;
     outline: none;
-    border: none;
     background: #212121;
 
     font-size: 2dvh;
 
     color: #FAFAFA;
+    user-select: none;
+}
+
+.component-button-disabled {
+    width: 30dvh;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 1.2dvh;
+    padding: 1dvh 3.4dvh;
+
+    cursor: not-allowed;
+
+    border-radius: 1dvh;
+    outline: none;
+    border: solid 0.2vh rgba(255, 255, 255, 0.750);
+    background: #575757;
+
+    font-size: 2dvh;
+
+    color: #ffffff;
     user-select: none;
 }
 
@@ -31,7 +54,7 @@
     transform: translateY(0.1dvh);
 }
 
-.component-button:focus {
+.component-button:focus-visible {
     background-color: #3b3b3b;
     outline: solid 0.4dvh #9f9f9f;
 }

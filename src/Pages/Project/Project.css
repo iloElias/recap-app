@@ -60,19 +60,48 @@
     aspect-ratio: 1/1;
 
     width: 5dvh;
+    min-width: 33px;
+    min-height: 33px;
+
     margin: 0 2vh;
 
     border-radius: 1dvh;
     outline: none;
-    border: none;
+    border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #212121;
 
-    font-size: 2dvh;
+    font-size: max(75%, 2dvh);
 
     cursor: pointer;
 
     color: #FAFAFA;
     user-select: none;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 1dvh
+}
+
+form :is(input, textarea) {
+    user-select: none;
+    touch-action: none;
+
+    resize: none;
+
+    padding: 0.9dvh 0.5dvh;
+
+    border-radius: 1dvh;
+    outline: none;
+    border: none;
+
+    background: #fafafa;
+
+    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+
+    font-size: 2dvh;
+    color: #212121;
 }
 
 .close-button:hover,

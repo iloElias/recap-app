@@ -1,48 +1,48 @@
 .App {
-  height: 100dvh;
+    height: 100dvh;
 
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .circular-image {
-  height: 10dvh;
+    height: 10dvh;
 
-  border-radius: 50%;
+    border-radius: 50%;
 }
 
 .not-loading-page {
-  min-height: "100dvh";
-  min-width: "100dvw";
-  display: 'flex';
-  flex-direction: "column";
-  justify-content: "center";
-  align-items: "center";
+    min-height: "100dvh";
+    min-width: "100dvw";
+    display: 'flex';
+    flex-direction: "column";
+    justify-content: "center";
+    align-items: "center";
 }
 
 .popup-container {
-  user-select: none;
-  touch-action: none;
+    user-select: none;
+    touch-action: none;
 
-  resize: none;
+    resize: none;
 
-  padding: 0.9dvh 0.5dvh;
+    padding: 0.9dvh 0.5dvh;
 
-  border-radius: 1dvh;
-  outline: none;
-  border: none;
+    border-radius: 1dvh;
+    outline: none;
+    border: none;
 
-  background: #fafafa;
+    background: #fafafa;
 
-  border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
 
-  font-size: 2dvh;
+    font-size: 2dvh;
 
-  color: #212121;
+    color: #212121;
 }

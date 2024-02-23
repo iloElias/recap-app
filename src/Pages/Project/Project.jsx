@@ -1,17 +1,20 @@
 import { Editor } from "@monaco-editor/react";
 import React, { useCallback, useEffect, useState } from "react";
 import "./Project.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 import { jwtDecode } from 'jwt-decode';
 
 import { Link } from 'react-router-dom'
 
-import { Alert, Popper, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
+import { Alert, Paper, Snackbar, Tooltip, tooltipClasses, Grow } from "@mui/material";
 import NotFound from "../../Components/NotFound/NotFound";
 import Markdown from "react-markdown";
 import styled from "@emotion/styled";
 import getApi from "../../Api/api";
+import Modal from "../../Components/Modal/Modal";
+import Button from "../../Components/Button/Button";
+import Input from "../../Components/Input/Input";
 
 const api = getApi();
 
@@ -26,14 +29,19 @@ const explodeMinSize = () => {
     return false;
 }
 
-let lastSavedValue = null;
-let lastSavedTime = null;
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading }) {
     const [openEditor, setOpenEditor] = useState(true);
     const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
     const [isMobile, setIsMobile] = useState(explodeMinSize());
+
+    const [deleteValue, setDeleteValue] = useState();
+    const [required, setRequired] = useState(false);
+
+    const [modalContent, setModalContent] = useState(<></>);
+    const [showModal, setShowModal] = useState(false);
+    const navigate = useNavigate();
 
     const [alertMessage, setAlertMessage] = useState();
     const [alert, openAlert] = useState();
@@ -46,6 +54,10 @@ export default function Project({ messages, setLoading }) {
     const [markdownText, setMarkdownText] = useState('');
     const [localMarkdownText, setLocalMarkdownText] = useState('');
     const [saveProject, setSaveProject] = useState(false);
+    const [lastSavedValue, setLastSavedValue] = useState();
+    const [lastSavedTime, setLastSavedTime] = useState(Date.now);
+
+    const [goHome, setGoHome] = useState(false);
     const urlParam = useParams('/project/:id');
     const [projectData, setProjectData] = useState({ pre_id: urlParam.id })
     const [projectAccess, setProjectAccess] = useState()
@@ -62,7 +74,7 @@ export default function Project({ messages, setLoading }) {
 
     // Project visualizer animations
     const editorVisualizerAnimation = useSpring({
-        marginLeft: openEditor ? '60.5dvh' : '9dvh'
+        marginLeft: openEditor ? 'max(60.5dvh, calc(55.5dvh + 33px))' : 'max(9dvh, calc(9dvh + 0px))'
     });
 
     // Buttons animation
@@ -73,8 +85,32 @@ export default function Project({ messages, setLoading }) {
         rotate: openEditor ? '-90deg' : '90deg'
     });
 
-    const saveFileToDatabase = useCallback((fileValue, projectId) => {
+    // Modal animation
+    const modalAnimation = useSpring({
+        zIndex: showModal ? 4 : -1,
+        opacity: showModal ? 1 : 0,
+        config: {
+            mass: 0.1,
+            tension: 314
+        },
+        immediate: (key) => key === (showModal ? "zIndex" : "")
+    });
+
+    const saveHandle = useCallback((fileValue, projectId) => {
         if (fileValue === lastSavedValue) {
+            if (goHome) {
+                setShowModal(false);
+                setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
+                setAlertSeverity('success')
+                openAlert(true);
+                setShowModal(false);
+                setLoading(true);
+
+                setTimeout(() => {
+                    setLoading(false);
+                    navigate('/projects');
+                }, 2000);
+            }
             return;
         }
 
@@ -92,12 +128,22 @@ export default function Project({ messages, setLoading }) {
                 Authorization: `Bearer ${receivedToken}`,
             }
         }).then((e) => {
-            lastSavedTime = Date.now();
-            lastSavedValue = fileValue;
-            setLoading(false);
-            setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
-            setAlertSeverity('success')
+            setLastSavedTime(Date.now());
+            setLastSavedValue(fileValue);
+            if (goHome) {
+                setShowModal(false);
+                setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
+                setAlertSeverity('success')
+                openAlert(true);
+
+                setTimeout(() => {
+                    navigate('/projects');
+                }, 2000);
+            }
             openAlert(true);
+            setAlertSeverity('success')
+            setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
+            setLoading(false);
         }).catch((e) => {
             setLoading(false);
             if (e.response.status === 400) {
@@ -114,14 +160,34 @@ export default function Project({ messages, setLoading }) {
             }
             openAlert(true);
         })
-    }, [messages, setAlertMessage, setAlertSeverity, openAlert, setLoading]);
+    }, [messages, goHome, lastSavedValue, lastSavedTime, setAlertMessage, setLastSavedTime, setLastSavedValue, setAlertSeverity, openAlert, navigate, setLoading]);
+
+    const deleteHandle = () => {
+        if (deleteValue === projectAccess.name) {
+
+        }
+    }
+
+    const exitProjectHandler = useCallback((fileValue) => {
+        if (fileValue === lastSavedValue) {
+            navigate('/projects');
+        }
+
+        setModalContent('exit');
+        setShowModal(true);
+    }, [navigate, setShowModal, setModalContent, lastSavedValue]);
+
+    const deleteProjectHandler = useCallback(() => {
+        setModalContent("delete");
+        setShowModal(true);
+    }, [setModalContent, setShowModal]);
 
     useEffect(() => {
         if (saveProject) {
-            saveFileToDatabase(markdownText, urlParam.id);
+            saveHandle(markdownText, urlParam.id);
             setSaveProject(false);
         }
-    }, [saveProject, markdownText, urlParam, saveFileToDatabase]);
+    }, [saveProject, markdownText, urlParam, saveHandle]);
 
     useEffect(() => {
         if (projectData.pre_id) {
@@ -138,6 +204,7 @@ export default function Project({ messages, setLoading }) {
             }).then((data) => {
                 const decodedData = jwtDecode(data.data);
 
+                setLastSavedValue(decodedData[0].imd);
                 setProjectData(decodedData[0]);
                 setLoading(false);
             }).catch((e) => {
@@ -154,7 +221,7 @@ export default function Project({ messages, setLoading }) {
             setLocalMarkdownText(projectData.imd);
             setProjectAccess(projectData.user_permissions)
         }
-    }, [projectData, messages, setProjectData, setLocalMarkdownText, setMarkdownText, setLoading]);
+    }, [projectData, messages, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
@@ -206,19 +273,21 @@ export default function Project({ messages, setLoading }) {
                                 <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                     <button className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
                                 </BootstrapTooltip>
-                                <BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+
+                                {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                     <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
-                                </BootstrapTooltip>
+                                </BootstrapTooltip>)}
+
                                 {!explodeMinSize() &&
                                     <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                         <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
                                     </BootstrapTooltip>}
                                 <BootstrapTooltip title={messages.go_back_home} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button className="close-button"><i class="bi bi-door-open"></i></button>
+                                    <button onClick={(projectAccess === 'own' ? exitProjectHandler : () => { navigate('/projects') })} className="close-button"><i className="bi bi-door-open"></i></button>
                                 </BootstrapTooltip>
-                                <BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button style={{ color: "red" }} className="close-button"><i class="bi bi-trash3"></i></button>
-                                </BootstrapTooltip>
+                                {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
+                                </BootstrapTooltip>)}
                             </div>
 
                             <Editor
@@ -245,15 +314,73 @@ export default function Project({ messages, setLoading }) {
                             />
                         </animated.div>
                     </div >
+
+                    <animated.div style={modalAnimation} onClick={() => { setShowModal(false) }} >
+                        <Modal >
+                            <Grow
+                                onClick={e => e.stopPropagation()}
+                                in={showModal}
+                                style={{ transformOrigin: '50% 0 0' }}
+                                {...(showModal ? { timeout: 500 } : {})}
+                            >
+
+                                <Paper>
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        maxWidth: '20rem',
+                                        padding: '2.5dvh 4dvh',
+                                        gap: '1vh'
+                                    }} >
+                                        {modalContent === "delete" ?
+                                            (<form onSubmit={e => { e.preventDefault(); setRequired(true) }}>
+                                                <h3>{messages.delete_project}</h3>
+                                                <p style={{ fontSize: "14px" }}>{`${messages.delete_project_confirm}`.split(':str')[0]} <strong>{projectData.name}</strong>{`${messages.delete_project_confirm}`.split(':str')[1]}</p>
+                                                <p style={{ fontSize: "13px" }}>{`${messages.delete_project_confirm_input}`.split(':str')[0]} <strong>{projectData.name}</strong>{`${messages.delete_project_confirm_input}`.split(':str')[1]}</p>
+
+                                                <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return value === projectData.name ? true : messages.delete_project_confirm_input_invalid }} update={setDeleteValue} />
+                                                <Button disabled={!(deleteValue === projectData.name) ? true : false} onClick={() => {
+                                                    setRequired(true);
+                                                    deleteHandle();
+                                                }} style={{
+                                                    width: '100%'
+                                                }}>{messages.confirm}</Button>
+                                            </form>) : (
+                                                <>
+                                                    <h3>{messages.save_project}</h3>
+                                                    <Button onClick={() => {
+                                                        setGoHome(true);
+                                                        handleFileSave();
+                                                    }} style={{
+                                                        width: '100%'
+                                                    }}>
+                                                        {messages.save_than_leave}
+                                                    </Button>
+                                                    <Button onClick={() => { navigate('/projects') }} style={{
+                                                        width: '100%'
+                                                    }}>
+                                                        {messages.leave_without_saving}
+                                                    </Button>
+                                                </>
+                                            )
+                                        }
+                                    </div>
+                                </Paper>
+                            </Grow>
+                        </Modal>
+                    </animated.div>
                 </div >) : (
                 <>
                 </>
-            )}
+            )
+            }
 
-            {notFoundProject && <NotFound>
-                <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
-                <Link to="/">{messages.go_back_home}</Link>
-            </NotFound>}
+            {
+                notFoundProject && <NotFound>
+                    <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
+                    <Link to="/">{messages.go_back_home}</Link>
+                </NotFound>
+            }
 
             < Snackbar
                 open={notification}
