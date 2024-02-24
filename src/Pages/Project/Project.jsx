@@ -37,6 +37,7 @@ export default function Project({ messages, setLoading }) {
     const [isMobile, setIsMobile] = useState(explodeMinSize());
 
     const [deleteValue, setDeleteValue] = useState();
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const [required, setRequired] = useState(false);
 
     const [modalContent, setModalContent] = useState(<></>);
@@ -130,9 +131,9 @@ export default function Project({ messages, setLoading }) {
         }).then((e) => {
             setLastSavedTime(Date.now());
             setLastSavedValue(fileValue);
+            setShowModal(false);
             if (goHome) {
-                setShowModal(false);
-                setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
+                setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
                 setAlertSeverity('success')
                 openAlert(true);
 
@@ -142,7 +143,7 @@ export default function Project({ messages, setLoading }) {
             }
             openAlert(true);
             setAlertSeverity('success')
-            setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
+            setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
             setLoading(false);
         }).catch((e) => {
             setLoading(false);
@@ -162,11 +163,24 @@ export default function Project({ messages, setLoading }) {
         })
     }, [messages, goHome, lastSavedValue, lastSavedTime, setAlertMessage, setLastSavedTime, setLastSavedValue, setAlertSeverity, openAlert, navigate, setLoading]);
 
-    const deleteHandle = () => {
-        if (deleteValue === projectAccess.name) {
+    const deleteHandle = useCallback((projectId) => {
+        console.log(deleteValue === projectData.name);
+        if (deleteValue === projectData.name) {
+            setShowModal(false);
+            setLoading(true);
+            api.delete(`/project/?project_id=${projectId}`).then(() => {
+                setAlertMessage(`${messages.delete_project_success}`);
+                setAlertSeverity('success')
+                openAlert(true);
 
+                setTimeout(() => {
+                    navigate('/projects');
+                }, 2000);
+            })
+        } else {
+            setConfirmDelete(false);
         }
-    }
+    }, [deleteValue, messages, projectData, navigate, setLoading])
 
     const exitProjectHandler = useCallback((fileValue) => {
         if (fileValue === lastSavedValue) {
@@ -190,6 +204,12 @@ export default function Project({ messages, setLoading }) {
     }, [saveProject, markdownText, urlParam, saveHandle]);
 
     useEffect(() => {
+        if (confirmDelete) {
+            deleteHandle(urlParam.id);
+        }
+    }, [confirmDelete, urlParam, deleteHandle]);
+
+    useEffect(() => {
         if (projectData.pre_id) {
             setNotificationMessage(messages.loading_your_project);
             setNotification(true)
@@ -203,10 +223,13 @@ export default function Project({ messages, setLoading }) {
                 }
             }).then((data) => {
                 const decodedData = jwtDecode(data.data);
-
-                setLastSavedValue(decodedData[0].imd);
-                setProjectData(decodedData[0]);
-                setLoading(false);
+                if (decodedData[0].state === 'inactive') {
+                    setNotFoundProject('notActive');
+                } else {
+                    setLastSavedValue(decodedData[0].imd);
+                    setProjectData(decodedData[0]);
+                    setLoading(false);
+                }
             }).catch((e) => {
                 setLoading(false);
                 if (e.response.status === 404) {
@@ -254,7 +277,7 @@ export default function Project({ messages, setLoading }) {
 
     return (
         <>
-            {projectAccess || notFoundProject ? (
+            {projectAccess && !notFoundProject ? (
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div id="text-container" className="transpiled-text-container">
@@ -341,7 +364,7 @@ export default function Project({ messages, setLoading }) {
                                                 <Input type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return value === projectData.name ? true : messages.delete_project_confirm_input_invalid }} update={setDeleteValue} />
                                                 <Button disabled={!(deleteValue === projectData.name) ? true : false} onClick={() => {
                                                     setRequired(true);
-                                                    deleteHandle();
+                                                    setConfirmDelete(true);
                                                 }} style={{
                                                     width: '100%'
                                                 }}>{messages.confirm}</Button>
@@ -376,7 +399,14 @@ export default function Project({ messages, setLoading }) {
             }
 
             {
-                notFoundProject && <NotFound>
+                notFoundProject && !projectData.state === 'inactive' && <NotFound>
+                    <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
+                    <Link to="/">{messages.go_back_home}</Link>
+                </NotFound>
+            }
+
+            {
+                notFoundProject && projectData.state === 'inactive' && <NotFound>
                     <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
                     <Link to="/">{messages.go_back_home}</Link>
                 </NotFound>

@@ -10,6 +10,7 @@
     padding: 1dvh 3.4dvh;
 
     border-radius: 1dvh;
+    border: solid 0.2vh rgba(255, 255, 255, 0.25);
     outline: none;
     background: #212121;
 
@@ -34,7 +35,7 @@
 
     border-radius: 1dvh;
     outline: none;
-    border: solid 0.2vh rgba(255, 255, 255, 0.750);
+    border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #575757;
 
     font-size: 2dvh;
