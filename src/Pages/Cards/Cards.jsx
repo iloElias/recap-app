@@ -167,7 +167,11 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     return (
         <>
             <div className="flex-column">
-                <RecapLogo height={"5dvh"} style={{ marginTop: "3.75dvh", minHeight: "4.5dvh" }} />
+                <RecapLogo style={{
+                    marginTop: "3.75dvh",
+                    minHeight: "min-content",
+                    height: "max(34px, 4.5dvh)"
+                }} />
                 <div className="cards-page">
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
                     <div className="cards-container">

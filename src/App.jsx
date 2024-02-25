@@ -70,8 +70,7 @@ function App() {
     const [notification, setNotification] = useState();
     const [notificationMessage, setNotificationMessage] = useState();
 
-    const [user, setUser] = useState([]);
-    const [userData, setUserData] = useState();
+    const [user, setUser] = useState(null);
     const [profile, setProfile] = useState(() => {
         if (!localUserProfile) return null;
         try {
@@ -81,7 +80,6 @@ function App() {
         } catch (err) {
             googleLogout();
 
-            setUserData(null);
             setUser(null);
 
             localStorage.removeItem("recap@localUserProfile");
@@ -109,14 +107,14 @@ function App() {
     const logoutHandler = useCallback(() => {
         googleLogout();
 
-        setUserData(null)
+        localStorage.removeItem("recap@localUserProfile");
+
         setProfile(null);
         setUser(null);
 
-        localStorage.removeItem("recap@localUserProfile");
         navigate('/login');
         setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null);
-    }, [setUserData, setProfile, setUser, setPreviousSessionMessage, navigate]);
+    }, [setProfile, setUser, setPreviousSessionMessage, navigate]);
 
     const prepareData = useCallback((profile) => {
         return {
@@ -136,16 +134,15 @@ function App() {
         if (decodedData && !decodedData.google_id) {
             api.post(('/user/')).then(() => {
                 localStorage.setItem("recap@localUserProfile", receivedToken);
-                setUserData(decodedData);
                 setProfile(decodedData);
             });
         } else {
-            setUserData(decodedData);
             setProfile(decodedData);
         }
 
+        navigate('/projects');
         localStorage.setItem("recap@localUserProfile", receivedToken);
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
         if (previousSessionMessage) {
@@ -208,13 +205,6 @@ function App() {
         },
         [user, setProfile, handleUser, prepareData]
     );
-
-    useEffect(() => {
-        if (userData) {
-            setIsLoading(false);
-            navigate('/projects')
-        }
-    }, [userData, navigate, setIsLoading]);
 
     useEffect(() => {
         if (!profile) {

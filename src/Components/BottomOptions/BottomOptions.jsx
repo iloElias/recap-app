@@ -1,4 +1,4 @@
-import { ColorPaletteIcon, ExportIcon, GlobeIcon, LogoutIcon, ShareIcon, TreeDotsIcon } from "../Icons/Icons";
+import { TreeDotsIcon } from "../Icons/Icons";
 import { useSpring, animated } from "react-spring";
 import React, { useState } from "react";
 import Button from "../Button/Button";
@@ -6,6 +6,7 @@ import "./BottomOptions.css";
 import { useParams } from "react-router-dom";
 
 import { ClickAwayListener } from '@mui/base';
+import { Paper } from "@mui/material";
 
 function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
@@ -45,9 +46,13 @@ function OptionPanel({ showPanel, title, children }) {
 
     return (
         <div style={{ zIndex: showPanel ? "27" : "25" }} className="vertical-visibility-container">
-            <animated.div style={panelAnimation} className="option-panel">
-                {title}
-                {children}
+            <animated.div style={panelAnimation}>
+                <Paper >
+                    <div className="option-panel">
+                        {title}
+                        {children}
+                    </div>
+                </Paper>
             </animated.div>
         </div>
     );
@@ -109,7 +114,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     <TreeDotsIcon />
                 </Button>
                 <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>
-                    <Option optionName={messages.languages_button_title} optionIcon={<GlobeIcon />} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
+                    <Option optionName={messages.languages_button_title} optionIcon={<i className="bi bi-globe2"></i>} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
                         <OptionPanel showPanel={showLanguagePanel} title={messages.languages_button_title}>
                             <select onChange={onLanguageChange} value={language}>
                                 <option value="en">English</option>
@@ -119,18 +124,18 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     </Option>
                     {urlParam.id && (
                         <>
-                            <Option optionName={messages.styles_button_title} optionIcon={<ColorPaletteIcon />} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
+                            <Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
                                 <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title}>
 
                                 </OptionPanel>
                             </Option>
-                            <Option optionName={messages.export_project_button_title} optionIcon={<ExportIcon />} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
+                            <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
                                 <OptionPanel showPanel={showExportPanel} >
                                     <Button className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
                                     <Button className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
                                 </OptionPanel>
                             </Option>
-                            <Option optionName={messages.share_project_button_title} optionIcon={<ShareIcon />} onClick={() => { hideAllPanels(); setShowSharePanel(!showSharePanel) }}>
+                            <Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => { hideAllPanels(); setShowSharePanel(!showSharePanel) }}>
                                 <OptionPanel showPanel={showSharePanel} title={messages.share_project_button_title}>
 
                                 </OptionPanel>
@@ -142,7 +147,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         <Option onClick={() => {
                             logoutHandler();
                             hideOptions();
-                        }} optionName={messages.account_logout_button_title} optionIcon={<LogoutIcon />} />
+                        }} optionName={messages.account_logout_button_title} optionIcon={<i className="bi bi-door-open"></i>} />
                     )}
                 </OptionsMenu>
             </div>

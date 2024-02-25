@@ -33,7 +33,7 @@
 
 .vertical-visibility-container {
     position: absolute;
-    right: 20dvh;
+    right: max(20dvh, 115px);
     padding: 0 1dvh 1dvh 1dvh;
 
     /* overflow: visible; */
@@ -53,6 +53,9 @@
 }
 
 .options-menu {
+    min-width: min-content;
+    min-height: min-content;
+
     display: flex;
     flex-direction: column;
     gap: 1dvh;
@@ -62,20 +65,26 @@
     display: flex;
     flex-direction: row;
 
+    height: min-content;
+    min-width: 33px;
+    min-height: 33px;
+
     height: 5dvh;
 }
 
 .option-panel {
     width: 25dvh;
-    height: fit-content;
+    height: min-content;
+
+    min-width: 120px;
+    max-width: 40vw;
+    min-height: fit-content;
 
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
 
     gap: 1.2dvh;
-    padding: 1dvh;
+    padding: clamp(1.5vh, 12px, 1vh);
 
     user-select: none;
     touch-action: none;
@@ -86,9 +95,7 @@
 
     background: #FAFAFA;
 
-    box-shadow: 0 0 0.5dvh rgba(146, 146, 146, 0.719);
-
-    font-size: 2dvh;
+    font-size: clamp(2dvh, 12px, 14px);
 
     text-transform: uppercase;
     color: #989898;
@@ -99,7 +106,7 @@
 
     size: 1dvh;
 
-    font-size: 2dvh;
+    font-size: clamp(2dvh, 12px, 14px);
 
     border-radius: 0.5dvh;
     background-color: #FAFAFA;

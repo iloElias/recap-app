@@ -258,7 +258,6 @@ export default function Project({ messages, setLoading }) {
         setUserForceMobile(!userForceMobile);
     }
 
-
     const BootstrapTooltip = styled(({ className, ...props }) => (
         <Tooltip {...props} classes={{ popper: className }} />
     ))(({ theme }) => ({
@@ -275,9 +274,22 @@ export default function Project({ messages, setLoading }) {
         },
     }));
 
+    const renderSwitch = () => {
+        switch (notFoundProject) {
+            case 'notFound':
+                return (<NotFoundCase messages={messages} />);
+            case 'notAllowed':
+                return (<NotAllowedCase messages={messages} />);
+            case 'notActive':
+                return (<NotActiveCase messages={messages} />);
+            default:
+                break;
+        }
+    }
+
     return (
         <>
-            {projectAccess && !notFoundProject ? (
+            {!notFoundProject ? (
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div id="text-container" className="transpiled-text-container">
@@ -399,17 +411,7 @@ export default function Project({ messages, setLoading }) {
             }
 
             {
-                notFoundProject && !projectData.state === 'inactive' && <NotFound>
-                    <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
-                    <Link to="/">{messages.go_back_home}</Link>
-                </NotFound>
-            }
-
-            {
-                notFoundProject && projectData.state === 'inactive' && <NotFound>
-                    <p>{notFoundProject === 'notAllowed' ? (messages.not_invited_to) : (messages.not_found_project)}</p>
-                    <Link to="/">{messages.go_back_home}</Link>
-                </NotFound>
+                renderSwitch()
             }
 
             < Snackbar
@@ -432,5 +434,32 @@ export default function Project({ messages, setLoading }) {
                 </Alert>
             </Snackbar>
         </>
+    );
+}
+
+function NotFoundCase({ messages }) {
+    return (
+        <NotFound>
+            <p>{messages.not_found_project}</p>
+            <Link to="/">{messages.go_back_home}</Link>
+        </NotFound>
+    );
+}
+
+function NotAllowedCase({ messages }) {
+    return (
+        <NotFound>
+            <p>{messages.not_invited_to}</p>
+            <Link to="/">{messages.go_back_home}</Link>
+        </NotFound>
+    );
+}
+
+function NotActiveCase({ messages }) {
+    return (
+        <NotFound>
+            <p>{messages.inactivated_project_page}</p>
+            <Link to="/">{messages.go_back_home}</Link>
+        </NotFound>
     );
 }
