@@ -242,9 +242,9 @@ export function Card({ cardTitle, cardId, cardSynopsis, onClick, isCreate, isLin
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: '#fafafa',
             color: 'rgba(0, 0, 0, 0.87)',
-            fontSize: '10px',
             border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
 
+            fontSize: '10px',
             minWidth: '170px',
             maxWidth: '170px'
         },

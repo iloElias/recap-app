@@ -1,0 +1,25 @@
+{
+    "project_name": "Nome do projeto",
+    "project_synopsis": "Sinopse do projeto",
+    "subjects": [
+        {
+            "subject_title": "Titulo do assunto",
+            "cards": [
+                {
+                    "card_title": "Exemplo de item",
+                    "content": [
+                        "O conteúdo dos cards serão exibidos desta forma",
+                        "Cada item na lista de conteúdo será renderizado na tela após um click no botão de recarregamento"
+                    ]
+                },
+                {
+                    "card_title": "Segundo item",
+                    "content": [
+                        "Segundo cartão do projeto",
+                        "Teste de renderização"
+                    ]
+                }
+            ]
+        }
+    ]
+}

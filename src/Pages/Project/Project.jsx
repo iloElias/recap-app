@@ -1,4 +1,3 @@
-import { Editor } from "@monaco-editor/react";
 import React, { useCallback, useEffect, useState } from "react";
 import "./Project.css";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,12 +8,17 @@ import { Link } from 'react-router-dom'
 
 import { Alert, Paper, Snackbar, Tooltip, tooltipClasses, Grow } from "@mui/material";
 import NotFound from "../../Components/NotFound/NotFound";
-import Markdown from "react-markdown";
+
 import styled from "@emotion/styled";
 import getApi from "../../Api/api";
 import Modal from "../../Components/Modal/Modal";
 import Button from "../../Components/Button/Button";
 import Input from "../../Components/Input/Input";
+import ReactJson from "react-json-view";
+
+
+import jsonTest from "./json.json";
+import { Editor } from "@monaco-editor/react";
 
 const api = getApi();
 
@@ -35,6 +39,8 @@ export default function Project({ messages, setLoading }) {
     const [openEditor, setOpenEditor] = useState(true);
     const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
     const [isMobile, setIsMobile] = useState(explodeMinSize());
+
+    const [fullScreen, setFullScreen] = useState(false);
 
     const [deleteValue, setDeleteValue] = useState();
     const [confirmDelete, setConfirmDelete] = useState(false);
@@ -67,10 +73,13 @@ export default function Project({ messages, setLoading }) {
 
     // Code editor animations
     const editorSideAnimation = useSpring({
-        transform: openEditor ? 'translateX(0%)' : 'translateX(-100%)',
+        transform: openEditor ? 'scaleX(0%)' : 'translateX(-100%)',
+        width: openEditor ? '' : '',
+        width: fullScreen ? '200dvh' : '51.5dvh'
     });
     const editorBottomAnimation = useSpring({
         transform: openEditor ? 'translateY(0%)' : 'translateY(100%)',
+        // height: fullScreen ? '90%' : '40%'
     });
 
     // Project visualizer animations
@@ -123,6 +132,7 @@ export default function Project({ messages, setLoading }) {
 
         const receivedToken = localStorage.getItem("recap@localUserProfile");
 
+        setShowModal(false);
         setLoading(true);
         api.put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
             headers: {
@@ -131,7 +141,6 @@ export default function Project({ messages, setLoading }) {
         }).then((e) => {
             setLastSavedTime(Date.now());
             setLastSavedValue(fileValue);
-            setShowModal(false);
             if (goHome) {
                 setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
                 setAlertSeverity('success')
@@ -140,11 +149,12 @@ export default function Project({ messages, setLoading }) {
                 setTimeout(() => {
                     navigate('/projects');
                 }, 2000);
+            } else {
+                openAlert(true);
+                setAlertSeverity('success')
+                setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
+                setLoading(false);
             }
-            openAlert(true);
-            setAlertSeverity('success')
-            setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
-            setLoading(false);
         }).catch((e) => {
             setLoading(false);
             if (e.response.status === 400) {
@@ -164,7 +174,6 @@ export default function Project({ messages, setLoading }) {
     }, [messages, goHome, lastSavedValue, lastSavedTime, setAlertMessage, setLastSavedTime, setLastSavedValue, setAlertSeverity, openAlert, navigate, setLoading]);
 
     const deleteHandle = useCallback((projectId) => {
-        console.log(deleteValue === projectData.name);
         if (deleteValue === projectData.name) {
             setShowModal(false);
             setLoading(true);
@@ -210,6 +219,8 @@ export default function Project({ messages, setLoading }) {
     }, [confirmDelete, urlParam, deleteHandle]);
 
     useEffect(() => {
+        if (projectData.id) return;
+
         if (projectData.pre_id) {
             setNotificationMessage(messages.loading_your_project);
             setNotification(true)
@@ -223,26 +234,27 @@ export default function Project({ messages, setLoading }) {
                 }
             }).then((data) => {
                 const decodedData = jwtDecode(data.data);
+
                 if (decodedData[0].state === 'inactive') {
                     setNotFoundProject('notActive');
                 } else {
                     setLastSavedValue(decodedData[0].imd);
                     setProjectData(decodedData[0]);
-                    setLoading(false);
+                    setMarkdownText(decodedData[0].imd);
+                    setLocalMarkdownText(decodedData[0].imd);
+                    setProjectAccess(decodedData[0].user_permissions)
                 }
-            }).catch((e) => {
+
                 setLoading(false);
+            }).catch((e) => {
                 if (e.response.status === 404) {
                     setNotFoundProject('notFound');
                 } else if (e.response.status === 405) {
                     setNotFoundProject('notAllowed');
                 }
+
+                setLoading(false);
             })
-        }
-        if (projectData.id) {
-            setMarkdownText(projectData.imd);
-            setLocalMarkdownText(projectData.imd);
-            setProjectAccess(projectData.user_permissions)
         }
     }, [projectData, messages, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, setLoading]);
 
@@ -251,7 +263,13 @@ export default function Project({ messages, setLoading }) {
     }
 
     const handleReload = () => {
-        setLocalMarkdownText(markdownText);
+        let text = markdownText.replaceAll('\\n', '');
+        text = text.replaceAll('\\n', '');
+        text = text.replaceAll('\\', '');
+        text = text.replaceAll('    ', '');
+
+        console.log(JSON.parse(text));
+        setLocalMarkdownText(JSON.parse(text));
     }
 
     const toggleMobile = () => {
@@ -262,12 +280,12 @@ export default function Project({ messages, setLoading }) {
         <Tooltip {...props} classes={{ popper: className }} />
     ))(({ theme }) => ({
         [`& .${tooltipClasses.arrow}`]: {
-            color: '#212121',
+            color: 'rgba(146, 146, 146, 0.719)',
         },
         [`& .${tooltipClasses.tooltip}`]: {
-            backgroundColor: '#212121',
-            color: '#fafafa',
-            border: 'none',
+            backgroundColor: '#fafafa',
+            color: 'rgba(0, 0, 0, 0.87)',
+            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
             fontFamily: 'Inter',
             fontSize: '2vh',
             padding: '1vh'
@@ -293,44 +311,54 @@ export default function Project({ messages, setLoading }) {
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div id="text-container" className="transpiled-text-container">
-                            <Markdown>{localMarkdownText}</Markdown>
+                            <ReactJson src={localMarkdownText} />
+                            {/* <Markdown>{localMarkdownText}</Markdown> */}
                         </div>
                     </animated.div>
 
+                    <div className="buttons">
+                        <animated.div className="editor-buttons" >
+                            <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button className="close-button rotate-button" onClick={() => {
+                                    setOpenEditor(!openEditor);
+                                }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
+                            </BootstrapTooltip>
+
+                            <BootstrapTooltip title={messages.legend_toggle_fullscreen} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button className="close-button rotate-button" onClick={() => {
+                                    setFullScreen(!fullScreen);
+                                }}>{fullScreen ? <i className="bi bi-fullscreen-exit"></i> : <i className="bi bi-fullscreen"></i>}</button>
+                            </BootstrapTooltip>
+
+                            <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
+                            </BootstrapTooltip>
+
+                            {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+                            </BootstrapTooltip>)}
+
+                            {!explodeMinSize() &&
+                                <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                    <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
+                                </BootstrapTooltip>}
+                            <BootstrapTooltip title={messages.go_back_home} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button onClick={(projectAccess === 'own' ? exitProjectHandler : () => { navigate('/projects') })} className="close-button"><i className="bi bi-door-open"></i></button>
+                            </BootstrapTooltip>
+                            {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                                <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
+                            </BootstrapTooltip>)}
+                        </animated.div>
+                    </div>
+
                     <div className="editor-tab">
                         <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
-                            <div className="editor-buttons">
-                                <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button className="close-button rotate-button" onClick={() => {
-                                        setOpenEditor(!openEditor);
-                                    }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
-                                </BootstrapTooltip>
-                                <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
-                                </BootstrapTooltip>
-
-                                {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
-                                </BootstrapTooltip>)}
-
-                                {!explodeMinSize() &&
-                                    <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                        <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
-                                    </BootstrapTooltip>}
-                                <BootstrapTooltip title={messages.go_back_home} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button onClick={(projectAccess === 'own' ? exitProjectHandler : () => { navigate('/projects') })} className="close-button"><i className="bi bi-door-open"></i></button>
-                                </BootstrapTooltip>
-                                {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
-                                </BootstrapTooltip>)}
-                            </div>
-
                             <Editor
                                 width="100%"
                                 height="100%"
 
                                 value={markdownText}
-                                language="markdown"
+                                language="json" //"markdown"
                                 theme="vs-dark"
 
                                 onChange={(value) => {
@@ -339,8 +367,10 @@ export default function Project({ messages, setLoading }) {
 
                                 options={{
                                     inlineSuggest: true,
-                                    fontSize: (!isMobile ? "12px" : "12px"),
+                                    fontSize: "12px",
+
                                     formatOnType: true,
+
                                     autoClosingBrackets: true,
                                     minimap: {
                                         enabled: false

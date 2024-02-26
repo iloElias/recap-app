@@ -10,26 +10,13 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './App.css';
 import Modal from './Components/Modal/Modal';
-import { Alert, Snackbar } from '@mui/material';
+import { Alert, CircularProgress, Snackbar } from '@mui/material';
 import Project from './Pages/Project/Project';
 import NotFound from './Components/NotFound/NotFound';
 import getApi from './Api/api';
+import getMessages from './Internationalization/emergencyMessages';
 
-const emergencyMessages = {
-    "en": {
-        request_timeout_excide: "The response time has expired, our service may be unavailable",
-        error_on_language_set: "An error has ocurred while setting the language",
-        reauthenticate_token_message: "There was a change on your access token, please log in again",
-        reauthenticate_logout_message: "O tempo de autenticação expirou, faça login novamente",
-    },
-    "pt-BR": {
-        request_timeout_excide: "O tempo de resposta foi excedido, talvez nossos serviços não estejam disponíveis",
-        error_on_language_set: "Um erro ocorreu durante o carregamento do idioma",
-        reauthenticate_token_message: "Houve uma alteração no token de acesso, faça login novamente",
-        reauthenticate_logout_message: "Authentication time has expired, please log in again",
-    }
-}
-
+const emergencyMessages = getMessages();
 const api = getApi();
 
 if (process.env.REACT_APP_LOCALHOST) {
@@ -90,6 +77,24 @@ function App() {
         }
     });
     const [isLoading, setIsLoading] = useState(false);
+
+    /* Testing stuff
+    useEffect(() => {
+        console.log({
+            language: language,
+            messages: messages,
+            previousSessionMessage: previousSessionMessage,
+            alertMessage: alertMessage,
+            alert: alert,
+            alertSeverity: alertSeverity,
+            notification: notification,
+            notificationMessage: notificationMessage,
+            user: user,
+            profile: profile,
+            isLoading: isLoading
+        });
+    }, [language, messages, previousSessionMessage, alertMessage, alert, alertSeverity, notification, notificationMessage, user, profile, isLoading]);
+    */
 
     const login = useGoogleLogin({
         onSuccess: (codeResponse) => {
@@ -170,8 +175,8 @@ function App() {
 
     useEffect(
         () => {
-            if (user) {
-                let profile = null;
+            if (user && !profile) {
+                let dbUser = null;
                 if (user.access_token) { // Normal redirect Login
                     axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
                         headers: {
@@ -179,10 +184,10 @@ function App() {
                             Accept: 'application/json'
                         }
                     }).then((res) => {
-                        profile = res.data;
+                        dbUser = res.data;
                         setProfile(res.data);
 
-                        const preparedData = prepareData(profile);
+                        const preparedData = prepareData(dbUser);
 
                         api.post(`user/login/`, [preparedData])
                             .then(data => {
@@ -191,9 +196,9 @@ function App() {
                     })
                 } else if (user.credential) { // One tap Login
                     const decodedUserData = jwtDecode(user.credential);
-                    profile = decodedUserData;
+                    dbUser = decodedUserData;
 
-                    const preparedData = prepareData(profile);
+                    const preparedData = prepareData(dbUser);
 
                     api.post(`user/login/`, [preparedData])
                         .then(data => {
@@ -203,7 +208,7 @@ function App() {
                 }
             }
         },
-        [user, setProfile, handleUser, prepareData]
+        [user, profile, setProfile, handleUser, prepareData]
     );
 
     useEffect(() => {
@@ -299,9 +304,12 @@ function App() {
                         )}
                     </div>
                     {isLoading &&
-                        (<animated.div style={loadingAnimation}>
+                        (<animated.div style={loadingAnimation} >
                             <Modal>
-                                <ReactLoading type='spinningBubbles' height={'7.5dvh'} width={'7.5dvh'} />
+                                <CircularProgress
+                                    color="info"
+                                    variant="indeterminate"
+                                />
                             </Modal>
                         </animated.div>)
                     }
