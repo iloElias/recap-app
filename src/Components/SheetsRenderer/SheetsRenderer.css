@@ -1,0 +1,53 @@
+.project-name {
+    color: #334455;
+    font-family: Inter;
+    font-weight: 300;
+}
+
+.project-name::after {
+    content: "cheatsheets";
+    color: #778ca1;
+    margin-left: 25px;
+}
+
+.card-outer-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.subject-name::before {
+    content: "#";
+    font-weight: 200;
+    color: #334455;
+}
+
+.card-outer-container:hover .subject-name,
+.card-outer-container:hover .subject-name::before {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: #506983;
+}
+
+/* .rendered-card {} */
+
+.rendered-card :nth-child(odd) {
+    padding: 5px 10px;
+    background-color: #f9f8fa;
+}
+
+.rendered-card :nth-child(even) {
+    padding: 5px 10px;
+    background-color: #ffffff;
+}
+
+.rendered-card :first-child {
+    border-radius: 4px 4px 0 0;
+}
+
+.rendered-card-footer {
+    padding: 5px 10px;
+    background-color: #c9c9c9;
+
+    border-radius: 0 0 4px 4px;
+}

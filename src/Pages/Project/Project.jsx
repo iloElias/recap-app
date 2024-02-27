@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "./Project.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
@@ -14,7 +14,6 @@ import getApi from "../../Api/api";
 import Modal from "../../Components/Modal/Modal";
 import Button from "../../Components/Button/Button";
 import Input from "../../Components/Input/Input";
-import ReactJson from "react-json-view";
 
 import { Editor } from "@monaco-editor/react";
 import SheetsRenderer from "../../Components/SheetsRenderer/SheetsRenderer";
@@ -72,14 +71,14 @@ export default function Project({ messages, setLoading }) {
 
     // Code editor animations
     const editorSideAnimation = useSpring({
-        transform: openEditor ? 'translateX(0%)' : 'translateX(-85%)',
+        transform: openEditor ? `translateX(0dvw)` : `translateX(-24.75dvw)`,
     });
     const editorBottomAnimation = useSpring({
         transform: openEditor ? 'translateY(0%)' : 'translateY(44%)',
     });
     const codeEditorAnimation = useSpring({
-        width: openEditor && fullScreen ? '200dvh' : '51.5dvh',
-        maxWidth: (!isMobile && !userForceMobile) ? 'calc(100dvw - )' : ''
+        width: openEditor && fullScreen ? '95dvw' : '24.75dvw',
+        maxWidth: 'calc(100dvw - max(33px, 5dvh))'
     });
 
     const codeEditorAnimationMobile = useSpring({
@@ -88,7 +87,7 @@ export default function Project({ messages, setLoading }) {
 
     // Project visualizer animations
     const editorVisualizerAnimation = useSpring({
-        marginLeft: openEditor ? 'max(60.5dvh, calc(55.5dvh + 33px))' : 'max(9dvh, calc(9dvh + 0px))'
+        marginLeft: openEditor ? 'max(calc(24.75dvw + 9dvh) ,calc(24.75dvw + (4dvh + 33px)))' : 'max(calc(0dvw + 9dvh) ,calc(0dvw + (4dvh + 33px)))'
     });
 
     // Buttons animation
@@ -222,6 +221,16 @@ export default function Project({ messages, setLoading }) {
         }
     }, [confirmDelete, urlParam, deleteHandle]);
 
+    const handleReload = useCallback((markdownText) => {
+        let text = markdownText.replaceAll('\\n', '');
+        text = text.replaceAll('\\n', '');
+        text = text.replaceAll('\\', '');
+        text = text.replaceAll('    ', '');
+
+        console.log(JSON.parse(text));
+        setLocalMarkdownText(JSON.parse(text));
+    }, [setLocalMarkdownText])
+
     useEffect(() => {
         if (projectData.id) return;
 
@@ -246,35 +255,28 @@ export default function Project({ messages, setLoading }) {
                     setProjectData(decodedData[0]);
                     setMarkdownText(decodedData[0].imd);
                     setLocalMarkdownText(decodedData[0].imd);
-                    setProjectAccess(decodedData[0].user_permissions)
+                    setProjectAccess(decodedData[0].user_permissions);
+
+                    handleReload(decodedData[0].imd);
                 }
 
                 setLoading(false);
             }).catch((e) => {
-                if (e.response.status === 404) {
+                if (e.response?.status === 404) {
                     setNotFoundProject('notFound');
-                } else if (e.response.status === 405) {
+                } else if (e.response?.status === 405) {
                     setNotFoundProject('notAllowed');
                 }
 
                 setLoading(false);
             })
         }
-    }, [projectData, messages, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, setLoading]);
+    }, [projectData, messages, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
     }
 
-    const handleReload = () => {
-        let text = markdownText.replaceAll('\\n', '');
-        text = text.replaceAll('\\n', '');
-        text = text.replaceAll('\\', '');
-        text = text.replaceAll('    ', '');
-
-        console.log(JSON.parse(text));
-        setLocalMarkdownText(JSON.parse(text));
-    }
 
     const toggleMobile = () => {
         setUserForceMobile(!userForceMobile);
@@ -317,7 +319,7 @@ export default function Project({ messages, setLoading }) {
                         <div id="text-container" className="transpiled-text-container">
                             {/* <ReactJson src={localMarkdownText} /> */}
 
-                            <SheetsRenderer render={localMarkdownText} />
+                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} />}
                         </div>
                     </animated.div>
 
@@ -368,7 +370,7 @@ export default function Project({ messages, setLoading }) {
                             </BootstrapTooltip>
 
                             <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button className="close-button" onClick={handleReload}><i className="bi bi-arrow-clockwise"></i></button>
+                                <button className="close-button" onClick={() => { handleReload(markdownText) }}><i className="bi bi-arrow-clockwise"></i></button>
                             </BootstrapTooltip>
 
                             {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
