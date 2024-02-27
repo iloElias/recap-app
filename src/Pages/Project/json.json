@@ -1,23 +1,123 @@
 {
-    "project_name": "Nome do projeto",
-    "project_synopsis": "Sinopse do projeto",
+    "project_name": "LingoLearn",
+    "project_synopsis": "Um aplicativo móvel para aprender idiomas de forma interativa e divertida.",
     "subjects": [
         {
-            "subject_title": "Titulo do assunto",
+            "subject_title": "Inglês Básico",
             "cards": [
                 {
-                    "card_title": "Exemplo de item",
-                    "content": [
-                        "O conteúdo dos cards serão exibidos desta forma",
-                        "Cada item na lista de conteúdo será renderizado na tela após um click no botão de recarregamento"
-                    ]
+                    "card_title": "Saudações",
+                    "header": "Saudações comuns em inglês",
+                    "body": [
+                        "Hello - Olá",
+                        "Good morning - Bom dia",
+                        "Good afternoon - Boa tarde",
+                        "Good evening - Boa noite",
+                        "How are you? - Como vai você?",
+                        "I'm fine, thank you - Estou bem, obrigado"
+                    ],
+                    "footer": "Pratique essas saudações para se sentir mais confiante em inglês."
                 },
                 {
-                    "card_title": "Segundo item",
-                    "content": [
-                        "Segundo cartão do projeto",
-                        "Teste de renderização"
-                    ]
+                    "card_title": "Números",
+                    "header": "Números em inglês de 1 a 10",
+                    "body": [
+                        "One - Um",
+                        "Two - Dois",
+                        "Three - Três",
+                        "Four - Quatro",
+                        "Five - Cinco",
+                        "Six - Seis",
+                        "Seven - Sete",
+                        "Eight - Oito",
+                        "Nine - Nove",
+                        "Ten - Dez"
+                    ],
+                    "footer": "Aprender números é fundamental para qualquer idioma."
+                }
+            ]
+        },
+        {
+            "subject_title": "Conversação",
+            "cards": [
+                {
+                    "card_title": "Conversas Simples",
+                    "header": "Conversas básicas para praticar",
+                    "body": [
+                        "Where are you from? - De onde você é?",
+                        "What's your name? - Qual é o seu nome?",
+                        "How old are you? - Quantos anos você tem?",
+                        "What do you do? - O que você faz?",
+                        "I'm from Brazil. - Sou do Brasil.",
+                        "My name is John. - Meu nome é John.",
+                        "I'm 25 years old. - Tenho 25 anos.",
+                        "I'm a student. - Sou estudante."
+                    ],
+                    "footer": "Pratique essas conversas para melhorar suas habilidades de comunicação."
+                }
+            ]
+        },
+        {
+            "subject_title": "Verbos Irregulares",
+            "cards": [
+                {
+                    "card_title": "Lista de Verbos Irregulares em Inglês",
+                    "header": "Alguns verbos irregulares comuns em inglês",
+                    "body": [
+                        "go - went - gone",
+                        "eat - ate - eaten",
+                        "drink - drank - drunk",
+                        "take - took - taken",
+                        "see - saw - seen",
+                        "do - did - done",
+                        "say - said - said",
+                        "come - came - come",
+                        "write - wrote - written",
+                        "buy - bought - bought"
+                    ],
+                    "footer": "Pratique esses verbos para melhorar suas habilidades de conjugação."
+                }
+            ]
+        },
+        {
+            "subject_title": "Vocabulário de Viagem",
+            "cards": [
+                {
+                    "card_title": "Palavras e Frases Úteis para Viagens",
+                    "header": "Vocabulário útil para viajar para países de língua inglesa",
+                    "body": [
+                        "Airport - Aeroporto",
+                        "Hotel - Hotel",
+                        "Taxi - Táxi",
+                        "Restaurant - Restaurante",
+                        "Bus - Ônibus",
+                        "Train - Trem",
+                        "Ticket - Bilhete",
+                        "Passport - Passaporte",
+                        "Excuse me, where is the restroom? - Com licença, onde fica o banheiro?",
+                        "How much does it cost? - Quanto custa?"
+                    ],
+                    "footer": "Essas palavras e frases podem ser úteis durante viagens internacionais."
+                }
+            ]
+        },
+        {
+            "subject_title": "Cultura e Tradições",
+            "cards": [
+                {
+                    "card_title": "Costumes e Tradições em Países de Língua Inglesa",
+                    "header": "Algumas tradições culturais comuns em países de língua inglesa",
+                    "body": [
+                        "Thanksgiving - Ação de Graças",
+                        "Halloween - Dia das Bruxas",
+                        "Christmas - Natal",
+                        "New Year's Eve - Véspera de Ano Novo",
+                        "Easter - Páscoa",
+                        "Greetings customs - Costumes de cumprimento",
+                        "Eating customs - Costumes alimentares",
+                        "Festivals and celebrations - Festivais e celebrações"
+                    ],
+                    "footer": "Entender a cultura e as tradições é essencial para uma comunicação eficaz."
                 }
             ]
         }

@@ -16,9 +16,8 @@ import Button from "../../Components/Button/Button";
 import Input from "../../Components/Input/Input";
 import ReactJson from "react-json-view";
 
-
-import jsonTest from "./json.json";
 import { Editor } from "@monaco-editor/react";
+import SheetsRenderer from "../../Components/SheetsRenderer/SheetsRenderer";
 
 const api = getApi();
 
@@ -73,13 +72,18 @@ export default function Project({ messages, setLoading }) {
 
     // Code editor animations
     const editorSideAnimation = useSpring({
-        transform: openEditor ? 'scaleX(0%)' : 'translateX(-100%)',
-        width: openEditor ? '' : '',
-        width: fullScreen ? '200dvh' : '51.5dvh'
+        transform: openEditor ? 'translateX(0%)' : 'translateX(-85%)',
     });
     const editorBottomAnimation = useSpring({
-        transform: openEditor ? 'translateY(0%)' : 'translateY(100%)',
-        // height: fullScreen ? '90%' : '40%'
+        transform: openEditor ? 'translateY(0%)' : 'translateY(44%)',
+    });
+    const codeEditorAnimation = useSpring({
+        width: openEditor && fullScreen ? '200dvh' : '51.5dvh',
+        maxWidth: (!isMobile && !userForceMobile) ? 'calc(100dvw - )' : ''
+    });
+
+    const codeEditorAnimationMobile = useSpring({
+        height: openEditor && fullScreen ? '90%' : '40%',
     });
 
     // Project visualizer animations
@@ -311,13 +315,46 @@ export default function Project({ messages, setLoading }) {
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div id="text-container" className="transpiled-text-container">
-                            <ReactJson src={localMarkdownText} />
-                            {/* <Markdown>{localMarkdownText}</Markdown> */}
+                            {/* <ReactJson src={localMarkdownText} /> */}
+
+                            <SheetsRenderer render={localMarkdownText} />
                         </div>
                     </animated.div>
 
-                    <div className="buttons">
-                        <animated.div className="editor-buttons" >
+                    <animated.div className="editor-tab" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
+                        <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? codeEditorAnimation : codeEditorAnimationMobile}>
+                            <Editor
+                                width="100%"
+                                height="100%"
+
+                                value={markdownText}
+                                language="json" //"markdown"
+                                theme="vs-dark"
+
+                                onChange={(value) => {
+                                    setMarkdownText(value);
+                                }}
+
+                                options={{
+                                    inlineSuggest: true,
+                                    fontSize: "12px",
+                                    fontFamily: "Fira Code, monospace",
+                                    lineDecorationsWidth: 0,
+                                    formatOnType: true,
+
+                                    renderIndentGuides: false,
+
+                                    autoClosingBrackets: true,
+                                    minimap: {
+                                        enabled: false
+                                    }
+                                }}
+                            />
+                        </animated.div>
+
+                        <div className="editor-buttons" style={{
+                            paddingTop: (!isMobile && !userForceMobile) ? "2dvh" : "0",
+                        }}>
                             <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
                                     setOpenEditor(!openEditor);
@@ -348,37 +385,8 @@ export default function Project({ messages, setLoading }) {
                             {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
                             </BootstrapTooltip>)}
-                        </animated.div>
-                    </div>
-
-                    <div className="editor-tab">
-                        <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
-                            <Editor
-                                width="100%"
-                                height="100%"
-
-                                value={markdownText}
-                                language="json" //"markdown"
-                                theme="vs-dark"
-
-                                onChange={(value) => {
-                                    setMarkdownText(value);
-                                }}
-
-                                options={{
-                                    inlineSuggest: true,
-                                    fontSize: "12px",
-
-                                    formatOnType: true,
-
-                                    autoClosingBrackets: true,
-                                    minimap: {
-                                        enabled: false
-                                    }
-                                }}
-                            />
-                        </animated.div>
-                    </div >
+                        </div>
+                    </animated.div>
 
                     <animated.div style={modalAnimation} onClick={() => { setShowModal(false) }} >
                         <Modal >
