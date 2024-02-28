@@ -18,22 +18,47 @@ body {
 }
 
 @media print {
+    body {
+        background: unset;
+    }
 
+    * {
+        margin: 0;
+        width: unset;
+    }
+
+    .editor-tab,
     .code-editor,
     .bottom-modal {
-        display: none;
+        display: none !important;
+    }
+
+    #project-editor {
+        display: grid;
+        place-items: center;
+        max-width: 100dvw;
     }
 
     #project-visualizer {
-        position: absolute;
-        left: 0;
-        width: 94dvw;
+        width: unset !important;
+        margin: 0 !important;
+        padding: 0 !important;
 
-        margin: 2vh 4vh 2vh 0;
-        border: none
+        border: none;
     }
 
     #text-container {
-        margin: 0;
+        margin: 0 !important;
+    }
+
+    .card-outer-container:hover .subject-name,
+    .card-outer-container:hover .subject-name::before {
+        cursor: pointer;
+        text-decoration: none;
+        text-decoration-color: unset;
+    }
+
+    .hologram {
+        display: none;
     }
 }

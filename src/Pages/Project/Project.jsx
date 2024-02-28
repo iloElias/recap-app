@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import "./Project.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
@@ -33,7 +33,7 @@ const explodeMinSize = () => {
 
 const saveMarkdownWaitTime = 5000;
 
-export default function Project({ messages, setLoading }) {
+export default function Project({ messages, setLoading, exportRef, setProjectName }) {
     const [openEditor, setOpenEditor] = useState(true);
     const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
     const [isMobile, setIsMobile] = useState(explodeMinSize());
@@ -257,6 +257,10 @@ export default function Project({ messages, setLoading }) {
                     setLocalMarkdownText(decodedData[0].imd);
                     setProjectAccess(decodedData[0].user_permissions);
 
+                    // eslint-disable-next-line
+                    let fileName = `${decodedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
+                    setProjectName(fileName);
+
                     handleReload(decodedData[0].imd);
                 }
 
@@ -271,7 +275,7 @@ export default function Project({ messages, setLoading }) {
                 setLoading(false);
             })
         }
-    }, [projectData, messages, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
+    }, [projectData, messages, setProjectName, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
@@ -316,7 +320,7 @@ export default function Project({ messages, setLoading }) {
             {!notFoundProject ? (
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
-                        <div id="text-container" className="transpiled-text-container">
+                        <div ref={exportRef} id="text-container" className="transpiled-text-container">
                             {/* <ReactJson src={localMarkdownText} /> */}
 
                             {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} />}

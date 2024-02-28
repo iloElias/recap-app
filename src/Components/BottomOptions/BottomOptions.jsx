@@ -7,6 +7,8 @@ import { useParams } from "react-router-dom";
 
 import { ClickAwayListener } from '@mui/base';
 import { Paper } from "@mui/material";
+import { exportComponentAsPNG } from "react-component-export-image";
+import generatePDF, { Margin } from "react-to-pdf";
 
 function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
@@ -71,7 +73,7 @@ function Option({ optionName, optionIcon, onClick, children, selected }) {
     );
 }
 
-export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler }) {
+export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName }) {
     const urlParam = useParams('/project/:id');
 
     const [showCategory, setShowCategory] = useState(false);
@@ -131,8 +133,16 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                             </Option>
                             <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
                                 <OptionPanel showPanel={showExportPanel} >
-                                    <Button className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
-                                    <Button className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
+                                    <Button onClick={() => {
+                                        exportComponentAsPNG(exportRef, {
+                                            fileName: `${projectName ?? 'document'}.png`, html2CanvasOptions: {
+                                                onclone: (clonedDoc) => {
+                                                    clonedDoc.getElementById("text-container").style.margin = "40px 60px 60px 40px";
+                                                },
+                                            },
+                                        })
+                                    }} className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
+                                    <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
                                 </OptionPanel>
                             </Option>
                             <Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => { hideAllPanels(); setShowSharePanel(!showSharePanel) }}>
@@ -151,6 +161,6 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     )}
                 </OptionsMenu>
             </div>
-        </ClickAwayListener>
+        </ClickAwayListener >
     ) : (<></>);
 }

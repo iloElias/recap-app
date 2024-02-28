@@ -85,7 +85,7 @@
 
     text-align: start;
     justify-content: flex-start;
-    padding: 0.5dvh 1dvh;
+    padding: 0.5dvh;
 }
 
 .file-export-button:hover {
@@ -99,7 +99,7 @@
     transform: translateY(0.1dvh);
 }
 
-.file-export-button:focus {
+.file-export-button:focus-visible {
     background-color: #ededed;
-    outline: double 0.4dvh #bebebe;
+    outline: solid 0.4dvh #bebebe;
 }

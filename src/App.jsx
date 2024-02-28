@@ -2,7 +2,7 @@ import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import BottomOptions from './Components/BottomOptions/BottomOptions';
 import { Routes, Route, Link, useNavigate, Navigate } from "react-router-dom";
 import { useSpring, animated } from 'react-spring';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactLoading from 'react-loading';
 import Login from './Pages/Login/Login';
 import Cards from './Pages/Cards/Cards';
@@ -30,11 +30,11 @@ if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile');
 
-function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler }) {
+function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler, exportRef, projectName }) {
     return (
         <>
             {children}
-            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} />
+            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={projectName} />
         </>
     );
 }
@@ -43,6 +43,9 @@ function App() {
     const navigate = useNavigate();
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
+
+    const exportRef = useRef();
+    const [actualProjectName, setActualProjectName] = useState();
 
     const [previousSessionMessage, setPreviousSessionMessage] = useState(() => {
         try {
@@ -276,8 +279,8 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
-                                    <Project messages={messages} setLoading={setIsLoading} />
+                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} >
+                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setProjectName={setActualProjectName} />
                                 </PageTemplate>} />
                                 <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <NotFound>

@@ -16,21 +16,42 @@ export default function SheetsRenderer({ children, render }) {
             {render.subjects?.map((subject, subjectIndex) => (
                 <div className="card-outer-container" key={subjectIndex}>
                     <h2 className="subject-name">{subject.subject_title}</h2>
-                    <Masonry columns={3} spacing={4}>
+                    <Masonry columns={3} spacing={3} >
                         {subject.cards?.map((card, cardIndex) => (
-                            <div className="rendered-card">
+                            <Paper className="rendered-card">
                                 <h3 className="rendered-card-title">{card.card_title}</h3>
-                                <Paper className="rendered-card-body" key={cardIndex} >
+                                {card.header && (<p className="rendered-card-header">{card.header}</p>)}
+                                <div className="rendered-card-body" key={cardIndex} >
                                     {card.body?.map((item, itemIndex) => (
                                         <p key={itemIndex}>{item}</p>
                                     ))}
                                     <h4 className="rendered-card-footer">{card.footer}</h4>
-                                </Paper>
-                            </div>
+                                </div>
+                            </Paper>
                         ))}
+                        <AddCardHologram />
                     </Masonry>
                 </div>
             ))}
+            <AddSubjectHologram />
+        </div>
+    );
+}
+
+function AddCardHologram() {
+
+    return (
+        <div className="hologram card-hologram">
+            +
+        </div>
+    );
+}
+
+function AddSubjectHologram() {
+
+    return (
+        <div className="hologram subject-hologram">
+            +
         </div>
     );
 }

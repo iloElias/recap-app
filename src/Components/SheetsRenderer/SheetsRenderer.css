@@ -13,7 +13,7 @@
 .card-outer-container {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1rem;
 }
 
 .subject-name::before {
@@ -29,20 +29,57 @@
     text-decoration-color: #506983;
 }
 
-/* .rendered-card {} */
+.card-outer-container {
+    max-width: 100%;
+}
 
-.rendered-card :nth-child(odd) {
+.card-outer-container> :nth-child(2) {
+    width: unset;
+}
+
+.rendered-card {
+    background-color: #e4e4e4 !important;
+    border-radius: 4px;
+}
+
+.rendered-card-title {
     padding: 5px 10px;
+}
+
+.rendered-card-header {
+    padding: 2px 10px 5px;
+}
+
+.rendered-card-body :nth-child(odd) {
     background-color: #f9f8fa;
 }
 
-.rendered-card :nth-child(even) {
-    padding: 5px 10px;
+.rendered-card-body :nth-child(even) {
     background-color: #ffffff;
 }
 
-.rendered-card :first-child {
+.rendered-card-body :first-child {
     border-radius: 4px 4px 0 0;
+}
+
+.rendered-card * :not(:last-child) {
+    border-bottom: 1px solid #bbbbbb;
+}
+
+.rendered-card-body * {
+    padding: 10px;
+}
+
+.rendered-card h3 {
+    font-size: 75%;
+}
+
+.rendered-card p {
+    font-size: 75%;
+}
+
+.rendered-card h4 {
+    font-size: 75%;
 }
 
 .rendered-card-footer {
@@ -50,4 +87,74 @@
     background-color: #c9c9c9;
 
     border-radius: 0 0 4px 4px;
+}
+
+/* Holograms */
+
+.hologram {
+    background-color: #11d0f2b3;
+    border: solid 1px #00d9ff;
+    border-radius: 4px;
+
+    text-align: center;
+    font-weight: 500;
+
+    color: #ffffff;
+    background-color: #11d0f2b3;
+    border: solid 1px #00d9ff;
+    border-radius: 4px;
+
+    text-align: center;
+    font-weight: 500;
+
+    color: #ffffff;
+}
+
+.card-hologram {
+
+
+    opacity: 0;
+
+    padding: 5%;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.card-outer-container:hover .card-hologram {
+    opacity: 0.5;
+}
+
+.card-outer-container .card-hologram:hover {
+    color: #000000;
+
+    opacity: 0.75;
+}
+
+.card-outer-container .card-hologram:active {
+    background-color: #09d6fac6;
+    border: solid 1px #00d0ff;
+
+    opacity: 1;
+}
+
+
+.subject-hologram {
+
+
+    opacity: 0.25;
+
+    padding: 0.5%;
+    transition: opacity 0.2s, color 0.2s;
+}
+
+.subject-hologram:hover {
+    color: #000000;
+
+    opacity: 0.75;
+}
+
+.subject-hologram:active {
+    background-color: #09d6fac6;
+    border: solid 1px #00d0ff;
+
+    opacity: 1;
 }
