@@ -15,6 +15,7 @@ function OptionsMenu({ showCategory, children }) {
         opacity: showCategory ? 1 : 0,
         transform: showCategory ? "translateY(0%)" : "translateY(125%)",
         gap: showCategory ? "1dvh" : "0dvh",
+
         config: showCategory ? {
             mass: 0.1,
             tension: 314
@@ -25,7 +26,10 @@ function OptionsMenu({ showCategory, children }) {
     });
 
     return (
-        <div className="visibility-container" style={{ overflowY: showCategory ? "visible" : "clip" }}>
+        <div className="visibility-container" style={{
+            overflowY: showCategory ? "visible" : "clip",
+            zIndex: showCategory ? '8' : '0'
+        }}>
             <animated.div style={optionsAnimation} className="options-menu">
                 {children}
             </animated.div>
@@ -47,7 +51,7 @@ function OptionPanel({ showPanel, title, children }) {
     });
 
     return (
-        <div style={{ zIndex: showPanel ? "27" : "25" }} className="vertical-visibility-container">
+        <div style={{ zIndex: showPanel ? "8" : "-1" }} className="vertical-visibility-container">
             <animated.div style={panelAnimation}>
                 <Paper >
                     <div className="option-panel">
@@ -111,7 +115,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
     return messages.languages_button_title ? (
         <ClickAwayListener onClickAway={hideOptions}>
-            <div className="bottom-modal" >
+            <div style={{
+                zIndex: showCategory ? '8' : '0'
+            }} className="bottom-modal" >
                 <Button id="bottom-button" onClick={toggleCategories}>
                     <TreeDotsIcon />
                 </Button>
@@ -137,7 +143,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                         exportComponentAsPNG(exportRef, {
                                             fileName: `${projectName ?? 'document'}.png`, html2CanvasOptions: {
                                                 onclone: (clonedDoc) => {
-                                                    clonedDoc.getElementById("text-container").style.margin = "40px 60px 60px 40px";
+                                                    clonedDoc.getElementById("project-visualizer").style.margin = "40px 60px 60px 40px";
                                                 },
                                             },
                                         })

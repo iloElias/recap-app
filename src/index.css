@@ -58,7 +58,7 @@ body {
         text-decoration-color: unset;
     }
 
-    .hologram {
-        display: none;
+    .hologram-container {
+        display: none !important;
     }
 }

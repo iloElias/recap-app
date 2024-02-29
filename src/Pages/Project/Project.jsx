@@ -227,7 +227,6 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         text = text.replaceAll('\\', '');
         text = text.replaceAll('    ', '');
 
-        console.log(JSON.parse(text));
         setLocalMarkdownText(JSON.parse(text));
     }, [setLocalMarkdownText])
 
@@ -323,7 +322,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         <div ref={exportRef} id="text-container" className="transpiled-text-container">
                             {/* <ReactJson src={localMarkdownText} /> */}
 
-                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} />}
+                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} messages={messages} />}
                         </div>
                     </animated.div>
 

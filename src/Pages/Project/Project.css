@@ -5,6 +5,8 @@
     min-height: 100%;
 
     display: flex;
+
+    justify-content: center;
 }
 
 .project-visualizer {
@@ -12,8 +14,9 @@
     padding: 2dvh;
 
     width: 100%;
+    height: min-content;
 
-    min-height: 100%;
+    max-width: 1200px;
 
     border: solid 0.15dvw rgba(180, 180, 180, 0.812);
     border-radius: 1dvh;

@@ -91,59 +91,146 @@
 
 /* Holograms */
 
-.hologram {
-    background-color: #11d0f2b3;
-    border: solid 1px #00d9ff;
-    border-radius: 4px;
+.hologram-container {
+    position: relative;
 
-    text-align: center;
-    font-weight: 500;
+    max-height: min-content;
 
-    color: #ffffff;
-    background-color: #11d0f2b3;
-    border: solid 1px #00d9ff;
-    border-radius: 4px;
-
-    text-align: center;
-    font-weight: 500;
-
-    color: #ffffff;
+    display: flex;
+    justify-content: center;
 }
 
-.card-hologram {
+.content-fields {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+
+    gap: 4px;
+
+    transition: height 0.2s;
+}
 
 
-    opacity: 0;
+.content-fields form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px
+}
 
-    padding: 5%;
+.content-fields form :is(input, textarea) {
+    user-select: none;
+    touch-action: none;
+
+    resize: none;
+
+    padding: 6px 4px;
+
+    border-radius: 4px;
+    outline: none;
+    border: none;
+
+    background: #fafafa;
+
+    border: solid 1px rgba(146, 146, 146, 0.719);
+
+    font-size: 75%;
+    color: #212121;
+}
+
+.content-fields form :is(input, textarea):focus {
+    border: solid 1px rgb(104, 104, 104);
+}
+
+.content-fields form :is(button, input[type='button']):hover {
+    border: solid 1px rgb(104, 104, 104);
+    cursor: pointer;
+}
+
+.deletable-content-field {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.deletable-content-field input {
+    width: 100%;
+}
+
+.deletable-content-field button {
+    position: absolute;
+    aspect-ratio: 1/1;
+    width: 20px;
+
+    margin-right: 4px;
+
+    background-color: transparent;
+    border: solid 1px rgba(146, 146, 146, 0.719);
+    border-radius: 3px;
+
+    color: red;
+    right: 0;
+}
+
+.hologram {
+    display: grid;
+    place-items: center;
+
+    background-color: #e4e4e4;
+    border: solid 1px #aaaaaa;
+    border-radius: 4px;
+
+    text-align: center;
+    font-weight: 500;
+    color: #000000;
+
     transition: opacity 0.2s, color 0.2s;
 }
 
-.card-outer-container:hover .card-hologram {
-    opacity: 0.5;
+.card-outer-container .card-hologram {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
 }
 
-.card-outer-container .card-hologram:hover {
-    color: #000000;
+.card-outer-container .hologram-container {
+    opacity: 0;
+    transition: opacity 0.2s, color 0.2s;
+}
 
+.card-outer-container:hover :is(.hologram-container, .card-hologram) {
+    opacity: 1;
+}
+
+.card-hologram:hover {
     opacity: 0.75;
 }
 
-.card-outer-container .card-hologram:active {
-    background-color: #09d6fac6;
-    border: solid 1px #00d0ff;
+.card-hologram:active {
+    background-color: #e4e4e4;
+    border: solid 1px #aaaaaa;
 
     opacity: 1;
 }
 
+.content-fields {
+    /* position: absolute; */
+
+    display: flex;
+    flex-direction: column;
+}
 
 .subject-hologram {
-
-
     opacity: 0.25;
 
     padding: 0.5%;
-    transition: opacity 0.2s, color 0.2s;
 }
 
 .subject-hologram:hover {
@@ -153,8 +240,8 @@
 }
 
 .subject-hologram:active {
-    background-color: #09d6fac6;
-    border: solid 1px #00d0ff;
+    background-color: #e4e4e4;
+    border: solid 1px #aaaaaa;
 
     opacity: 1;
 }
