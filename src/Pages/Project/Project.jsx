@@ -15,7 +15,7 @@ import Modal from "../../Components/Modal/Modal";
 import Button from "../../Components/Button/Button";
 import Input from "../../Components/Input/Input";
 
-import { Editor } from "@monaco-editor/react";
+import { Editor, Monaco } from "@monaco-editor/react";
 import SheetsRenderer from "../../Components/SheetsRenderer/SheetsRenderer";
 
 const api = getApi();
@@ -134,6 +134,8 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         }
 
         const receivedToken = localStorage.getItem("recap@localUserProfile");
+        const monacoEditor = Monaco.editor.createModel(document.getElementById('code-editor-container'), { language: 'json' });
+
 
         setShowModal(false);
         setLoading(true);
@@ -322,12 +324,12 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         <div ref={exportRef} id="text-container" className="transpiled-text-container">
                             {/* <ReactJson src={localMarkdownText} /> */}
 
-                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} messages={messages} />}
+                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />}
                         </div>
                     </animated.div>
 
                     <animated.div className="editor-tab" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
-                        <animated.div className="code-editor" style={(!isMobile && !userForceMobile) ? codeEditorAnimation : codeEditorAnimationMobile}>
+                        <animated.div id='code-editor-container' className="code-editor" style={(!isMobile && !userForceMobile) ? codeEditorAnimation : codeEditorAnimationMobile}>
                             <Editor
                                 width="100%"
                                 height="100%"

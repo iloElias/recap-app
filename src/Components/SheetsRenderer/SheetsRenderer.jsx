@@ -4,7 +4,16 @@ import { ClickAwayListener, Paper } from '@mui/material';
 import { Masonry } from '@mui/lab';
 import "./SheetsRenderer.css";
 
-export default function SheetsRenderer({ render, messages }) {
+export default function SheetsRenderer({ render, messages, setRender, setCurrentTextOnEditor }) {
+    const handleNewCard = (subjectIndex, newCard) => {
+        render.subjects.at(subjectIndex).cards.push(newCard);
+
+        const renderTextJson = JSON.stringify(render);
+
+        setRender(renderTextJson);
+        setCurrentTextOnEditor(renderTextJson);
+    }
+
     return (
         <div style={{
             display: "flex",
@@ -18,18 +27,18 @@ export default function SheetsRenderer({ render, messages }) {
                     <h2 className="subject-name">{subject.subject_title}</h2>
                     <Masonry columns={3} spacing={3} >
                         {subject.cards?.map((card, cardIndex) => (
-                            <Paper key={cardIndex} className="rendered-card">
-                                <h3 className="rendered-card-title">{card.card_title}</h3>
+                            (card.card_title || card.header || card.body[0] || card.footer) && <Paper key={cardIndex} className="rendered-card">
+                                {card.card_title && (<h3 className="rendered-card-title">{card.card_title}</h3>)}
                                 {card.header && (<p className="rendered-card-header">{card.header}</p>)}
                                 <div className="rendered-card-body" >
                                     {card.body?.map((item, itemIndex) => (
-                                        <p key={itemIndex}>{item}</p>
+                                        item && (<p key={itemIndex}>{item}</p>)
                                     ))}
-                                    <h4 className="rendered-card-footer">{card.footer}</h4>
+                                    {card.footer && (<h4 className="rendered-card-footer">{card.footer}</h4>)}
                                 </div>
                             </Paper>
                         ))}
-                        <AddCardHologram messages={messages} />
+                        <AddCardHologram messages={messages} key={subjectIndex} onAddNewCard={handleNewCard} />
                     </Masonry>
                 </div>
             ))}
@@ -38,10 +47,14 @@ export default function SheetsRenderer({ render, messages }) {
     );
 }
 
-function AddCardHologram({ messages }) {
+function AddCardHologram({ currentIndex, messages, onAddNewCard }) {
     const [showFields, setShowFields] = useState(false)
-    const [contentList, setContentList] = useState([''])
     const [currentInput, setCurrentInput] = useState();
+
+    const [title, setTitle] = useState();
+    const [subtitle, setSubtitle] = useState();
+    const [contentList, setContentList] = useState(['']);
+    const [conclusion, setConclusion] = useState();
 
     useEffect(() => {
         if (currentInput) {
@@ -74,18 +87,14 @@ function AddCardHologram({ messages }) {
         }
     });
 
-    const portalForm = useSpring({
-        // height: showFields ? '100%' : '10%'
-    });
-
     return (
         <ClickAwayListener onClickAway={() => { setShowFields(false) }
         }>
             <div className="hologram-container" style={{ opacity: showFields && '1', height: !showFields && '50px' }}>
                 <animated.div className={`content-fields`} style={fieldsContainerAnimation} >
                     <form action="" onSubmit={(e) => { e.preventDefault() }}>
-                        <input type="text" placeholder={messages.add_card_hologram_title} />
-                        <input type="text" placeholder={messages.add_card_hologram_subtitle} />
+                        <input type="text" placeholder={messages.add_card_hologram_title} onChange={(e) => { setTitle(e.target.value) }} />
+                        <input type="text" placeholder={messages.add_card_hologram_subtitle} onChange={(e) => { setSubtitle(e.target.value) }} />
                     </form>
 
                     <form style={{ height: showFields ? '100%' : '32px' }} onSubmit={(e) => { e.preventDefault() }}>
@@ -96,10 +105,9 @@ function AddCardHologram({ messages }) {
                                         e.preventDefault();
                                         setContentList([...contentList, '']);
                                         setCurrentInput(e.target);
-                                        console.log(e);
                                     }
-                                }} onChange={(target) => {
-                                    contentList[index] = target.value;
+                                }} onChange={(e) => {
+                                    contentList[index] = e.target.value;
                                     setContentList([...contentList]);
                                 }} />
                                 <button tabIndex={2} onClick={(e) => {
@@ -114,20 +122,30 @@ function AddCardHologram({ messages }) {
                             e.preventDefault();
                             setContentList([...contentList, '']);
                         }} />
-                        <input type="text" placeholder={messages.add_card_hologram_conclusion} onKeyDown={(e) => {
-                            if (`${e.code}`.toLowerCase() === 'enter') {
-                                e.preventDefault();
-                            }
-                        }} />
                     </form>
 
-                    <form style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        width: '100%'
-                    }} onSubmit={(e) => { e.preventDefault() }}>
-                        <input type="button" value={messages.add_card_hologram_add_card} />
-                        <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowFields(false) }} />
+                    <form onSubmit={(e) => { e.preventDefault() }}>
+                        <input type="text" placeholder={messages.add_card_hologram_conclusion} onChange={(e) => { setConclusion(e.target.value) }} onKeyDown={(e) => {
+                            if (`${e.code}`.toLowerCase() === 'enter') {
+                                e.preventDefault();
+                                setConclusion(e.value);
+                            }
+                        }} />
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            width: '100%'
+                        }}>
+                            <input type="button" value={messages.add_card_hologram_add_card} onClick={() => {
+                                onAddNewCard(currentIndex, {
+                                    card_title: title,
+                                    header: subtitle,
+                                    body: contentList,
+                                    footer: conclusion
+                                });
+                            }} />
+                            <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowFields(false) }} />
+                        </div>
                     </form>
                 </animated.div>
                 <animated.button onClick={() => { setShowFields(true) }} className="hologram card-hologram" style={buttonFadeAnimation}>
