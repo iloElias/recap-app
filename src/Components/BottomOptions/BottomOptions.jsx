@@ -116,9 +116,11 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     return messages.languages_button_title ? (
         <ClickAwayListener onClickAway={hideOptions}>
             <div style={{
-                zIndex: showCategory ? '8' : '0'
+                zIndex: showCategory ? '18' : '8'
             }} className="bottom-modal" >
-                <Button id="bottom-button" onClick={toggleCategories}>
+                <Button style={{
+                    zIndex: showCategory ? '20' : '10'
+                }} id="bottom-button" onClick={toggleCategories}>
                     <TreeDotsIcon />
                 </Button>
                 <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>

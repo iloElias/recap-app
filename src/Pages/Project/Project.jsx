@@ -15,7 +15,7 @@ import Modal from "../../Components/Modal/Modal";
 import Button from "../../Components/Button/Button";
 import Input from "../../Components/Input/Input";
 
-import { Editor, Monaco } from "@monaco-editor/react";
+import { Editor } from "@monaco-editor/react";
 import SheetsRenderer from "../../Components/SheetsRenderer/SheetsRenderer";
 
 const api = getApi();
@@ -34,6 +34,8 @@ const explodeMinSize = () => {
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading, exportRef, setProjectName }) {
+    const [editorInstance, setEditorInstance] = useState();
+
     const [openEditor, setOpenEditor] = useState(true);
     const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
     const [isMobile, setIsMobile] = useState(explodeMinSize());
@@ -82,7 +84,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     });
 
     const codeEditorAnimationMobile = useSpring({
-        height: openEditor && fullScreen ? '90%' : '40%',
+        height: openEditor && fullScreen ? '87%' : '40%',
     });
 
     // Project visualizer animations
@@ -134,8 +136,6 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         }
 
         const receivedToken = localStorage.getItem("recap@localUserProfile");
-        const monacoEditor = Monaco.editor.createModel(document.getElementById('code-editor-container'), { language: 'json' });
-
 
         setShowModal(false);
         setLoading(true);
@@ -210,12 +210,20 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         setShowModal(true);
     }, [setModalContent, setShowModal]);
 
+    const editorDidMount = (editor, monaco) => {
+        setEditorInstance(editor);
+    }
+
     useEffect(() => {
         if (saveProject) {
+            if (editorInstance) {
+                editorInstance.getAction('editor.action.formatDocument').run();
+            }
+
             saveHandle(markdownText, urlParam.id);
             setSaveProject(false);
         }
-    }, [saveProject, markdownText, urlParam, saveHandle]);
+    }, [saveProject, editorInstance, markdownText, urlParam, saveHandle]);
 
     useEffect(() => {
         if (confirmDelete) {
@@ -230,7 +238,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         text = text.replaceAll('    ', '');
 
         setLocalMarkdownText(JSON.parse(text));
-    }, [setLocalMarkdownText])
+
+        if (editorInstance) {
+            editorInstance.getAction('editor.action.formatDocument').run();
+        }
+    }, [setLocalMarkdownText, editorInstance])
 
     useEffect(() => {
         if (projectData.id) return;
@@ -341,6 +353,8 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                 onChange={(value) => {
                                     setMarkdownText(value);
                                 }}
+
+                                onMount={editorDidMount}
 
                                 options={{
                                     inlineSuggest: true,

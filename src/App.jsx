@@ -255,7 +255,7 @@ function App() {
     }
 
     const loadingAnimation = useSpring({
-        zIndex: isLoading ? 50 : -1,
+        zIndex: `${isLoading ? 50 : -1} !important`,
         opacity: isLoading ? 1 : 0,
         config: {
             mass: 0.1,
@@ -308,7 +308,7 @@ function App() {
                     </div>
                     {isLoading &&
                         (<animated.div style={loadingAnimation} >
-                            <Modal>
+                            <Modal style={{ position: 'fixed', zIndex: '100' }} >
                                 <CircularProgress
                                     color="info"
                                     variant="indeterminate"

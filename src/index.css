@@ -61,4 +61,8 @@ body {
     .hologram-container {
         display: none !important;
     }
+
+    .card-outer-container .subject-name::after {
+        visibility: hidden;
+    }
 }
