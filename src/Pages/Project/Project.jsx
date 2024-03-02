@@ -89,7 +89,8 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     // Project visualizer animations
     const editorVisualizerAnimation = useSpring({
-        marginLeft: openEditor ? 'max(calc(24.75dvw + 9dvh) ,calc(24.75dvw + (4dvh + 33px)))' : 'max(calc(0dvw + 9dvh) ,calc(0dvw + (4dvh + 33px)))'
+        marginLeft: openEditor ? 'max(calc(24.75dvw + 9dvh) ,calc(24.75dvw + (4dvh + 33px)))' : 'max(calc(0dvw + 9dvh) ,calc(0dvw + (4dvh + 33px)))',
+        border: (projectAccess === 'guest') && 'none'
     });
 
     // Buttons animation
@@ -215,6 +216,12 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     }
 
     useEffect(() => {
+        if (projectAccess === 'guest') {
+            setOpenEditor(false);
+        }
+    }, [projectAccess, setOpenEditor]);
+
+    useEffect(() => {
         if (saveProject) {
             if (editorInstance) {
                 editorInstance.getAction('editor.action.formatDocument').run();
@@ -336,11 +343,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         <div ref={exportRef} id="text-container" className="transpiled-text-container">
                             {/* <ReactJson src={localMarkdownText} /> */}
 
-                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />}
+                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} userPermission={projectAccess} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />}
                         </div>
                     </animated.div>
 
-                    <animated.div className="editor-tab" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
+                    {(projectAccess !== 'guest') && (<animated.div className="editor-tab" style={(!isMobile && !userForceMobile) ? editorSideAnimation : editorBottomAnimation}>
                         <animated.div id='code-editor-container' className="code-editor" style={(!isMobile && !userForceMobile) ? codeEditorAnimation : codeEditorAnimationMobile}>
                             <Editor
                                 width="100%"
@@ -392,7 +399,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                 <button className="close-button" onClick={() => { handleReload(markdownText) }}><i className="bi bi-arrow-clockwise"></i></button>
                             </BootstrapTooltip>
 
-                            {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
+                            {(projectAccess === 'own' || projectAccess === 'manage') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
                             </BootstrapTooltip>)}
 
@@ -407,7 +414,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                 <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
                             </BootstrapTooltip>)}
                         </div>
-                    </animated.div>
+                    </animated.div>)}
 
                     <animated.div style={modalAnimation} onClick={() => { setShowModal(false) }} >
                         <Modal >
@@ -522,3 +529,8 @@ function NotActiveCase({ messages }) {
         </NotFound>
     );
 }
+
+
+/*
+
+*/
