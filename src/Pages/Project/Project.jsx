@@ -31,6 +31,7 @@ const explodeMinSize = () => {
     return false;
 }
 
+document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading, exportRef, setProjectName }) {
@@ -188,9 +189,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 setAlertSeverity('success')
                 openAlert(true);
 
-                setTimeout(() => {
-                    navigate('/projects');
-                }, 2000);
+                navigate('/projects');
             })
         } else {
             setConfirmDelete(false);
@@ -244,7 +243,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         text = text.replaceAll('\\', '');
         text = text.replaceAll('    ', '');
 
-        setLocalMarkdownText(JSON.parse(text));
+        try {
+            setLocalMarkdownText(JSON.parse(text));
+        } catch (e) {
+            setLocalMarkdownText('');
+        }
 
         if (editorInstance) {
             editorInstance.getAction('editor.action.formatDocument').run();
@@ -277,11 +280,17 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                     setLocalMarkdownText(decodedData[0].imd);
                     setProjectAccess(decodedData[0].user_permissions);
 
+                    if (editorInstance) {
+                        editorInstance.getAction('editor.action.formatDocument').run();
+                    }
+
                     // eslint-disable-next-line
                     let fileName = `${decodedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
                     setProjectName(fileName);
 
+
                     handleReload(decodedData[0].imd);
+                    document.getElementById("page-title").innerText = `Recap - ${decodedData[0].name}`.replaceAll('_', ' ');
                 }
 
                 setLoading(false);
@@ -295,7 +304,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 setLoading(false);
             })
         }
-    }, [projectData, messages, setProjectName, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
+    }, [projectData, editorInstance, messages, setProjectName, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
@@ -341,9 +350,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div ref={exportRef} id="text-container" className="transpiled-text-container">
-                            {/* <ReactJson src={localMarkdownText} /> */}
-
-                            {(localMarkdownText && localMarkdownText !== '') && <SheetsRenderer render={localMarkdownText} userPermission={projectAccess} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />}
+                            <SheetsRenderer render={localMarkdownText} userPermission={projectAccess} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />
                         </div>
                     </animated.div>
 

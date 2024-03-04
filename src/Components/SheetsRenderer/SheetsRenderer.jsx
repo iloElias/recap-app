@@ -31,22 +31,29 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
         setCurrentTextOnEditor(renderTextJson);
     }
 
+    const handleProjectEdit = (projectData) => {
+        const renderTextJson = JSON.stringify(projectData);
+
+        setRender(renderTextJson);
+        setCurrentTextOnEditor(renderTextJson);
+    }
+
     // if (`${window.location.href}`.split('#')[1] && `${window.location.href}`.split('#')[1] !== undefined) {
     //     if (document.getElementById(`${window.location.href}`.split('#')[1]))
     //         document.getElementById(`${window.location.href}`.split('#')[1]).style = `outline: solid 200px blue`;
     // }
 
-    return (
-        <div style={{
+    return (render && render.project_name && render.project_synopsis) ?
+        (<div style={{
             display: "flex",
             flexDirection: "column",
             gap: "1.5rem"
         }}>
-            <h1 className="project-name">{render.project_name}</h1>
-            <p className="project-synopsis">{render.project_synopsis}</p>
+            {render.project_name && (<h1 className="project-name">{render.project_name}</h1>)}
+            {render.project_synopsis && (<p className="project-synopsis">{render.project_synopsis}</p>)}
             {render.subjects?.map((subject, subjectIndex) => (
                 <div className="card-outer-container" key={subjectIndex}>
-                    <h2 className="subject-name" id={`subject-${subjectIndex}`}>{subject.subject_title}</h2>
+                    {subject.subject_title && (<h2 className="subject-name" id={`subject-${subjectIndex}`}>{subject.subject_title}</h2>)}
                     <Masonry columns={3} spacing={3} >
                         {subject.cards?.map((card, cardIndex) => (
                             (card.card_title || card.header || card.body[0] || card.footer) && <Paper id={`subject-${subjectIndex}-card-${cardIndex}`} key={cardIndex} className="rendered-card">
@@ -66,7 +73,9 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
             ))}
             {(userPermission === 'own' || userPermission === 'manage') && (<AddSubjectHologram messages={messages} addNewSubject={handleNewSubject} />)}
         </div>
-    );
+        ) : (
+            <AddProjectInfo render={render} messages={messages} handleNewProjectInfo={handleProjectEdit} />
+        );
 }
 
 function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
@@ -94,14 +103,14 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
     }, [currentInput, subjectIndex, contentList.length])
 
     const fieldsContainerAnimation = useSpring({
-        pointerEvent: showFields ? "all" : "none",
+        display: showFields ? "flex" : "none",
         opacity: showFields ? 1 : 0,
         zIndex: showFields ? 1 : 0,
         config: globalSpringConfig
     });
     const buttonFadeAnimation = useSpring({
-        opacity: showFields ? 0 : 1,
-        zIndex: showFields ? 0 : 1,
+        opacity: showFields && 0,
+        zIndex: showFields && 0,
         config: globalSpringConfig
     });
 
@@ -190,6 +199,7 @@ function AddSubjectHologram({ messages, addNewSubject }) {
         setSubjectTitle('');
     }
 
+
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
         opacity: showFields ? 1 : 0,
@@ -197,8 +207,8 @@ function AddSubjectHologram({ messages, addNewSubject }) {
         config: globalSpringConfig
     });
     const buttonFadeAnimation = useSpring({
-        opacity: showFields ? 0 : 1,
-        zIndex: showFields ? 0 : 1,
+        opacity: showFields && 0,
+        zIndex: showFields && 0,
         config: globalSpringConfig
     });
 
@@ -222,6 +232,62 @@ function AddSubjectHologram({ messages, addNewSubject }) {
                                     cards: []
                                 });
                                 resetFields();
+                            }} />
+                            <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowFields(false) }} />
+                        </div>
+                    </form>
+                </animated.div>
+                <animated.button onClick={() => { setShowFields(true) }} className="hologram subject-hologram" style={buttonFadeAnimation}>
+                    <div style={{
+                        fontSize: "30px",
+                        fontWeight: "350"
+                    }}>+</div>
+                </animated.button>
+            </div>
+        </ClickAwayListener >
+    );
+}
+
+function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
+    const [showFields, setShowFields] = useState(false)
+
+    const [projectTitle, setProjectTitle] = useState(render.project_name ?? '');
+    const [projectSynopsis, setProjectSynopsis] = useState(render.project_synopsis ?? '');
+
+
+    const fieldsContainerAnimation = useSpring({
+        display: showFields ? "flex" : "none",
+        opacity: showFields ? 1 : 0,
+        zIndex: showFields ? 1 : 0,
+        config: globalSpringConfig
+    });
+    const buttonFadeAnimation = useSpring({
+        opacity: showFields && 0,
+        zIndex: showFields && 0,
+        config: globalSpringConfig
+    });
+
+    return (
+        <ClickAwayListener onClickAway={() => { setShowFields(false) }
+        }>
+            <div className="subject-hologram-container hologram-container" style={{ opacity: showFields && '1', height: !showFields && '50px' }}>
+                <animated.div className='content-fields' style={fieldsContainerAnimation} >
+                    <form action="" onSubmit={(e) => { e.preventDefault() }}>
+                        <input type="text" placeholder={messages.add_project_info_title} value={projectTitle} onChange={(e) => { setProjectTitle(e.target.value) }} />
+                        <input type="text" placeholder={messages.add_project_info_synopsis} value={projectSynopsis} onChange={(e) => { setProjectSynopsis(e.target.value) }} />
+                        <div style={{
+                            display: 'grid',
+                            gridTemplateColumns: '1fr 1fr',
+                            width: '100%',
+                            gap: '4px'
+                        }}>
+                            <input type="button" value={messages.add_project} onClick={() => {
+                                if (!projectTitle || projectTitle === '' || !projectSynopsis || projectSynopsis === '') return;
+                                handleNewProjectInfo({
+                                    project_name: projectTitle,
+                                    project_synopsis: projectSynopsis,
+                                    subjects: []
+                                });
                             }} />
                             <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowFields(false) }} />
                         </div>

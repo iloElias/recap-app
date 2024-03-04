@@ -13,6 +13,8 @@ export default function Login({ messages, loginHandler }) {
         }
     }, [navigate]);
 
+    document.getElementById("page-title").innerText = "Recap - Login"
+
     return (
         <div className="container container-login">
             <RecapLogo />

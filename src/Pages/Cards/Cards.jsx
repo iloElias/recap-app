@@ -58,6 +58,8 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
         immediate: (key) => key === (showModal ? "zIndex" : "")
     });
 
+    document.getElementById("page-title").innerText = "Recap - Home";
+
     const toggleModal = () => {
         setShowModal(!showModal);
     }
