@@ -1,6 +1,6 @@
 import { TreeDotsIcon } from "../Icons/Icons";
 import { useSpring, animated } from "react-spring";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../Button/Button";
 import "./BottomOptions.css";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,10 @@ import { Grow, Paper, Skeleton } from "@mui/material";
 import { exportComponentAsPNG } from "react-component-export-image";
 import generatePDF, { Margin } from "react-to-pdf";
 import Modal from "../Modal/Modal";
+import getApi from "../../Api/api";
+import { jwtDecode } from "jwt-decode";
+
+const api = getApi();
 
 function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
@@ -88,7 +92,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     const [showSharePanel, setShowSharePanel] = useState(false);
 
     const [usersSearched, setUsersSearched] = useState();
-    const [email, setEmail] = useState();
+    const [lockSearch, setLockSearch] = useState(false);
+    const [email, setEmail] = useState("");
 
     const modalAnimation = useSpring({
         zIndex: showSharePanel ? 4 : -1,
@@ -100,6 +105,36 @@ export default function BottomOptions({ messages, language, setLanguage, profile
         immediate: (key) => key === (showSharePanel ? "zIndex" : "")
     });
 
+
+    useEffect(() => {
+        if (lockSearch) { return }
+        if (usersSearched && usersSearched[0] === 'search') {
+            if (email === '') {
+                setUsersSearched(null);
+                return;
+            }
+
+            setLockSearch(true);
+            api.get(`/invite/user/?email=${email}`).then((data) => {
+                const decodedData = jwtDecode(data.data);
+                if (!decodedData[0]) {
+                    setUsersSearched("anyFound");
+                    return;
+                }
+
+                setUsersSearched(decodedData);
+            }).catch((e) => {
+            }).finally(() => {
+                setLockSearch(false);
+            });
+        }
+    }, [usersSearched, email, lockSearch]);
+
+    // useEffect(() => {
+    //     if () {
+
+    //     }
+    // }, []);
 
     const toggleCategories = () => {
         setShowCategory(!showCategory);
@@ -160,7 +195,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                             width: '100%',
                                             gap: '4px'
                                         }}>
-                                            <input type="button" value={messages.user_search} onClick={() => { setUsersSearched([]) }} />
+                                            <input type="button" value={messages.user_search} onClick={() => { setUsersSearched(['search']) }} />
                                             <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowSharePanel(false); setUsersSearched(null) }} />
                                         </div>
                                     </form>
@@ -179,9 +214,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                     gap: '1vh'
                                 }}>
                                     {usersSearched !== 'anyFound' ?
-                                        (usersSearched.length === 0 ? (<UserInformationItem />) : (usersSearched.map((user) => {
-                                            return (<UserInformationItem />)
-                                        }))) : (<p>Any users found with {email}</p>)}
+                                        (usersSearched.length === 0 ? (<UserInformationItem />) : (usersSearched.map((user, index) => {
+                                            return (<UserInformationItem key={index} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} />)
+                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email} ${email}`}</p>)}
                                 </div>
                             </Paper>)}
                         </div>
@@ -268,15 +303,15 @@ function UserInformationItem({ name, nick, email, picturePath }) {
             </div>
         ) : (
             <div className="user-invite-item">
-                <img src={picturePath} alt="" />
+                {picturePath ? (<img src={picturePath} alt="" />) : (<Skeleton variant="circular" width={35} height={35} />)}
                 <div style={{
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     height: "100%"
                 }}>
-                    <div className="user-identifier"><h4>{name}</h4> <div className="dot">•</div><p>{nick}</p></div>
-                    <p className="user-invite-item-email">{email}</p>
+                    <div className="user-identifier">{name ? (<h4>{name}</h4>) : (<Skeleton variant="rectangular" width={80} height={13.5} />)}{(name && nick) ? (<div className="dot">•</div>) : (<></>)}{nick ? (<p>{nick}</p>) : (<Skeleton variant="rectangular" width={120} height={13.5} />)}</div>
+                    {email ? (<p className="user-invite-item-email" title={email} >{email}</p>) : (<Skeleton variant="rectangular" width={190} height={13.5} />)}
                 </div>
             </div>
         )

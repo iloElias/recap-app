@@ -207,3 +207,9 @@
     width: 35px;
     height: 35px;
 }
+
+
+.user-invite-item-email {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
