@@ -156,14 +156,24 @@
     cursor: pointer;
 }
 
+form label {
+    font-size: 75%;
+}
+
 .user-invite-item {
+    position: relative;
+
     display: flex;
     flex-direction: row;
 
     gap: 4px;
 
+    background-color: #fff;
+
     color: #323232;
     padding: 1.5dvh 1dvh;
+
+    align-items: center;
 
     border-radius: 4px;
 }
@@ -204,12 +214,112 @@
     border-radius: 50%;
     aspect-ratio: 1/1;
 
-    width: 35px;
-    height: 35px;
+    width: 40px;
+    height: 40px;
 }
 
 
 .user-invite-item-email {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.no-select:hover {
+    outline: none;
+    cursor: unset;
+    background-color: unset;
+}
+
+.loading {
+    cursor: progress;
+}
+
+.invite-this-user {
+    position: absolute;
+    top: 50%;
+    z-index: 0;
+    transform: translateY(-50%);
+}
+
+.invite-this-user .paper {
+    display: flex;
+    flex-direction: column;
+
+    min-width: max-content;
+
+    gap: 4px;
+
+    background-color: #fff;
+
+    color: #323232;
+    padding: 1.5dvh 1dvh 1dvh;
+
+    border-radius: 4px;
+}
+
+.paper form input[type="button"] {
+    user-select: none;
+    touch-action: none;
+
+    resize: none;
+
+    padding: 4px 2px;
+
+    border-radius: 4px;
+    outline: none;
+    border: none;
+
+    background: #fafafa;
+
+    border: solid 1px rgba(146, 146, 146, 0.719);
+
+    font-size: 60%;
+    color: #212121;
+}
+
+.paper form input[type="button"]:hover {
+    cursor: pointer;
+    background: #f5f5f5;
+}
+
+.already-invited {
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: #c8c8c886;
+    border-radius: 8px;
+
+    width: 100%;
+    height: 100%;
+}
+
+.already-invited .content {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    width: calc(100% - 8px);
+    height: calc(100% - 8px);
+
+    outline: dashed 1px #7f7f7f;
+    border-radius: 4px;
+}
+
+.already-invited .content * {
+    aspect-ratio: 1/1;
+
+    background-color: #fafafa;
+    border: dashed 1px #7f7f7f;
+    border-radius: 4px;
+
+    padding: 4px;
+
+    text-align: center;
 }

@@ -6,12 +6,13 @@ import "./BottomOptions.css";
 import { useParams } from "react-router-dom";
 
 import { ClickAwayListener } from '@mui/base';
-import { Grow, Paper, Skeleton } from "@mui/material";
+import { Avatar, Grow, Paper, Skeleton, Tooltip, tooltipClasses } from "@mui/material";
 import { exportComponentAsPNG } from "react-component-export-image";
 import generatePDF, { Margin } from "react-to-pdf";
 import Modal from "../Modal/Modal";
 import getApi from "../../Api/api";
 import { jwtDecode } from "jwt-decode";
+import styled from "@emotion/styled";
 
 const api = getApi();
 
@@ -82,7 +83,7 @@ function Option({ optionName, optionIcon, onClick, children, selected }) {
     );
 }
 
-export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName }) {
+export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission }) {
     const urlParam = useParams('/project/:id');
 
     const [showCategory, setShowCategory] = useState(false);
@@ -115,8 +116,10 @@ export default function BottomOptions({ messages, language, setLanguage, profile
             }
 
             setLockSearch(true);
-            api.get(`/invite/user/?email=${email}`).then((data) => {
+            api.get(`/invite/user/?search=${email}&project_id=${urlParam.id}`).then((data) => {
                 const decodedData = jwtDecode(data.data);
+
+                console.log(decodedData);
                 if (!decodedData[0]) {
                     setUsersSearched("anyFound");
                     return;
@@ -128,7 +131,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                 setLockSearch(false);
             });
         }
-    }, [usersSearched, email, lockSearch]);
+    }, [usersSearched, urlParam, email, lockSearch]);
 
     // useEffect(() => {
     //     if () {
@@ -164,7 +167,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
     return messages.languages_button_title ? (
         <>
-            <animated.div style={modalAnimation} onClick={() => { setShowSharePanel(false) }} >
+            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<animated.div style={modalAnimation} onClick={() => { setShowSharePanel(false) }} >
                 <Modal >
                     <Grow
                         onClick={e => e.stopPropagation()}
@@ -184,8 +187,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
                                     <form action="" onSubmit={(e) => {
                                         e.preventDefault();
+                                        setUsersSearched(['search']);
                                     }}>
-                                        <input type="text" placeholder="Email" value={email} onChange={(e) => {
+                                        <input type="text" placeholder={messages.user_search_input_label} value={email} onChange={(e) => {
                                             setEmail(e.target.value)
                                         }} />
 
@@ -210,19 +214,19 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                     display: 'flex',
                                     flexDirection: 'column',
                                     width: '18rem',
-                                    margin: '1.5dvh 0.25dvh',
+                                    margin: '1.5dvh',
                                     gap: '1vh'
                                 }}>
                                     {usersSearched !== 'anyFound' ?
-                                        (usersSearched.length === 0 ? (<UserInformationItem />) : (usersSearched.map((user, index) => {
+                                        (typeof usersSearched === 'string' ? (<UserInformationItem />) : (usersSearched?.map((user, index) => {
                                             return (<UserInformationItem key={index} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} />)
-                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email} ${email}`}</p>)}
+                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}`} <i>{` ${email}`}</i></p>)}
                                 </div>
                             </Paper>)}
                         </div>
                     </Grow>
                 </Modal>
-            </animated.div>
+            </animated.div>)}
 
 
             <ClickAwayListener onClickAway={hideOptions}>
@@ -245,11 +249,11 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         </Option>
                         {urlParam.id && (
                             <>
-                                <Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
+                                {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
                                     <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title}>
 
                                     </OptionPanel>
-                                </Option>
+                                </Option>)}
                                 <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
                                     <OptionPanel showPanel={showExportPanel} >
                                         <Button onClick={() => {
@@ -264,11 +268,11 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                         <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
                                     </OptionPanel>
                                 </Option>
-                                <Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => {
+                                {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => {
                                     hideAllPanels();
                                     setShowCategory(false);
                                     setShowSharePanel(!showSharePanel)
-                                }} />
+                                }} />)}
                             </>
                         )}
 
@@ -285,11 +289,55 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     ) : (<></>);
 }
 
-function UserInformationItem({ name, nick, email, picturePath }) {
+function UserInformationItem({ name, nick, email, picturePath, alreadyInvited }) {
+    const [isInvited, setIsInvited] = useState(alreadyInvited ?? false);
+    const [confirmChoice, setConfirmChoice] = useState(false);
+    const animation = useSpring({
+        left: confirmChoice ? "110%" : "10%",
+        opacity: confirmChoice ? "1" : "0",
+    });
+
+    const inviteAnimation = useSpring({
+        transform: isInvited ? "scale(1)" : "scale(0.7)",
+        opacity: confirmChoice ? "0" : "1",
+        config: {
+            mass: 0.4,
+            tension: 337,
+            friction: 10
+        }
+    });
+
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip arrow {...props} placement="bottom" enterDelay={500} classes={{ popper: className }} slotProps={{
+            popper: {
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: [0, -30],
+                        },
+                    },
+                ],
+            },
+        }}
+        />
+    ))(({ theme }) => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            backgroundColor: '#fafafa',
+            color: 'rgba(0, 0, 0, 0.87)',
+            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
+
+            fontSize: '10px',
+            textAlign: 'center',
+            maxWidth: '170px'
+        },
+    }));
+
+
     return ((!name || !email) ?
         (
-            <div className="user-invite-item">
-                <Skeleton variant="circular" width={35} height={35} />
+            <div className="user-invite-item no-select loading">
+                <Skeleton variant="circular" width={40} height={40} />
                 <div style={{
                     display: "flex",
                     flexDirection: "column",
@@ -302,18 +350,55 @@ function UserInformationItem({ name, nick, email, picturePath }) {
                 </div>
             </div>
         ) : (
-            <div className="user-invite-item">
-                {picturePath ? (<img src={picturePath} alt="" />) : (<Skeleton variant="circular" width={35} height={35} />)}
-                <div style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    height: "100%"
-                }}>
-                    <div className="user-identifier">{name ? (<h4>{name}</h4>) : (<Skeleton variant="rectangular" width={80} height={13.5} />)}{(name && nick) ? (<div className="dot">•</div>) : (<></>)}{nick ? (<p>{nick}</p>) : (<Skeleton variant="rectangular" width={120} height={13.5} />)}</div>
-                    {email ? (<p className="user-invite-item-email" title={email} >{email}</p>) : (<Skeleton variant="rectangular" width={190} height={13.5} />)}
+            <div style={{ position: "relative" }}>
+                <ClickAwayListener onClickAway={() => { confirmChoice && setConfirmChoice(false) }}>
+                    <animated.div className="invite-this-user" style={animation}>
+                        <Paper className="paper">
+
+                            <form action="" onSubmit={e => e.preventDefault()}>
+                                <label>Convidar este usuário?</label>
+                                <div style={{
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    width: '100%',
+                                    gap: '4px'
+                                }}>
+                                    <input type="button" value="Sim" onClick={() => {
+                                        setIsInvited(true);
+                                        setConfirmChoice(false);
+                                    }} />
+                                    <input type="button" value="Cancelar" onClick={() => { setConfirmChoice(false) }} />
+                                </div>
+                            </form>
+                        </Paper>
+                    </animated.div>
+                </ClickAwayListener>
+
+                <div onClick={() => {
+                    if (!isInvited) {
+                        setConfirmChoice(!confirmChoice);
+                    }
+                }} className={`user-invite-item ${isInvited && "no-select"}`}>
+                    {picturePath ? (<Avatar src={picturePath} />) : (<Skeleton variant="circular" width={40} height={40} />)}
+                    <div style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        height: "100%"
+                    }}>
+                        <div className="user-identifier">{name ? (<h4>{name}</h4>) : (<Skeleton variant="rectangular" width={80} height={13.5} />)}{(name && nick) ? (<div className="dot">•</div>) : (<></>)}{nick ? (<p>{nick}</p>) : (<Skeleton variant="rectangular" width={120} height={13.5} />)}</div>
+                        {email ? (<p className="user-invite-item-email" title={email} >{email}</p>) : (<Skeleton variant="rectangular" width={190} height={13.5} />)}
+                    </div>
                 </div>
-            </div>
+
+                {isInvited && (<HtmlTooltip title={`Este usuário ja foi convidado`} >
+                    <animated.div className="already-invited" style={inviteAnimation}>
+                        <div className="content">
+                            <i className="bi bi-check-square"></i>
+                        </div>
+                    </animated.div>
+                </HtmlTooltip>)}
+            </div >
         )
     );
 }

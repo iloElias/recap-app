@@ -74,7 +74,7 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
             {(userPermission === 'own' || userPermission === 'manage') && (<AddSubjectHologram messages={messages} addNewSubject={handleNewSubject} />)}
         </div>
         ) : (
-            <AddProjectInfo render={render} messages={messages} handleNewProjectInfo={handleProjectEdit} />
+            (userPermission === 'own' || userPermission === 'manage') && (<AddProjectInfo render={render} messages={messages} handleNewProjectInfo={handleProjectEdit} />)
         );
 }
 

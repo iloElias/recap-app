@@ -30,11 +30,11 @@ if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile');
 
-function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler, exportRef, projectName }) {
+function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler, exportRef, projectName, actualProjectPermission }) {
     return (
         <>
             {children}
-            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={projectName} />
+            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={projectName} actualProjectPermission={actualProjectPermission} />
         </>
     );
 }
@@ -46,6 +46,7 @@ function App() {
 
     const exportRef = useRef();
     const [actualProjectName, setActualProjectName] = useState();
+    const [actualProjectPermission, setActualProjectPermission] = useState('guest');
 
     const [previousSessionMessage, setPreviousSessionMessage] = useState(() => {
         try {
@@ -279,8 +280,8 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} >
-                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setProjectName={setActualProjectName} />
+                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} >
+                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} />
                                 </PageTemplate>} />
                                 <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <NotFound>

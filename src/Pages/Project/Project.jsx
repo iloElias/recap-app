@@ -31,14 +31,17 @@ const explodeMinSize = () => {
     return false;
 }
 
+const localDefinedPreferEditorOpen = localStorage.getItem('recap@preferEditorOpen') ?? true;
+const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileState') ?? false;
+
 document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
-export default function Project({ messages, setLoading, exportRef, setProjectName }) {
+export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess }) {
     const [editorInstance, setEditorInstance] = useState();
 
-    const [openEditor, setOpenEditor] = useState(true);
-    const [userForceMobile, setUserForceMobile] = useState(explodeMinSize());
+    const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen === 'true' ? true : false);
+    const [userForceMobile, setUserForceMobile] = useState(explodeMinSize() ? true : (localDefinedPreferMobileState === 'true' ? true : false));
     const [isMobile, setIsMobile] = useState(explodeMinSize());
 
     const [fullScreen, setFullScreen] = useState(false);
@@ -279,6 +282,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                     setMarkdownText(decodedData[0].imd);
                     setLocalMarkdownText(decodedData[0].imd);
                     setProjectAccess(decodedData[0].user_permissions);
+                    setCurrentProjectAccess(decodedData[0].user_permissions);
 
                     if (editorInstance) {
                         editorInstance.getAction('editor.action.formatDocument').run();
@@ -304,7 +308,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 setLoading(false);
             })
         }
-    }, [projectData, editorInstance, messages, setProjectName, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
+    }, [projectData, editorInstance, messages, setProjectName, setCurrentProjectAccess, setLastSavedValue, setProjectData, setLocalMarkdownText, setMarkdownText, handleReload, setLoading]);
 
     const handleFileSave = () => {
         setSaveProject(true);
@@ -312,6 +316,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
 
     const toggleMobile = () => {
+        localStorage.setItem("recap@preferMobileState", !userForceMobile);
         setUserForceMobile(!userForceMobile);
     }
 
@@ -392,6 +397,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         }}>
                             <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
+                                    localStorage.setItem("recap@preferEditorOpen", !openEditor);
                                     setOpenEditor(!openEditor);
                                 }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
                             </BootstrapTooltip>
