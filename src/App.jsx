@@ -17,7 +17,6 @@ import getApi from './Api/api';
 import getMessages from './Internationalization/emergencyMessages';
 
 const emergencyMessages = getMessages();
-const api = getApi();
 
 if (process.env.REACT_APP_LOCALHOST) {
     document.getElementById("page-title").innerText = `Recap - ${process.env.REACT_APP_LOCALHOST}`
@@ -41,10 +40,12 @@ function PageTemplate({ children, profile, language, messages, setLanguage, logo
 
 function App() {
     const navigate = useNavigate();
+    const exportRef = useRef();
+    const api = getApi();
+
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
 
-    const exportRef = useRef();
     const [actualProjectName, setActualProjectName] = useState();
     const [actualProjectPermission, setActualProjectPermission] = useState('guest');
 
@@ -151,7 +152,7 @@ function App() {
 
         navigate('/projects');
         localStorage.setItem("recap@localUserProfile", receivedToken);
-    }, [navigate]);
+    }, [navigate, api]);
 
     useEffect(() => {
         if (previousSessionMessage) {
@@ -168,7 +169,7 @@ function App() {
     }, [previousSessionMessage, setAlertMessage, setAlertSeverity, setNotificationMessage]);
 
     useEffect(() => {
-        api.get(`language/?lang=${language}&message=all`)
+        getApi().get(`language/?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
             .catch((err) => {
                 console.error("Ops, an error has ocurred on language set", err);
@@ -212,7 +213,7 @@ function App() {
                 }
             }
         },
-        [user, profile, setProfile, handleUser, prepareData]
+        [user, profile, api, setProfile, handleUser, prepareData]
     );
 
     useEffect(() => {

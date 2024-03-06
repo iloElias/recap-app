@@ -14,8 +14,6 @@ import getApi from "../../Api/api";
 import { jwtDecode } from "jwt-decode";
 import styled from "@emotion/styled";
 
-const api = getApi();
-
 function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
         opacity: showCategory ? 1 : 0,
@@ -85,6 +83,7 @@ function Option({ optionName, optionIcon, onClick, children, selected }) {
 
 export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission }) {
     const urlParam = useParams('/project/:id');
+    const api = getApi();
 
     const [showCategory, setShowCategory] = useState(false);
     const [showLanguagePanel, setShowLanguagePanel] = useState(false);
@@ -92,8 +91,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     const [showExportPanel, setShowExportPanel] = useState(false);
     const [showSharePanel, setShowSharePanel] = useState(false);
 
-    const [usersSearched, setUsersSearched] = useState();
+    const [usersSearched, setUsersSearched] = useState("search");
     const [lockSearch, setLockSearch] = useState(false);
+    const [searchUsedText, setSearchUsedText] = useState();
     const [email, setEmail] = useState("");
 
     const modalAnimation = useSpring({
@@ -109,17 +109,17 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
     useEffect(() => {
         if (lockSearch) { return }
-        if (usersSearched && usersSearched[0] === 'search') {
+        if (usersSearched === 'search') {
             if (email === '') {
                 setUsersSearched(null);
                 return;
             }
 
+            setSearchUsedText(email);
             setLockSearch(true);
             api.get(`/invite/user/?search=${email}&project_id=${urlParam.id}`).then((data) => {
                 const decodedData = jwtDecode(data.data);
 
-                console.log(decodedData);
                 if (!decodedData[0]) {
                     setUsersSearched("anyFound");
                     return;
@@ -131,13 +131,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                 setLockSearch(false);
             });
         }
-    }, [usersSearched, urlParam, email, lockSearch]);
-
-    // useEffect(() => {
-    //     if () {
-
-    //     }
-    // }, []);
+    }, [usersSearched, api, urlParam, email, lockSearch]);
 
     const toggleCategories = () => {
         setShowCategory(!showCategory);
@@ -173,7 +167,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         onClick={e => e.stopPropagation()}
                         in={showSharePanel}
                         style={{ transformOrigin: '50% 0 0' }}
-                        {...(showSharePanel ? { timeout: 500 } : {})}
+                        {...(showSharePanel ? { timeout: 1000 } : {})}
                     >
                         <div style={{
                             display: "flex",
@@ -187,7 +181,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
                                     <form action="" onSubmit={(e) => {
                                         e.preventDefault();
-                                        setUsersSearched(['search']);
+                                        if (email !== "") {
+                                            setUsersSearched('search');
+                                        }
                                     }}>
                                         <input type="text" placeholder={messages.user_search_input_label} value={email} onChange={(e) => {
                                             setEmail(e.target.value)
@@ -199,7 +195,11 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                             width: '100%',
                                             gap: '4px'
                                         }}>
-                                            <input type="button" value={messages.user_search} onClick={() => { setUsersSearched(['search']) }} />
+                                            <input type="button" value={messages.user_search} onClick={() => {
+                                                if (email !== "") {
+                                                    setUsersSearched('search');
+                                                }
+                                            }} />
                                             <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowSharePanel(false); setUsersSearched(null) }} />
                                         </div>
                                     </form>
@@ -219,8 +219,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                 }}>
                                     {usersSearched !== 'anyFound' ?
                                         (typeof usersSearched === 'string' ? (<UserInformationItem />) : (usersSearched?.map((user, index) => {
-                                            return (<UserInformationItem key={index} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} />)
-                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}`} <i>{` ${email}`}</i></p>)}
+                                            return (<UserInformationItem key={index} userId={user.id} projectId={urlParam.id} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} lockSearch={lockSearch} setLockSearch={setLockSearch} alreadyInvited={(user.user_permissions && user.user_permissions !== "none") ? true : false} />)
+                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}  ${searchUsedText}`}</p>)}
                                 </div>
                             </Paper>)}
                         </div>
@@ -234,7 +234,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     zIndex: showCategory ? '18' : '8'
                 }} className="bottom-modal" >
                     <Button style={{
-                        zIndex: showCategory ? '20' : '10'
+                        zIndex: showCategory ? '20' : '10',
+                        textAlign: "center"
                     }} id="bottom-button" onClick={toggleCategories}>
                         <TreeDotsIcon />
                     </Button>
@@ -289,9 +290,26 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     ) : (<></>);
 }
 
-function UserInformationItem({ name, nick, email, picturePath, alreadyInvited }) {
-    const [isInvited, setIsInvited] = useState(alreadyInvited ?? false);
+function UserInformationItem({ name, userId, projectId, nick, email, picturePath, alreadyInvited, lockSearch, setLockSearch }) {
+    const api = getApi();
+
+    const [isInvited, setIsInvited] = useState(alreadyInvited);
     const [confirmChoice, setConfirmChoice] = useState(false);
+    const [sendInvite, setSendInvite] = useState(false);
+
+    useEffect(() => {
+        if (sendInvite && !lockSearch) {
+            setLockSearch(true);
+
+            api.put(`/invite/user/?user_id=${userId}&project_id=${projectId}`).then(() => {
+                setIsInvited(true);
+            }).catch().finally(() => {
+                setLockSearch(false);
+                setSendInvite(false);
+            })
+        }
+    }, [sendInvite, api, setLockSearch, lockSearch, projectId, userId]);
+
     const animation = useSpring({
         left: confirmChoice ? "110%" : "10%",
         opacity: confirmChoice ? "1" : "0",
@@ -336,7 +354,7 @@ function UserInformationItem({ name, nick, email, picturePath, alreadyInvited })
 
     return ((!name || !email) ?
         (
-            <div className="user-invite-item no-select loading">
+            <div style={{ cursor: "progress" }} className="user-invite-item no-select">
                 <Skeleton variant="circular" width={40} height={40} />
                 <div style={{
                     display: "flex",
@@ -363,9 +381,11 @@ function UserInformationItem({ name, nick, email, picturePath, alreadyInvited })
                                     width: '100%',
                                     gap: '4px'
                                 }}>
-                                    <input type="button" value="Sim" onClick={() => {
-                                        setIsInvited(true);
-                                        setConfirmChoice(false);
+                                    <input type="button" style={{ cursor: lockSearch ? "progress" : "pointer" }} value="Sim" onClick={() => {
+                                        if (!lockSearch) {
+                                            setSendInvite(true);
+                                            setConfirmChoice(false);
+                                        }
                                     }} />
                                     <input type="button" value="Cancelar" onClick={() => { setConfirmChoice(false) }} />
                                 </div>

@@ -35,13 +35,8 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
         const renderTextJson = JSON.stringify(projectData);
 
         setRender(renderTextJson);
-        setCurrentTextOnEditor(renderTextJson);
+        setCurrentTextOnEditor(projectData);
     }
-
-    // if (`${window.location.href}`.split('#')[1] && `${window.location.href}`.split('#')[1] !== undefined) {
-    //     if (document.getElementById(`${window.location.href}`.split('#')[1]))
-    //         document.getElementById(`${window.location.href}`.split('#')[1]).style = `outline: solid 200px blue`;
-    // }
 
     return (render && render.project_name && render.project_synopsis) ?
         (<div style={{

@@ -18,8 +18,6 @@ import Input from "../../Components/Input/Input";
 import { Editor } from "@monaco-editor/react";
 import SheetsRenderer from "../../Components/SheetsRenderer/SheetsRenderer";
 
-const api = getApi();
-
 const getWindowSize = () => {
     return { height: window.innerHeight, width: window.innerWidth };
 }
@@ -38,6 +36,8 @@ document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess }) {
+    const api = getApi();
+
     const [editorInstance, setEditorInstance] = useState();
 
     const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen === 'true' ? true : false);
@@ -249,7 +249,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         try {
             setLocalMarkdownText(JSON.parse(text));
         } catch (e) {
-            setLocalMarkdownText('');
+            setLocalMarkdownText(text);
         }
 
         if (editorInstance) {
@@ -258,7 +258,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     }, [setLocalMarkdownText, editorInstance])
 
     useEffect(() => {
-        if (projectData.id) return;
+        if (!projectData || projectData.id) return;
 
         if (projectData.pre_id) {
             setNotificationMessage(messages.loading_your_project);
@@ -280,7 +280,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                     setLastSavedValue(decodedData[0].imd);
                     setProjectData(decodedData[0]);
                     setMarkdownText(decodedData[0].imd);
-                    setLocalMarkdownText(decodedData[0].imd);
+                    handleReload(decodedData[0].imd);
                     setProjectAccess(decodedData[0].user_permissions);
                     setCurrentProjectAccess(decodedData[0].user_permissions);
 
@@ -290,11 +290,10 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
                     // eslint-disable-next-line
                     let fileName = `${decodedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
+                    document.getElementById("page-title").innerText = `Recap - ${decodedData[0].name}`;
                     setProjectName(fileName);
 
-
                     handleReload(decodedData[0].imd);
-                    document.getElementById("page-title").innerText = `Recap - ${decodedData[0].name}`.replaceAll('_', ' ');
                 }
 
                 setLoading(false);
