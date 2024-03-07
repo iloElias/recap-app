@@ -113,7 +113,6 @@
     cursor: pointer;
 }
 
-
 .option-panel select:focus {
     outline: none;
     border: 0.2dvh solid #a1a1a1;

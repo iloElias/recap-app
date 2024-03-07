@@ -218,8 +218,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                     gap: '1vh'
                                 }}>
                                     {usersSearched !== 'anyFound' ?
-                                        (typeof usersSearched === 'string' ? (<UserInformationItem />) : (usersSearched?.map((user, index) => {
-                                            return (<UserInformationItem key={index} userId={user.id} projectId={urlParam.id} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} lockSearch={lockSearch} setLockSearch={setLockSearch} alreadyInvited={(user.user_permissions && user.user_permissions !== "none") ? true : false} />)
+                                        (typeof usersSearched === 'string' ? (<UserInformationItem messages={messages} />) : (usersSearched?.map((user, index) => {
+                                            return (<UserInformationItem profile={profile} messages={messages} key={index} userId={user.id} projectId={urlParam.id} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} lockSearch={lockSearch} setLockSearch={setLockSearch} alreadyInvited={(user.user_permissions && user.user_permissions !== "none") ? true : false} />)
                                         }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}  ${searchUsedText}`}</p>)}
                                 </div>
                             </Paper>)}
@@ -290,7 +290,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     ) : (<></>);
 }
 
-function UserInformationItem({ name, userId, projectId, nick, email, picturePath, alreadyInvited, lockSearch, setLockSearch }) {
+function UserInformationItem({ profile, name, userId, projectId, nick, email, picturePath, alreadyInvited, lockSearch, setLockSearch, messages }) {
     const api = getApi();
 
     const [isInvited, setIsInvited] = useState(alreadyInvited);
@@ -374,20 +374,20 @@ function UserInformationItem({ name, userId, projectId, nick, email, picturePath
                         <Paper className="paper">
 
                             <form action="" onSubmit={e => e.preventDefault()}>
-                                <label>Convidar este usuário?</label>
+                                <label>{messages.invite_this_user}?</label>
                                 <div style={{
                                     display: 'grid',
                                     gridTemplateColumns: '1fr 1fr',
                                     width: '100%',
                                     gap: '4px'
                                 }}>
-                                    <input type="button" style={{ cursor: lockSearch ? "progress" : "pointer" }} value="Sim" onClick={() => {
+                                    <input type="button" style={{ cursor: lockSearch ? "progress" : "pointer" }} value={messages.confirm_invite} onClick={() => {
                                         if (!lockSearch) {
                                             setSendInvite(true);
                                             setConfirmChoice(false);
                                         }
                                     }} />
-                                    <input type="button" value="Cancelar" onClick={() => { setConfirmChoice(false) }} />
+                                    <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setConfirmChoice(false) }} />
                                 </div>
                             </form>
                         </Paper>
@@ -411,10 +411,10 @@ function UserInformationItem({ name, userId, projectId, nick, email, picturePath
                     </div>
                 </div>
 
-                {isInvited && (<HtmlTooltip title={`Este usuário ja foi convidado`} >
+                {isInvited && (<HtmlTooltip title={(profile && profile.email === email) ? messages.this_is_you : messages.already_invited} >
                     <animated.div className="already-invited" style={inviteAnimation}>
                         <div className="content">
-                            <i className="bi bi-check-square"></i>
+                            {(profile && profile.email === email) ? <i className="bi bi-person-square"></i> : <i className="bi bi-check-square"></i>}
                         </div>
                     </animated.div>
                 </HtmlTooltip>)}
