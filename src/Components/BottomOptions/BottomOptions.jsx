@@ -228,63 +228,70 @@ export default function BottomOptions({ messages, language, setLanguage, profile
             </animated.div>)}
 
 
-            <div onClick={hideOptions}>
-                <div style={{
-                    zIndex: showCategory ? '18' : '8'
-                }} onClick={e => e.stopPropagation()} className="bottom-modal" >
-                    <Button style={{
-                        zIndex: showCategory ? '20' : '10',
-                        textAlign: "center"
-                    }} id="bottom-button" onClick={toggleCategories}>
-                        <TreeDotsIcon />
-                    </Button>
-                    <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>
-                        <Option optionName={messages.languages_button_title} optionIcon={<i className="bi bi-globe2"></i>} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
-                            <OptionPanel showPanel={showLanguagePanel} title={messages.languages_button_title}>
-                                <select onChange={onLanguageChange} value={language}>
-                                    <option value="en">English</option>
-                                    <option value="pt-BR">Português</option>
-                                </select>
-                            </OptionPanel>
-                        </Option>
-                        {urlParam.id && (
-                            <>
-                                {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
-                                    <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title}>
-
-                                    </OptionPanel>
-                                </Option>)}
-                                <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
-                                    <OptionPanel showPanel={showExportPanel} >
-                                        <Button onClick={() => {
-                                            exportComponentAsPNG(exportRef, {
-                                                fileName: `${projectName ?? 'document'}.png`, html2CanvasOptions: {
-                                                    onclone: (clonedDoc) => {
-                                                        clonedDoc.getElementById("project-visualizer").style.margin = "40px 60px 60px 40px";
-                                                    },
-                                                },
-                                            })
-                                        }} className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
-                                        <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
-                                    </OptionPanel>
-                                </Option>
-                                {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => {
-                                    hideAllPanels();
-                                    setShowCategory(false);
-                                    setShowSharePanel(!showSharePanel)
-                                }} />)}
-                            </>
-                        )}
-
-                        {profile && (
-                            <Option onClick={() => {
-                                logoutHandler();
-                                hideOptions();
-                            }} optionName={messages.account_logout_button_title} optionIcon={<i className="bi bi-door-open"></i>} />
-                        )}
-                    </OptionsMenu>
-                </div>
+            <div style={{
+                position: "fixed",
+                height: "100dvh",
+                width: "100dvw",
+                pointerEvents: showCategory ? "all" : "none",
+                zIndex: showCategory ? "10" : "-1",
+            }} onClick={hideOptions}>
             </div >
+
+            <div style={{
+                zIndex: showCategory ? '18' : '8'
+            }} onClick={e => e.stopPropagation()} className="bottom-modal" >
+                <Button style={{
+                    zIndex: showCategory ? '20' : '10',
+                    textAlign: "center"
+                }} id="bottom-button" onClick={toggleCategories}>
+                    <TreeDotsIcon />
+                </Button>
+                <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>
+                    <Option optionName={messages.languages_button_title} optionIcon={<i className="bi bi-globe2"></i>} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
+                        <OptionPanel showPanel={showLanguagePanel} title={messages.languages_button_title}>
+                            <select onChange={onLanguageChange} value={language}>
+                                <option value="en">English</option>
+                                <option value="pt-BR">Português</option>
+                            </select>
+                        </OptionPanel>
+                    </Option>
+                    {urlParam.id && (
+                        <>
+                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
+                                <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title}>
+
+                                </OptionPanel>
+                            </Option>)}
+                            <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
+                                <OptionPanel showPanel={showExportPanel} >
+                                    <Button onClick={() => {
+                                        exportComponentAsPNG(exportRef, {
+                                            fileName: `${projectName ?? 'document'}.png`, html2CanvasOptions: {
+                                                onclone: (clonedDoc) => {
+                                                    clonedDoc.getElementById("project-visualizer").style.margin = "40px 60px 60px 40px";
+                                                },
+                                            },
+                                        })
+                                    }} className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
+                                    <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
+                                </OptionPanel>
+                            </Option>
+                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => {
+                                hideAllPanels();
+                                setShowCategory(false);
+                                setShowSharePanel(!showSharePanel)
+                            }} />)}
+                        </>
+                    )}
+
+                    {profile && (
+                        <Option onClick={() => {
+                            logoutHandler();
+                            hideOptions();
+                        }} optionName={messages.account_logout_button_title} optionIcon={<i className="bi bi-door-open"></i>} />
+                    )}
+                </OptionsMenu>
+            </div>
         </>
     ) : (<></>);
 }

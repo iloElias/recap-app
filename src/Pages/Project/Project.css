@@ -189,8 +189,10 @@ form :is(input, textarea) {
 }
 
 .mobile .project-visualizer {
-    margin: 2dvh 2dvh;
-    padding: 2dvh;
+    margin: 1dvh;
+    padding: 1dvh;
+
+    border: none;
 
     width: 100%;
 }
