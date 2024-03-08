@@ -297,12 +297,19 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
                 setLoading(false);
             }).catch((e) => {
+                if (e.response?.status === 403) {
+                    setNotFoundProject('notAllowed');
+                    return;
+                }
                 if (e.response?.status === 404) {
                     setNotFoundProject('notFound');
-                } else if (e.response?.status === 405) {
-                    setNotFoundProject('notAllowed');
+                    return;
                 }
-
+                if (e.response?.status === 400 || e.response?.data?.status === "active") {
+                    setNotFoundProject('notActive');
+                    return;
+                }
+            }).finally(() => {
                 setLoading(false);
             })
         }

@@ -84,6 +84,10 @@
 .close-button {
     position: relative;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     aspect-ratio: 1/1;
 
     z-index: 2;
@@ -148,6 +152,11 @@ form :is(input, textarea) {
 
 .close-button:active {
     transform: translateY(0.1dvh);
+}
+
+.not-found * {
+    margin: 0 25px;
+    text-align: center;
 }
 
 @media (max-width: 640px) {
@@ -245,7 +254,7 @@ form :is(input, textarea) {
 }
 
 .mobile>* .editor-buttons>.bottom-modal #bottom-button {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1/1 !important;
     padding: 0.5vh;
     min-width: 100%;
     min-height: 100%;

@@ -49,7 +49,7 @@
 }
 
 #bottom-button {
-    aspect-ratio: 1/1;
+    aspect-ratio: 1/1 !important;
 
     padding: 0.5vh;
 
