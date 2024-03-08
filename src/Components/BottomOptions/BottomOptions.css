@@ -10,9 +10,9 @@
 
     align-items: flex-end;
 
-    gap: 1dvh;
+    gap: 1vh;
 
-    margin: 2dvh;
+    margin: 2vh;
 }
 
 .bottom-modal button {
@@ -30,7 +30,7 @@
 }
 
 .visibility-container {
-    padding-top: 1dvh;
+    padding-top: 1vh;
     overflow: visible;
     overflow-y: clip;
 }
@@ -51,13 +51,13 @@
 #bottom-button {
     aspect-ratio: 1/1;
 
-    padding: 0.5dvh;
+    padding: 0.5vh;
 
     min-width: 33px;
     min-height: 33px;
 
-    max-width: 5dvh;
-    height: 5dvh;
+    max-width: 5vh;
+    height: 5vh;
 }
 
 .options-menu {

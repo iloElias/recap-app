@@ -10,8 +10,8 @@
 }
 
 .project-visualizer {
-    margin: 2dvh 9dvh;
-    padding: 2dvh;
+    margin: 2vh 9vh;
+    padding: 2vh;
 
     width: 100%;
     height: max(100%, fit-content);
@@ -19,7 +19,7 @@
     max-width: 1200px;
 
     border: solid 0.15dvw rgba(180, 180, 180, 0.812);
-    border-radius: 1dvh;
+    border-radius: 1vh;
 }
 
 .transpiled-text-container {
