@@ -99,7 +99,7 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
 
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
-        opacity: showFields ? 1 : 0,
+        opacity: showFields ? 1 : 0.5,
         zIndex: showFields ? 1 : 0,
         config: globalSpringConfig
     });
@@ -197,7 +197,7 @@ function AddSubjectHologram({ messages, addNewSubject }) {
 
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
-        opacity: showFields ? 1 : 0,
+        opacity: showFields ? 1 : 0.5,
         zIndex: showFields ? 1 : 0,
         config: globalSpringConfig
     });
@@ -252,7 +252,7 @@ function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
 
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
-        opacity: showFields ? 1 : 0,
+        opacity: showFields ? 1 : 0.5,
         zIndex: showFields ? 1 : 0,
         config: globalSpringConfig
     });

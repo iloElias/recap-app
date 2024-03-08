@@ -271,7 +271,7 @@ function App() {
         <>
             {messages.loaded ? (
                 <>
-                    <div className="App">
+                    <div id='App-root-container' className="App">
                         <Routes>
                             <Route path='/'>
                                 <Route index element={<Navigate to='/projects' ></Navigate>} />
@@ -281,9 +281,10 @@ function App() {
                                 <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
-                                <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} >
-                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} profile={profile} />
-                                </PageTemplate>} />
+                                <Route path='project/:id' element={
+                                    <Project BottomOptions={
+                                        ({ ref }) => { return (<BottomOptions ref={ref} profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} />) }
+                                    } messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} profile={profile} />} />
                                 <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <NotFound>
                                         <p>{messages.not_found_page}</p>

@@ -32,7 +32,7 @@
 .visibility-container {
     padding-top: 1vh;
     overflow: visible;
-    overflow-y: clip;
+    /* overflow-y: clip; */
 }
 
 .vertical-visibility-container {
@@ -40,8 +40,8 @@
     right: max(20dvh, 115px);
     padding: 0 1dvh 1dvh 1dvh;
 
-    /* overflow: visible; */
-    overflow-x: clip;
+    overflow: visible;
+    /* overflow-x: clip; */
 }
 
 .vertical-visibility-container div {
@@ -61,7 +61,7 @@
 }
 
 .options-menu {
-    min-width: min-content;
+    min-width: max-content;
     min-height: min-content;
 
     display: flex;

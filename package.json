@@ -35,6 +35,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "serve": "serve build",
+    "deploy": "yarn build & yarn global add serve & serve -s build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -30,7 +30,7 @@ function OptionsMenu({ showCategory, children }) {
 
     return (
         <div className="visibility-container" style={{
-            overflowY: showCategory ? "visible" : "clip",
+            // overflowY: "clip",
             zIndex: showCategory ? '8' : '0'
         }}>
             <animated.div style={optionsAnimation} className="options-menu">
@@ -80,7 +80,7 @@ function Option({ optionName, optionIcon, onClick, children, selected }) {
     );
 }
 
-export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission }) {
+export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission, bottomModalContainerRef }) {
     const urlParam = useParams('/project/:id');
     const api = getApi();
 
@@ -154,6 +154,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     };
 
     const hideOptions = () => {
+        console.log("Hide");
         setShowCategory(false);
         hideAllPanels();
     }
@@ -227,19 +228,19 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                 </Modal>
             </animated.div>)}
 
-
-            <div style={{
-                position: "fixed",
-                height: "100dvh",
-                width: "100dvw",
-                pointerEvents: showCategory ? "all" : "none",
-                zIndex: showCategory ? "10" : "-1",
-            }} onClick={hideOptions}>
-            </div >
-
             <div style={{
                 zIndex: showCategory ? '18' : '8'
-            }} onClick={e => e.stopPropagation()} className="bottom-modal" >
+            }} onClick={e => e.stopPropagation()} id="bottom-modal-container" className="bottom-modal" >
+                <div className="hide-bottom-modal" style={{
+                    position: "fixed",
+                    height: "100dvh",
+                    width: "100dvw",
+                    right: "0",
+                    bottom: "0",
+                    pointerEvents: showCategory ? "auto" : "none",
+                    zIndex: showCategory ? "7" : "-1",
+                }} onClick={hideOptions}>
+                </div >
                 <Button style={{
                     zIndex: showCategory ? '20' : '10',
                     textAlign: "center"

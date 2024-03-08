@@ -35,7 +35,7 @@ const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileSt
 document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
-export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess, profile }) {
+export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess, profile, BottomOptions }) {
     const [editorInstance, setEditorInstance] = useState();
 
     const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen === 'true' ? true : false);
@@ -215,6 +215,9 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         setEditorInstance(editor);
     }
 
+
+
+
     useEffect(() => {
         if (projectAccess === 'guest') {
             setOpenEditor(false);
@@ -344,8 +347,14 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         }
     }
 
+    useEffect(() => {
+
+    }, [isMobile]);
+
     return (
         <>
+            {!isMobile && <BottomOptions />}
+
             {!notFoundProject ? (
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
@@ -387,9 +396,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                             />
                         </animated.div>
 
-                        <div className="editor-buttons" style={{
+                        <div id="editor-buttons-container" className="editor-buttons" style={{
                             paddingTop: (!isMobile && !userForceMobile) ? "2dvh" : "0",
                         }}>
+                            {isMobile && <BottomOptions />}
+
                             <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
                                     localStorage.setItem("recap@preferEditorOpen", !openEditor);
