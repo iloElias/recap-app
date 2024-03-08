@@ -162,7 +162,9 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     return messages.languages_button_title ? (
         <>
             {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<animated.div style={modalAnimation} onClick={() => { setShowSharePanel(false) }} >
-                <Modal >
+                <Modal style={{
+                    pointerEvents: showSharePanel ? "all" : "none"
+                }}>
                     <Grow
                         onClick={e => e.stopPropagation()}
                         in={showSharePanel}
