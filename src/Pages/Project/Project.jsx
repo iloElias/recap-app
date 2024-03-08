@@ -35,9 +35,7 @@ const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileSt
 document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
-export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess }) {
-    const api = getApi();
-
+export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess, profile }) {
     const [editorInstance, setEditorInstance] = useState();
 
     const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen === 'true' ? true : false);
@@ -144,7 +142,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
         setShowModal(false);
         setLoading(true);
-        api.put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
+        getApi().put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
             headers: {
                 Authorization: `Bearer ${receivedToken}`,
             }
@@ -183,11 +181,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         })
     }, [messages, goHome, lastSavedValue, lastSavedTime, setAlertMessage, setLastSavedTime, setLastSavedValue, setAlertSeverity, openAlert, navigate, setLoading]);
 
-    const deleteHandle = useCallback((projectId) => {
+    const deleteHandle = useCallback((projectId, profile) => {
         if (deleteValue === projectData.name) {
             setShowModal(false);
             setLoading(true);
-            api.delete(`/project/?project_id=${projectId}`).then(() => {
+            getApi().delete(`/project/?project_id=${projectId}&user_id=${profile.id}`).then(() => {
                 setAlertMessage(`${messages.delete_project_success}`);
                 setAlertSeverity('success')
                 openAlert(true);
@@ -236,9 +234,9 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     useEffect(() => {
         if (confirmDelete) {
-            deleteHandle(urlParam.id);
+            deleteHandle(urlParam.id, profile);
         }
-    }, [confirmDelete, urlParam, deleteHandle]);
+    }, [confirmDelete, urlParam, profile, deleteHandle]);
 
     const handleReload = useCallback((markdownText) => {
         let text = markdownText.replaceAll('\\n', '');
@@ -267,7 +265,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
             const receivedToken = localStorage.getItem("recap@localUserProfile");
 
-            api.get(`/project/markdown?project_id=${projectData.pre_id}`, {
+            getApi().get(`/project/markdown?project_id=${projectData.pre_id}`, {
                 headers: {
                     Authorization: `Bearer ${receivedToken}`,
                 }
@@ -284,16 +282,14 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                     setProjectAccess(decodedData[0].user_permissions);
                     setCurrentProjectAccess(decodedData[0].user_permissions);
 
-                    if (editorInstance) {
-                        editorInstance.getAction('editor.action.formatDocument').run();
-                    }
-
                     // eslint-disable-next-line
                     let fileName = `${decodedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
                     document.getElementById("page-title").innerText = `Recap - ${decodedData[0].name}`;
                     setProjectName(fileName);
 
-                    handleReload(decodedData[0].imd);
+                    if (editorInstance) {
+                        editorInstance.getAction('editor.action.formatDocument').run();
+                    }
                 }
 
                 setLoading(false);

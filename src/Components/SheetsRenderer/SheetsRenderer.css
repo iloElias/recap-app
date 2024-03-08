@@ -1,12 +1,19 @@
 .project-name {
+    max-width: max-content;
+
     color: #334455;
     font-family: Inter;
     font-weight: 300;
+    font-size: clamp(120%, 4dvh, 175%);
+
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .project-name::after {
     content: "cheatsheets";
     color: #778ca1;
+
     margin-left: 25px;
 }
 

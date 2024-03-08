@@ -5,7 +5,6 @@ import Button from "../Button/Button";
 import "./BottomOptions.css";
 import { useParams } from "react-router-dom";
 
-import { ClickAwayListener } from '@mui/base';
 import { Avatar, Grow, Paper, Skeleton, Tooltip, tooltipClasses } from "@mui/material";
 import { exportComponentAsPNG } from "react-component-export-image";
 import generatePDF, { Margin } from "react-to-pdf";
@@ -167,7 +166,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         onClick={e => e.stopPropagation()}
                         in={showSharePanel}
                         style={{ transformOrigin: '50% 0 0' }}
-                        {...(showSharePanel ? { timeout: 1000 } : {})}
+                        {...(showSharePanel ? { timeout: 350 } : {})}
                     >
                         <div style={{
                             display: "flex",
@@ -229,10 +228,10 @@ export default function BottomOptions({ messages, language, setLanguage, profile
             </animated.div>)}
 
 
-            <ClickAwayListener onClickAway={hideOptions}>
+            <div onClick={hideOptions}>
                 <div style={{
                     zIndex: showCategory ? '18' : '8'
-                }} className="bottom-modal" >
+                }} onClick={e => e.stopPropagation()} className="bottom-modal" >
                     <Button style={{
                         zIndex: showCategory ? '20' : '10',
                         textAlign: "center"
@@ -285,7 +284,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         )}
                     </OptionsMenu>
                 </div>
-            </ClickAwayListener >
+            </div >
         </>
     ) : (<></>);
 }
@@ -369,8 +368,8 @@ function UserInformationItem({ profile, name, userId, projectId, nick, email, pi
             </div>
         ) : (
             <div style={{ position: "relative" }}>
-                <ClickAwayListener onClickAway={() => { confirmChoice && setConfirmChoice(false) }}>
-                    <animated.div className="invite-this-user" style={animation}>
+                <div onClick={() => { confirmChoice && setConfirmChoice(false) }}>
+                    <animated.div className="invite-this-user" onClick={e => e.stopPropagation()} style={animation}>
                         <Paper className="paper">
 
                             <form action="" onSubmit={e => e.preventDefault()}>
@@ -392,7 +391,7 @@ function UserInformationItem({ profile, name, userId, projectId, nick, email, pi
                             </form>
                         </Paper>
                     </animated.div>
-                </ClickAwayListener>
+                </div>
 
                 <div onClick={() => {
                     if (!isInvited) {

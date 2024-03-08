@@ -49,7 +49,7 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
             {render.subjects?.map((subject, subjectIndex) => (
                 <div className="card-outer-container" key={subjectIndex}>
                     {subject.subject_title && (<h2 className="subject-name" id={`subject-${subjectIndex}`}>{subject.subject_title}</h2>)}
-                    <Masonry columns={3} spacing={3} >
+                    <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={3} >
                         {subject.cards?.map((card, cardIndex) => (
                             (card.card_title || card.header || card.body[0] || card.footer) && <Paper id={`subject-${subjectIndex}-card-${cardIndex}`} key={cardIndex} className="rendered-card">
                                 {card.card_title && (<h3 className="rendered-card-title">{card.card_title}</h3>)}

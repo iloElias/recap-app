@@ -173,9 +173,10 @@
 
         text-overflow: ellipsis;
         overflow: hidden;
+        word-break: break-all;
 
         font-family: 'Covered By Your Grace', cursive;
-        font-size: 4dvh;
+        font-size: clamp(100%, 4dvh, 200%);
         line-height: 25px;
         color: #212121;
 

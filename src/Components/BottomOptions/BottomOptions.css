@@ -3,6 +3,8 @@
     bottom: 0;
     right: 0;
 
+    pointer-events: none;
+
     display: flex;
     flex-direction: column-reverse;
 
@@ -11,6 +13,10 @@
     gap: 1dvh;
 
     margin: 2dvh;
+}
+
+.bottom-modal button {
+    pointer-events: all;
 }
 
 .user-select-background {
@@ -36,6 +42,10 @@
 
     /* overflow: visible; */
     overflow-x: clip;
+}
+
+.vertical-visibility-container div {
+    pointer-events: all;
 }
 
 #bottom-button {

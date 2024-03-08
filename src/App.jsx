@@ -282,7 +282,7 @@ function App() {
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
                                 <Route path='project/:id' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} >
-                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} />
+                                    <Project messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} profile={profile} />
                                 </PageTemplate>} />
                                 <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <NotFound>
