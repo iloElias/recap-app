@@ -406,8 +406,6 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         <div id="editor-buttons-container" className="editor-buttons" style={{
                             paddingTop: (!isMobile && !userForceMobile) ? "2dvh" : "0",
                         }}>
-                            {isMobile && <BottomOptions />}
-
                             <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
                                     localStorage.setItem("recap@preferEditorOpen", !openEditor);
@@ -439,6 +437,8 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                             {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
                             </BootstrapTooltip>)}
+
+                            {isMobile && <BottomOptions />}
                         </div>
                     </animated.div>)}
 
