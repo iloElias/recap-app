@@ -167,7 +167,6 @@ function App() {
             }
         }
     }, [previousSessionMessage, setAlertMessage, setAlertSeverity, setNotificationMessage]);
-
     useEffect(() => {
         getApi().get(`language/?lang=${language}&message=all`)
             .then((response) => setMessages(response.data))
@@ -222,11 +221,11 @@ function App() {
             return;
         }
 
-        if (profile && !profile.logged_in) {
-            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
-            logoutHandler();
-            return;
-        }
+        // if (profile && !profile.logged_in) {
+        //     sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+        //     logoutHandler();
+        //     return;
+        // }
 
         const currentDate = new Date();
         const profileDate = new Date(profile.logged_in);
@@ -234,7 +233,7 @@ function App() {
         const maxLoginTime = 86400000 * 1.5; // One and half a day
 
         if (timeDifference > maxLoginTime) {
-            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message ?? emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
             logoutHandler();
         }
     }, [profile, navigate, logoutHandler, messages]);

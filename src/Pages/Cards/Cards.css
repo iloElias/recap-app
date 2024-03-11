@@ -87,8 +87,9 @@
 
     position: absolute;
     background-color: #fafafa;
+    box-shadow: 5px 5px 7px rgba(33, 33, 33, 0.1);
 
-    transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
+    transition: 0.2s transform, 0.2s min-width, 0.2s min-height, 0.2s box-shadow;
     cursor: pointer;
 }
 
@@ -100,19 +101,24 @@
 
     position: absolute;
     background-color: #D8D8D8;
-    transition: 0.2s transform, 0.2s min-width, 0.2s min-height;
+    box-shadow: 0px 0px 7px #D8D8D8;
+
+    transition: 0.2s transform, 0.2s min-width, 0.2s min-height, 0.2s box-shadow;
 }
 
 .card-container:hover .card-paper {
+    box-shadow: 3px 3px 4px rgba(33, 33, 33, 0.1);
     transform: rotate(4deg) translateX(-5.3px) translateY(-6px);
 }
 
 .card-container:hover .card-paper-shadow {
     min-height: 167px;
+    box-shadow: 0px 0px 2px #D8D8D8;
     transform: rotate(1.56deg) translateX(-2px) translateY(-2px);
 }
 
 .card-container:active .card-paper {
+    box-shadow: 0px 0px 5px rgba(33, 33, 33, 0.1);
     transform: rotate(1deg) translateX(0px) translateY(-2px);
 }
 
@@ -120,6 +126,7 @@
     min-height: 157px;
     min-width: 157px;
     opacity: 0.75;
+    box-shadow: 0px 0px 0px rgba(33, 33, 33, 0);
     transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
 }
 
