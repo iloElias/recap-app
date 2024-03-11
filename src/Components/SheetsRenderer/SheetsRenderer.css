@@ -223,6 +223,8 @@
     border: solid 1px #aaaaaa;
     border-radius: 4px;
 
+    min-height: 50px;
+
     opacity: 0.75;
 
     text-align: center;

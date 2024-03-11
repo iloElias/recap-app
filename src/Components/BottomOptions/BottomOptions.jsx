@@ -29,7 +29,7 @@ function OptionsMenu({ showCategory, children }) {
     });
 
     return (
-        <div className="visibility-container" style={{
+        <div className={`visibility-container ${!showCategory ? "disable-pointer-event" : ""}`} style={{
             // overflowY: "clip",
             zIndex: showCategory ? '8' : '0'
         }}>
@@ -96,8 +96,10 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     const [email, setEmail] = useState("");
 
     const modalAnimation = useSpring({
-        zIndex: showSharePanel ? 4 : -1,
+        zIndex: showSharePanel ? 11 : -1,
         opacity: showSharePanel ? 1 : 0,
+        position: "absolute",
+
         config: {
             mass: 0.1,
             tension: 314
@@ -161,78 +163,77 @@ export default function BottomOptions({ messages, language, setLanguage, profile
 
     return messages.languages_button_title ? (
         <>
-            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<animated.div style={modalAnimation} onClick={() => { setShowSharePanel(false) }} >
-                <Modal style={{
-                    pointerEvents: showSharePanel ? "all" : "none"
-                }}>
-                    <Grow
-                        onClick={e => e.stopPropagation()}
-                        in={showSharePanel}
-                        style={{ transformOrigin: '50% 0 0' }}
-                        {...(showSharePanel ? { timeout: 350 } : {})}
-                    >
-                        <div style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "4px",
-                            width: "20rem",
-                        }}>
-                            <Paper>
-                                <div className="user-search-container" >
-                                    {messages.share_project_button_title}
-
-                                    <form action="" onSubmit={(e) => {
-                                        e.preventDefault();
-                                        if (email !== "") {
-                                            setUsersSearched('search');
-                                        }
-                                    }}>
-                                        <input type="text" placeholder={messages.user_search_input_label} value={email} onChange={(e) => {
-                                            setEmail(e.target.value)
-                                        }} />
-
-                                        <div style={{
-                                            display: 'grid',
-                                            gridTemplateColumns: '1fr 1fr',
-                                            width: '100%',
-                                            gap: '4px'
-                                        }}>
-                                            <input type="button" value={messages.user_search} onClick={() => {
-                                                if (email !== "") {
-                                                    setUsersSearched('search');
-                                                }
-                                            }} />
-                                            <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowSharePanel(false); setUsersSearched(null) }} />
-                                        </div>
-                                    </form>
-                                </div>
-                            </Paper>
-
-                            {usersSearched && (<Paper style={{
-                                display: "flex",
-                                justifyContent: "center"
-                            }}>
-                                <div style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    width: '18rem',
-                                    margin: '1.5dvh',
-                                    gap: '1vh'
-                                }}>
-                                    {usersSearched !== 'anyFound' ?
-                                        (typeof usersSearched === 'string' ? (<UserInformationItem messages={messages} />) : (usersSearched?.map((user, index) => {
-                                            return (<UserInformationItem profile={profile} messages={messages} key={index} userId={user.id} projectId={urlParam.id} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} lockSearch={lockSearch} setLockSearch={setLockSearch} alreadyInvited={(user.user_permissions && user.user_permissions !== "none") ? true : false} />)
-                                        }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}  ${searchUsedText}`}</p>)}
-                                </div>
-                            </Paper>)}
-                        </div>
-                    </Grow>
-                </Modal>
-            </animated.div>)}
-
             <div style={{
                 zIndex: showCategory ? '18' : '8'
             }} onClick={e => e.stopPropagation()} id="bottom-modal-container" className="bottom-modal" >
+                {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<animated.div className="bottom-options-modal-container" style={modalAnimation} onClick={() => { setShowSharePanel(false) }} >
+                    <Modal style={{
+                        pointerEvents: showSharePanel ? "all" : "none"
+                    }}>
+                        <Grow
+                            onClick={e => e.stopPropagation()}
+                            in={showSharePanel}
+                            style={{ transformOrigin: '50% 0 0' }}
+                            {...(showSharePanel ? { timeout: 350 } : {})}
+                        >
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "4px",
+                                width: "20rem",
+                            }}>
+                                <Paper>
+                                    <div className="user-search-container" >
+                                        {messages.share_project_button_title}
+
+                                        <form action="" onSubmit={(e) => {
+                                            e.preventDefault();
+                                            if (email !== "") {
+                                                setUsersSearched('search');
+                                            }
+                                        }}>
+                                            <input type="text" placeholder={messages.user_search_input_label} value={email} onChange={(e) => {
+                                                setEmail(e.target.value)
+                                            }} />
+
+                                            <div style={{
+                                                display: 'grid',
+                                                gridTemplateColumns: '1fr 1fr',
+                                                width: '100%',
+                                                gap: '4px'
+                                            }}>
+                                                <input type="button" value={messages.user_search} onClick={() => {
+                                                    if (email !== "") {
+                                                        setUsersSearched('search');
+                                                    }
+                                                }} />
+                                                <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowSharePanel(false); setUsersSearched(null) }} />
+                                            </div>
+                                        </form>
+                                    </div>
+                                </Paper>
+
+                                {usersSearched && (<Paper style={{
+                                    display: "flex",
+                                    justifyContent: "center"
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        width: '18rem',
+                                        margin: '1.5dvh',
+                                        gap: '1vh'
+                                    }}>
+                                        {usersSearched !== 'anyFound' ?
+                                            (typeof usersSearched === 'string' ? (<UserInformationItem messages={messages} />) : (usersSearched?.map((user, index) => {
+                                                return (<UserInformationItem profile={profile} messages={messages} key={index} userId={user.id} projectId={urlParam.id} name={user.name} email={user.email} nick={user.username} picturePath={user.picture_path} lockSearch={lockSearch} setLockSearch={setLockSearch} alreadyInvited={(user.user_permissions && user.user_permissions !== "none") ? true : false} />)
+                                            }))) : (<p style={{ display: "flex", width: "100%", textAlign: "center", fontSize: "85%" }}>{`${messages.any_user_found_with_email}  ${searchUsedText}`}</p>)}
+                                    </div>
+                                </Paper>)}
+                            </div>
+                        </Grow>
+                    </Modal>
+                </animated.div>)}
                 <div className="hide-bottom-modal" style={{
                     position: "fixed",
                     height: "100dvh",

@@ -332,3 +332,7 @@ form label {
 
     text-align: center;
 }
+
+.disable-pointer-event * {
+    pointer-events: none !important;
+}
