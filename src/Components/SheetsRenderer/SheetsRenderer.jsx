@@ -1,8 +1,12 @@
-import { React, useEffect, useState } from "react";
+import { React, useState } from "react";
 import { useSpring, animated } from 'react-spring';
 import { ClickAwayListener, Paper } from '@mui/material';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import AutoLinkText from 'react-autolink-text2';
 import { Masonry } from '@mui/lab';
 import "./SheetsRenderer.css";
+import ReactTextareaAutosize from "react-textarea-autosize";
 
 const globalSpringConfig = {
     mass: 1.5,
@@ -56,7 +60,7 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
                                 {card.header && (<p className="rendered-card-header">{card.header}</p>)}
                                 <div className="rendered-card-body" >
                                     {card.body?.map((item, itemIndex) => (
-                                        item && (<p key={itemIndex}>{item}</p>)
+                                        item && (<RenderText key={`sub:${subjectIndex}&card:${cardIndex}&item:${itemIndex}`} render={item} />)
                                     ))}
                                     {card.footer && (<h4 className="rendered-card-footer">{card.footer}</h4>)}
                                 </div>
@@ -73,9 +77,51 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
         );
 }
 
+function RenderText({ render }) {
+    const codeRegex = /(.*)\[code=(.*?)\](.*?)\[endOfCode\]/s;
+
+    const match = codeRegex.exec(render);
+
+    if (match) {
+        const beforeText = match[1];
+        const language = match[2];
+        const code = match[3];
+
+        // console.log(match);
+
+        return (
+            <div>
+                <p>{beforeText}</p>
+                <SyntaxHighlighter
+                    wrapLines={true}
+                    language={language}
+                    style={docco}
+                >
+                    {code}
+                </SyntaxHighlighter>
+            </div>
+        );
+    } else {
+        return (
+            <p>
+                <AutoLinkText text={render} />
+                {/* {render.split(delimiter).map((word, index) => {
+                    const match = word.match(delimiter);
+                    if (match) {
+                        const url = match[0];
+                        return (
+                            <a key={index} href={url.startsWith('http') ? url : `http://${url}`}>{url}</a>
+                        );
+                    }
+                    return word;
+                })} */}
+            </p>
+        );
+    }
+};
+
 function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
     const [showFields, setShowFields] = useState(false)
-    const [currentInput, setCurrentInput] = useState();
 
     const [title, setTitle] = useState();
     const [subtitle, setSubtitle] = useState();
@@ -88,14 +134,6 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
         setContentList(['']);
         setConclusion('');
     }
-
-    useEffect(() => {
-        if (currentInput) {
-            try {
-                document.getElementById(`content-input-${subjectIndex}-${contentList.length - 1}`).focus();
-            } catch (e) { }
-        }
-    }, [currentInput, subjectIndex, contentList.length])
 
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
@@ -122,16 +160,11 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                     <form style={{ height: showFields ? '100%' : '32px' }} onSubmit={(e) => { e.preventDefault() }}>
                         {contentList.map((content, index) => {
                             return (content !== null ? <div key={index} className="deletable-content-field">
-                                <input style={{ paddingRight: '26px' }} type="text" value={content} id={`content-input-${subjectIndex}-${index}`} placeholder={`${messages.add_card_hologram_content} ${index + 1}`} onKeyDown={(e) => {
-                                    if (`${e.code}`.toLowerCase() === 'enter') {
-                                        e.preventDefault();
-                                        setContentList([...contentList, '']);
-                                        setCurrentInput(e.target);
-                                    }
-                                }} onChange={(e) => {
-                                    contentList[index] = e.target.value;
-                                    setContentList([...contentList]);
-                                }} />
+                                <ReactTextareaAutosize style={{ paddingRight: '26px' }} value={content} id={`content-input-${subjectIndex}-${index}`} placeholder={`${messages.add_card_hologram_content} ${index + 1}`}
+                                    onChange={(e) => {
+                                        contentList[index] = e.target.value;
+                                        setContentList([...contentList]);
+                                    }} />
                                 <button tabIndex={2} onClick={(e) => {
                                     if (e.type === 'click') {
                                         contentList[index] = null;
@@ -150,7 +183,7 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                         <input type="text" placeholder={messages.add_card_hologram_conclusion} value={conclusion} onChange={(e) => { setConclusion(e.target.value) }} onKeyDown={(e) => {
                             if (`${e.code}`.toLowerCase() === 'enter') {
                                 e.preventDefault();
-                                setConclusion(e.value);
+                                setConclusion(`${e.value}`);
                             }
                         }} />
                         <div style={{
@@ -161,10 +194,10 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                         }}>
                             <input type="button" value={messages.add_card_hologram_add_card} onClick={() => {
                                 onAddNewCard(subjectIndex, {
-                                    card_title: title,
-                                    header: subtitle,
+                                    card_title: `${title}`,
+                                    header: `${subtitle}`,
                                     body: contentList,
-                                    footer: conclusion
+                                    footer: `${conclusion}`
                                 });
                                 setShowFields(false);
                                 resetFields();
@@ -223,7 +256,7 @@ function AddSubjectHologram({ messages, addNewSubject }) {
                             <input type="button" value={messages.add_subject_hologram_add_subject} onClick={() => {
                                 if (!subjectTitle || subjectTitle === '') return;
                                 addNewSubject({
-                                    subject_title: subjectTitle,
+                                    subject_title: `${subjectTitle}`,
                                     cards: []
                                 });
                                 resetFields();
@@ -279,8 +312,8 @@ function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
                             <input type="button" value={messages.add_project} onClick={() => {
                                 if (!projectTitle || projectTitle === '' || !projectSynopsis || projectSynopsis === '') return;
                                 handleNewProjectInfo({
-                                    project_name: projectTitle,
-                                    project_synopsis: projectSynopsis,
+                                    project_name: `${projectTitle}`,
+                                    project_synopsis: `${projectSynopsis}`,
                                     subjects: []
                                 });
                             }} />

@@ -66,7 +66,7 @@ function App() {
     const [profile, setProfile] = useState(() => {
         if (!localUserProfile) return null;
         try {
-            const decodedData = jwtDecode(localUserProfile)[0];
+            const decodedData = jwtDecode(localUserProfile);
 
             return decodedData;
         } catch (err) {
@@ -139,7 +139,7 @@ function App() {
 
     const handleUser = useCallback((data) => {
         const receivedToken = data.data;
-        const decodedData = jwtDecode(receivedToken)[0];
+        const decodedData = jwtDecode(receivedToken);
 
         if (decodedData && !decodedData.google_id) {
             api.post(('/user/')).then(() => {

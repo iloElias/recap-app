@@ -242,10 +242,11 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     }, [confirmDelete, urlParam, profile, deleteHandle]);
 
     const handleReload = useCallback((markdownText) => {
-        let text = markdownText.replaceAll('\\n', '');
-        text = text.replaceAll('\\n', '');
-        text = text.replaceAll('\\', '');
-        text = text.replaceAll('    ', '');
+        let text = markdownText
+        // .replaceAll('\\n', '');
+        // text = text.replaceAll('\\n', '');
+        // text = text.replaceAll('\\', '');
+        // text = text.replaceAll('    ', '');
 
         try {
             setLocalMarkdownText(JSON.parse(text));
