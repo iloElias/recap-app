@@ -236,7 +236,7 @@ function App() {
             sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message ?? emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
             logoutHandler();
         }
-    }, [profile, navigate, logoutHandler, messages]);
+    }, [profile, navigate, logoutHandler, messages, emergencyMessages]);
 
     const maybeAnError = useSpring({
         delay: 4000,
