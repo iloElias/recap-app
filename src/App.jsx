@@ -16,7 +16,6 @@ import NotFound from './Components/NotFound/NotFound';
 import getApi from './Api/api';
 import getMessages from './Internationalization/emergencyMessages';
 
-const emergencyMessages = getMessages();
 
 if (process.env.REACT_APP_LOCALHOST) {
     document.getElementById("page-title").innerText = `Recap - ${process.env.REACT_APP_LOCALHOST}`
@@ -42,6 +41,7 @@ function App() {
     const navigate = useNavigate();
     const exportRef = useRef();
     const api = getApi();
+    const emergencyMessages = getMessages();
 
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
