@@ -333,7 +333,7 @@ function App() {
                         <ReactLoading type={"spinningBubbles"} color="#bbbbbb" height={'75%'} width={'75%'} />
                     </div >
                     <animated.div style={maybeAnError} className="network-static-message">
-                        {getMessages()[localDefinedLanguage].request_timeout_excide}
+                        {getMessages()[localDefinedLanguage]?.request_timeout_excide}
                     </animated.div>
                 </div>
             )}
