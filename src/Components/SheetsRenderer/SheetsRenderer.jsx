@@ -105,16 +105,6 @@ function RenderText({ render }) {
         return (
             <p>
                 <AutoLinkText text={render} />
-                {/* {render.split(delimiter).map((word, index) => {
-                    const match = word.match(delimiter);
-                    if (match) {
-                        const url = match[0];
-                        return (
-                            <a key={index} href={url.startsWith('http') ? url : `http://${url}`}>{url}</a>
-                        );
-                    }
-                    return word;
-                })} */}
             </p>
         );
     }
@@ -192,15 +182,17 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                             width: '100%',
                             gap: '4px'
                         }}>
-                            <input type="button" value={messages.add_card_hologram_add_card} onClick={() => {
-                                onAddNewCard(subjectIndex, {
-                                    card_title: `${title}`,
-                                    header: `${subtitle}`,
-                                    body: contentList,
-                                    footer: `${conclusion}`
-                                });
-                                setShowFields(false);
-                                resetFields();
+                            <input type="button" style={{ cursor: (title) ? "pointer" : "not-allowed" }} value={messages.add_card_hologram_add_card} onClick={() => {
+                                if (title) {
+                                    onAddNewCard(subjectIndex, {
+                                        card_title: title,
+                                        body: contentList,
+                                        header: subtitle,
+                                        footer: conclusion
+                                    });
+                                    setShowFields(false);
+                                    resetFields();
+                                }
                             }} />
                             <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowFields(false) }} />
                         </div>

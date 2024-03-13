@@ -167,11 +167,6 @@ function App() {
     }, [token, profile]);
 
     useEffect(() => {
-        console.log(profile);
-    }, [profile]);
-
-
-    useEffect(() => {
         if (previousSessionMessage) {
             if (previousSessionMessage.message && previousSessionMessage.severity) {
                 setAlertSeverity(previousSessionMessage.severity);
@@ -333,7 +328,7 @@ function App() {
                         <ReactLoading type={"spinningBubbles"} color="#bbbbbb" height={'75%'} width={'75%'} />
                     </div >
                     <animated.div style={maybeAnError} className="network-static-message">
-                        {getMessages()[localDefinedLanguage]?.request_timeout_excide}
+                        {getMessages()[localDefinedLanguage].request_timeout_excide ?? getMessages()['en'].request_timeout_excide}
                     </animated.div>
                 </div>
             )}

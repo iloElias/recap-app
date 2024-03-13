@@ -4,8 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
 
 import { Link } from 'react-router-dom'
+import debounce from 'lodash.debounce';
 
-import { Alert, Paper, Snackbar, Tooltip, tooltipClasses, Grow } from "@mui/material";
+import { Alert, Paper, Snackbar, Tooltip, tooltipClasses, Grow, CircularProgress } from "@mui/material";
 import NotFound from "../../Components/NotFound/NotFound";
 
 import styled from "@emotion/styled";
@@ -28,17 +29,17 @@ const explodeMinSize = () => {
     return false;
 }
 
-const localDefinedPreferEditorOpen = localStorage.getItem('recap@preferEditorOpen') ?? true;
-const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileState') ?? false;
-
 document.getElementById("page-title").innerText = "Recap - Project";
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({ messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess, profile, BottomOptions }) {
+    const localDefinedPreferEditorOpen = localStorage.getItem('recap@preferEditorOpen') === "true" ? true : false;
+    const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileState') === "true" ? true : false;
+
     const [editorInstance, setEditorInstance] = useState();
 
-    const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen === 'true' ? true : false);
-    const [userForceMobile, setUserForceMobile] = useState(explodeMinSize() ? true : (localDefinedPreferMobileState === 'true' ? true : false));
+    const [openEditor, setOpenEditor] = useState(localDefinedPreferEditorOpen);
+    const [userForceMobile, setUserForceMobile] = useState(explodeMinSize() ? true : (localDefinedPreferMobileState));
     const [isMobile, setIsMobile] = useState(explodeMinSize());
 
     const [fullScreen, setFullScreen] = useState(false);
@@ -69,6 +70,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     const urlParam = useParams('/project/:id');
     const [projectData, setProjectData] = useState({ pre_id: urlParam.id })
     const [projectAccess, setProjectAccess] = useState()
+    const [isSilentlyLoading, setIsSilentlyLoading] = useState(false);
 
     window.addEventListener('resize', () => { setIsMobile(explodeMinSize()) });
 
@@ -112,6 +114,28 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         },
         immediate: (key) => key === (showModal ? "zIndex" : "")
     });
+
+    // eslint-disable-next-line
+    const autoSave = useCallback(
+        // eslint-disable-next-line
+        debounce(() => {
+            if (projectAccess === 'own' || projectAccess === 'manage') {
+                setIsSilentlyLoading(true);
+                getApi().put(`/project/?project_id=${urlParam.id}`, [{ imd: markdownText }], {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("recap@localUserProfile")}`,
+                    }
+                }).then(() => {
+                    setLastSavedTime(Date.now());
+                    setLastSavedValue(markdownText);
+
+                }).catch().finally(() => {
+                    setIsSilentlyLoading(false);
+                    setLocalMarkdownText(JSON.parse(markdownText));
+                })
+            }
+            return;
+        }, 2000), [projectAccess, markdownText]);
 
     const saveHandle = useCallback((fileValue, projectId) => {
         if (fileValue === lastSavedValue) {
@@ -213,9 +237,6 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     const editorDidMount = (editor, monaco) => {
         setEditorInstance(editor);
     }
-
-
-
 
     useEffect(() => {
         if (projectAccess === 'guest') {
@@ -382,6 +403,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
                                 onChange={(value) => {
                                     setMarkdownText(value);
+                                    autoSave();
                                 }}
 
                                 onMount={editorDidMount}
@@ -424,7 +446,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                             </BootstrapTooltip>
 
                             {(projectAccess === 'own' || projectAccess === 'manage') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button className="close-button" onClick={handleFileSave}><i className="bi bi-floppy"></i></button>
+                                <button className="close-button" onClick={() => { !isSilentlyLoading && handleFileSave() }}>{isSilentlyLoading ? (<CircularProgress color="inherit" size={"50%"} />) : (<i className="bi bi-floppy"></i>)}</button>
                             </BootstrapTooltip>)}
 
                             {!explodeMinSize() &&
