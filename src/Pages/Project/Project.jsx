@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from "react";
 import "./Project.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
-import { jwtDecode } from 'jwt-decode';
 
 import { Link } from 'react-router-dom'
 
@@ -274,21 +273,21 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                     Authorization: `Bearer ${receivedToken}`,
                 }
             }).then((data) => {
-                const decodedData = jwtDecode(data.data);
+                const receivedData = data.data;
 
-                if (decodedData[0].state === 'inactive') {
+                if (receivedData[0].state === 'inactive') {
                     setNotFoundProject('notActive');
                 } else {
-                    setLastSavedValue(decodedData[0].imd);
-                    setProjectData(decodedData[0]);
-                    setMarkdownText(decodedData[0].imd);
-                    handleReload(decodedData[0].imd);
-                    setProjectAccess(decodedData[0].user_permissions);
-                    setCurrentProjectAccess(decodedData[0].user_permissions);
+                    setLastSavedValue(receivedData[0].imd);
+                    setProjectData(receivedData[0]);
+                    setMarkdownText(receivedData[0].imd);
+                    handleReload(receivedData[0].imd);
+                    setProjectAccess(receivedData[0].user_permissions);
+                    setCurrentProjectAccess(receivedData[0].user_permissions);
 
                     // eslint-disable-next-line
-                    let fileName = `${decodedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
-                    document.getElementById("page-title").innerText = `Recap - ${decodedData[0].name}`;
+                    let fileName = `${receivedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
+                    document.getElementById("page-title").innerText = `Recap - ${receivedData[0].name}`;
                     setProjectName(fileName);
 
                     if (editorInstance) {

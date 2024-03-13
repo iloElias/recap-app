@@ -46,3 +46,13 @@
 
     color: #212121;
 }
+
+.centralized-container {
+    min-height: 100dvh;
+    min-width: 100dvw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5dvh;
+}

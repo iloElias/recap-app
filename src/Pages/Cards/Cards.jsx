@@ -7,7 +7,6 @@ import Button from "../../Components/Button/Button";
 import Input, { TextArea } from "../../Components/Input/Input";
 import { Alert, Paper, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import styled from "@emotion/styled";
 import getApi from "../../Api/api";
 
@@ -96,7 +95,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                     }
                 })
 
-                setUserCards(jwtDecode(userCardsData.data));
+                setUserCards(userCardsData.data);
                 setNotification(false);
                 setLoading(false)
                 setUserDataWasLoaded(true)
@@ -140,14 +139,13 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                     }
                 });
 
-                const decodedResponse = jwtDecode(project.data);
-
                 setAlertSeverity('success');
-                setUserCards([...userCards, { id: decodedResponse.id, name: newCardRef.name, synopsis: newCardRef.synopsis }])
+                setUserCards([...userCards, { id: project.data.id, name: newCardRef.name, synopsis: newCardRef.synopsis }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
             } catch (err) {
                 if (err.response.status === 401) {
                     sessionStorage.setItem('recap@previousSessionError', JSON.stringify(({ message: messages.reauthenticate_token_message, severity: 'error' })));
+
                     logoutHandler();
                 }
 

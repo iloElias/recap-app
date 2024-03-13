@@ -2,12 +2,10 @@ import axios from "axios";
 import API_URL from "./api.constant";
 
 export default function getApi() {
-    const userToken = localStorage.getItem('recap@localUserProfile') ?? null;
-
-    return axios.create(userToken ? {
+    return axios.create(localStorage.getItem('recap@localUserProfile') ? {
         baseURL: `${API_URL}`,
         headers: {
-            Authorization: `Bearer ${userToken}`,
+            Authorization: `Bearer ${localStorage.getItem('recap@localUserProfile')}`,
         }
     } : {
         baseURL: `${API_URL}`,

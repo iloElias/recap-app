@@ -10,7 +10,6 @@ import { exportComponentAsPNG } from "react-component-export-image";
 import generatePDF, { Margin } from "react-to-pdf";
 import Modal from "../Modal/Modal";
 import getApi from "../../Api/api";
-import { jwtDecode } from "jwt-decode";
 import styled from "@emotion/styled";
 
 function OptionsMenu({ showCategory, children }) {
@@ -119,14 +118,12 @@ export default function BottomOptions({ messages, language, setLanguage, profile
             setSearchUsedText(email);
             setLockSearch(true);
             api.get(`/invite/user/?search=${email}&project_id=${urlParam.id}`).then((data) => {
-                const decodedData = jwtDecode(data.data);
-
-                if (!decodedData[0]) {
+                if (!data.data[0]) {
                     setUsersSearched("anyFound");
                     return;
                 }
 
-                setUsersSearched(decodedData);
+                setUsersSearched(data.data);
             }).catch((e) => {
             }).finally(() => {
                 setLockSearch(false);
@@ -156,7 +153,6 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     };
 
     const hideOptions = () => {
-        console.log("Hide");
         setShowCategory(false);
         hideAllPanels();
     }

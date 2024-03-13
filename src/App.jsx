@@ -41,7 +41,6 @@ function App() {
     const navigate = useNavigate();
     const exportRef = useRef();
     const api = getApi();
-    const emergencyMessages = getMessages();
 
     const [language, setLanguage] = useState(localDefinedLanguage ? localDefinedLanguage : 'en');
     const [messages, setMessages] = useState({});
@@ -63,24 +62,23 @@ function App() {
     const [notificationMessage, setNotificationMessage] = useState();
 
     const [user, setUser] = useState(null);
-    const [profile, setProfile] = useState(() => {
+    const [profile, setProfile] = useState();
+    const [token, setToken] = useState(() => {
         if (!localUserProfile) return null;
         try {
-            const decodedData = jwtDecode(localUserProfile);
-
-            return decodedData;
+            return localUserProfile;
         } catch (err) {
             googleLogout();
-
             setUser(null);
+            setProfile(null);
 
             localStorage.removeItem("recap@localUserProfile");
-            setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || { message: emergencyMessages[localDefinedLanguage].reauthenticate_token_message, severity: 'error' });
+            setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || { message: getMessages()[localDefinedLanguage].reauthenticate_token_message, severity: 'error' });
 
             navigate('/login');
             return null;
         }
-    });
+    })
     const [isLoading, setIsLoading] = useState(false);
 
     /* Testing stuff
@@ -120,6 +118,7 @@ function App() {
         localStorage.removeItem("recap@localUserProfile");
 
         setProfile(null);
+        setToken(null);
         setUser(null);
 
         navigate('/login');
@@ -138,21 +137,39 @@ function App() {
     }, []);
 
     const handleUser = useCallback((data) => {
-        const receivedToken = data.data;
-        const decodedData = jwtDecode(receivedToken);
+        const response = data.data;
+        const userData = response.answer;
 
-        if (decodedData && !decodedData.google_id) {
-            api.post(('/user/')).then(() => {
-                localStorage.setItem("recap@localUserProfile", receivedToken);
-                setProfile(decodedData);
+        if (userData && !userData.google_id) {
+            getApi().post(('user/')).then(() => {
+                localStorage.setItem("recap@localUserProfile", response.token);
+                setProfile(userData);
             });
         } else {
-            setProfile(decodedData);
+            setProfile(userData);
         }
 
         navigate('/projects');
-        localStorage.setItem("recap@localUserProfile", receivedToken);
-    }, [navigate, api]);
+        localStorage.setItem("recap@localUserProfile", response.token);
+    }, [navigate]);
+
+    useEffect(() => {
+        if (token && !profile) {
+            setIsLoading(true);
+            getApi().get(`user/authenticate/`).then(e => {
+                setProfile(e.data);
+            }).catch(e => {
+
+            }).finally(() => {
+                setIsLoading(false);
+            });
+        }
+    }, [token, profile]);
+
+    useEffect(() => {
+        console.log(profile);
+    }, [profile]);
+
 
     useEffect(() => {
         if (previousSessionMessage) {
@@ -189,8 +206,6 @@ function App() {
                         }
                     }).then((res) => {
                         dbUser = res.data;
-                        setProfile(res.data);
-
                         const preparedData = prepareData(dbUser);
 
                         api.post(`user/login/`, [preparedData])
@@ -212,31 +227,34 @@ function App() {
                 }
             }
         },
-        [user, profile, api, setProfile, handleUser, prepareData]
+        [user, profile, api, handleUser, prepareData]
     );
 
     useEffect(() => {
-        if (!profile) {
+        if (!token && !profile) {
             navigate("/login");
             return;
         }
 
-        // if (profile && !profile.logged_in) {
-        //     sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message || emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
-        //     logoutHandler();
-        //     return;
-        // }
+        if (token && !profile) {
+            return;
+        }
 
-        const currentDate = new Date();
-        const profileDate = new Date(profile.logged_in);
-        const timeDifference = currentDate - profileDate;
-        const maxLoginTime = 86400000 * 1.5; // One and half a day
+        try {
+            const currentDate = new Date();
+            const profileDate = new Date(profile.logged_in);
+            const timeDifference = currentDate - profileDate;
+            const maxLoginTime = 86400000 * 1.5; // One and half a day
 
-        if (timeDifference > maxLoginTime) {
-            sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message ?? emergencyMessages[localDefinedLanguage].reauthenticate_logout_message) }));
+            if (timeDifference > maxLoginTime) {
+                sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ notification: (messages.reauthenticate_logout_message ?? getMessages()[localDefinedLanguage].reauthenticate_logout_message) }));
+                logoutHandler();
+            }
+        } catch (e) {
+            console.log("chamado aqui", profile);
             logoutHandler();
         }
-    }, [profile, navigate, logoutHandler, messages, emergencyMessages]);
+    }, [profile, token, navigate, logoutHandler, messages]);
 
     const maybeAnError = useSpring({
         delay: 4000,
@@ -244,16 +262,6 @@ function App() {
         to: { opacity: 1 },
         config: {}
     });
-
-    const centerStyle = {
-        minHeight: "100dvh",
-        minWidth: "100dvw",
-        display: 'flex',
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        gap: "5dvh"
-    }
 
     const loadingAnimation = useSpring({
         zIndex: `${isLoading ? 50 : -1} !important`,
@@ -268,7 +276,7 @@ function App() {
 
     return (
         <>
-            {messages.loaded ? (
+            {(messages.loaded) ? (
                 <>
                     <div id='App-root-container' className="App">
                         <Routes>
@@ -296,7 +304,7 @@ function App() {
                     </div >
 
                     <div style={{ display: "none" }}>
-                        {!profile && (
+                        {(!token && !profile) && (
                             <GoogleLogin
                                 onSuccess={(credentialResponse) => {
                                     oneTapLogin(credentialResponse);
@@ -320,12 +328,12 @@ function App() {
                     }
                 </>
             ) : (
-                <div style={centerStyle}>
+                <div className='centralized-container'>
                     <div className="loading-container" >
                         <ReactLoading type={"spinningBubbles"} color="#bbbbbb" height={'75%'} width={'75%'} />
                     </div >
                     <animated.div style={maybeAnError} className="network-static-message">
-                        {emergencyMessages[localDefinedLanguage].request_timeout_excide}
+                        {getMessages()[localDefinedLanguage].request_timeout_excide}
                     </animated.div>
                 </div>
             )}
