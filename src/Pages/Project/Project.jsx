@@ -118,24 +118,27 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
     // eslint-disable-next-line
     const autoSave = useCallback(
         // eslint-disable-next-line
-        debounce(() => {
+        debounce((fileValue, projectId) => {
             if (projectAccess === 'own' || projectAccess === 'manage') {
+                if (fileValue === lastSavedValue) {
+                    return;
+                }
                 setIsSilentlyLoading(true);
-                getApi().put(`/project/?project_id=${urlParam.id}`, [{ imd: markdownText }], {
+                getApi().put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("recap@localUserProfile")}`,
                     }
                 }).then(() => {
                     setLastSavedTime(Date.now());
-                    setLastSavedValue(markdownText);
+                    setLastSavedValue(fileValue);
 
                 }).catch().finally(() => {
                     setIsSilentlyLoading(false);
-                    setLocalMarkdownText(JSON.parse(markdownText));
+                    setLocalMarkdownText(JSON.parse(fileValue));
                 })
             }
             return;
-        }, 2000), [projectAccess, markdownText]);
+        }, 5000), [projectAccess, markdownText]);
 
     const saveHandle = useCallback((fileValue, projectId) => {
         if (fileValue === lastSavedValue) {
@@ -213,7 +216,9 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 setAlertSeverity('success')
                 openAlert(true);
 
-                navigate('/projects');
+                setTimeout(() => {
+                    navigate('/projects');
+                }, 2000);
             })
         } else {
             setConfirmDelete(false);
@@ -222,6 +227,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     const exitProjectHandler = useCallback((fileValue) => {
         if (fileValue === lastSavedValue) {
+
             navigate('/projects');
         }
 
@@ -403,7 +409,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
                                 onChange={(value) => {
                                     setMarkdownText(value);
-                                    autoSave();
+                                    autoSave(value, urlParam.id);
                                 }}
 
                                 onMount={editorDidMount}
@@ -505,7 +511,12 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                                     }}>
                                                         {messages.save_than_leave}
                                                     </Button>
-                                                    <Button onClick={() => { navigate('/projects') }} style={{
+                                                    <Button onClick={() => {
+                                                        setTimeout(() => {
+                                                            setLoading(true);
+                                                            navigate('/projects');
+                                                        }, 1500);
+                                                    }} style={{
                                                         width: '100%'
                                                     }}>
                                                         {messages.leave_without_saving}
