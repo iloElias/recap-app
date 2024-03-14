@@ -5,13 +5,13 @@
 }
 
 .cards-page-title {
-    width: 90dvw;
+    width: 90vw;
     height: min-content;
     text-align: start;
 
-    margin: 5.65dvh 0 0 0;
+    margin: 5.65vh 0 0 0;
 
-    font-size: clamp(2.7dvh, 12px, 14px);
+    font-size: clamp(2.7vh, 12px, 14px);
 }
 
 .cards-page {
@@ -25,10 +25,10 @@
 }
 
 .cards-container {
-    width: 90dvw;
+    width: 90vw;
 
     margin-top: 2.25rem;
-    margin-bottom: 5dvh;
+    margin-bottom: 5vh;
 
     display: grid;
     gap: 2rem;
@@ -141,24 +141,24 @@
 
 .create-card-container {
     display: flex;
-    gap: 1dvh;
+    gap: 1vh;
 
     flex-direction: column;
 
-    padding: 2.5dvh 4dvh 4dvh 4dvh;
+    padding: 2.5vh 4vh 4vh 4vh;
     height: min-content;
 
-    max-width: 90dvw;
-    max-height: 90dvh;
+    max-width: 90vw;
+    max-height: 90vh;
 
     background-color: #fafafa;
-    border-radius: 1dvh;
+    border-radius: 8px;
 }
 
 .create-card-container form {
     display: flex;
     flex-direction: column;
-    gap: 1dvh
+    gap: 1vh
 }
 
 .create-card-container :is(input, textarea) {
@@ -167,17 +167,17 @@
 
     resize: none;
 
-    padding: 0.9dvh 0.5dvh;
+    padding: 0.9vh 0.5vh;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     outline: none;
     border: none;
 
     background: #fafafa;
 
-    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+    border: solid 0.1vh rgba(146, 146, 146, 0.719);
 
-    font-size: 2dvh;
+    font-size: 2vh;
     color: #212121;
 }
 
@@ -192,7 +192,7 @@
         word-break: break-all;
 
         font-family: 'Covered By Your Grace', cursive;
-        font-size: clamp(100%, 4dvh, 200%);
+        font-size: clamp(100%, 4vh, 200%);
         line-height: 25px;
         color: #212121;
 
@@ -201,13 +201,13 @@
     }
 
     .cards-container {
-        width: 90dvw;
+        width: 90vw;
 
         position: relative;
-        left: 1.75dvh;
+        left: 1.75vh;
 
         margin-top: 2.25rem;
-        margin-bottom: 5dvh;
+        margin-bottom: 5vh;
 
         display: grid;
         place-items: center;
@@ -217,7 +217,7 @@
 
     .card-container {
         aspect-ratio: 1/1;
-        min-width: 40dvw;
+        min-width: 40vw;
         width: min-content;
 
         display: flex;
@@ -233,8 +233,8 @@
         justify-content: center;
         align-items: center;
 
-        min-width: 40dvw;
-        max-width: 40dvw;
+        min-width: 40vw;
+        max-width: 40vw;
 
         transform: rotate(7.35deg) translateX(-10px) translateY(-10px);
 
@@ -245,8 +245,8 @@
     }
 
     .card-paper-shadow {
-        min-width: 40dvw;
-        min-height: 41dvw;
+        min-width: 40vw;
+        min-height: 41vw;
 
         transform: rotate(3.56deg) translateX(-5px) translateY(-4.86px);
 
@@ -261,7 +261,7 @@
 
     .card-container:hover .card-paper-shadow {
         transition: 0.2s;
-        min-height: 41dvw;
+        min-height: 41vw;
         transform: rotate(1.56deg) translateX(-2px) translateY(-2px);
     }
 
@@ -270,8 +270,8 @@
     }
 
     .card-container:active .card-paper-shadow {
-        min-height: 39dvw;
-        min-width: 39dvw;
+        min-height: 39vw;
+        min-width: 39vw;
         opacity: 0.75;
         transform: rotate(1deg) translateX(-0.7px) translateY(-0.8px);
     }

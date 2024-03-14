@@ -12,18 +12,18 @@
 .display-error-message {
     min-width: min-content;
 
-    padding: 0 0.25dvh 0 0.25;
-    margin-left: 0.25dvh;
+    padding: 0 0.25vh 0 0.25;
+    margin-left: 0.25vh;
 
     background-color: #fafafa;
 
     color: red;
     text-align: start;
-    font-size: 1.7dvh;
+    font-size: 1.7vh;
 
     user-select: none;
 
     position: absolute;
 
-    transform: translateX(0.25dvh) translateY(-0.9dvh);
+    transform: translateX(0.25vh) translateY(-0.9vh);
 }

@@ -1122,7 +1122,7 @@
 "@babel/runtime@^7.14.0", "@babel/runtime@^7.3.1":
   version "7.24.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.0.tgz#584c450063ffda59697021430cb47101b085951e"
-  integrity sha512-Chk32uHMg6TnQdvw2e9IlqPpFX/6NLuK0Ys2PqLb7/gL5uFn9mXvK715FGLlOLQrcO4qIkNHkvPGktzzXexsFw==
+  integrity sha512-Chk32uHMg6TnQvw2e9IlqPpFX/6NLuK0Ys2PqLb7/gL5uFn9mXvK715FGLlOLQrcO4qIkNHkvPGktzzXexsFw==
   dependencies:
     regenerator-runtime "^0.14.0"
 
@@ -3599,7 +3599,7 @@ caniuse-api@^3.0.0:
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001565, caniuse-lite@^1.0.30001578:
   version "1.0.30001580"
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001580.tgz"
-  integrity sha512-mtj5ur2FFPZcCEpXFy8ADXbDACuNFXg6mxVDqp7tqooX6l3zwm+d8EPoeOSIFRDvHs8qu7/SLFOGniULkcH2iA==
+  integrity sha512-mtj5ur2FFPZcCEpXFy8ADXbDACuNFXg6mxVDqp7tqooX6l3zwm+d8EPoeOSIFRvhs8qu7/SLFOGniULkcH2iA==
 
 canvg@^3.0.6:
   version "3.0.10"
@@ -4213,7 +4213,7 @@ damerau-levenshtein@^1.0.8:
 data-urls@^2.0.0:
   version "2.0.0"
   resolved "https://registry.npmjs.org/data-urls/-/data-urls-2.0.0.tgz"
-  integrity sha512-X5eWTSXO/BJmpdIKCRuKUgSCgAN0OwliVK3yPKbwIWU1Tdw5BRajxlzMidvh+gwko9AfQ9zIj52pzF91Q3YAvQ==
+  integrity sha512-X5eWTSXO/BJmpdIKCRuKUgSCgAN0OwliVK3yPKbwIWU1Tdw5BRajxlzMivh+gwko9AfQ9zIj52pzF91Q3YAvQ==
   dependencies:
     abab "^2.0.3"
     whatwg-mimetype "^2.3.0"
@@ -5339,7 +5339,7 @@ for-each@^0.3.3:
 foreground-child@^3.1.0:
   version "3.1.1"
   resolved "https://registry.npmjs.org/foreground-child/-/foreground-child-3.1.1.tgz"
-  integrity sha512-TMKDUnIte6bfb5nWv7V/caI169OHgvwjb7V4WkeUvbQQdjr5rWKqHFiKWb/fcOwB+CzBT+qbWjvj+DVwRskpIg==
+  integrity sha512-TMKDUnIte6bfb5nWv7V/caI169OHgvwjb7V4WkeUvbQQdjr5rWKqHFiKWb/fcOwB+CzBT+qbWjvj+vwRskpIg==
   dependencies:
     cross-spawn "^7.0.0"
     signal-exit "^4.0.1"
@@ -7278,7 +7278,7 @@ lru-cache@^6.0.0:
 "lru-cache@^9.1.1 || ^10.0.0":
   version "10.1.0"
   resolved "https://registry.npmjs.org/lru-cache/-/lru-cache-10.1.0.tgz"
-  integrity sha512-/1clY/ui8CzjKFyjdvwPWJUYKiFVXG2I2cY0ssG7h4+hwk+XOIX7ZSG9Q7TW8TW3Kp3BUSqgFWBLgL4PJ+Blag==
+  integrity sha512-/1clY/ui8CzjKFyjvwPWJUYKiFVXG2I2cY0ssG7h4+hwk+XOIX7ZSG9Q7TW8TW3Kp3BUSqgFWBLgL4PJ+Blag==
 
 lz-string@^1.5.0:
   version "1.5.0"
@@ -8208,7 +8208,7 @@ picocolors@^1.0.0:
 picomatch@^2.0.4, picomatch@^2.2.1, picomatch@^2.2.2, picomatch@^2.2.3, picomatch@^2.3.1:
   version "2.3.1"
   resolved "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz"
-  integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
+  integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCvwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
 
 pify@^2.3.0:
   version "2.3.0"
@@ -8310,7 +8310,7 @@ postcss-custom-media@^8.0.2:
 postcss-custom-properties@^12.1.10:
   version "12.1.11"
   resolved "https://registry.npmjs.org/postcss-custom-properties/-/postcss-custom-properties-12.1.11.tgz"
-  integrity sha512-0IDJYhgU8xDv1KY6+VgUwuQkVtmYzRwu+dMjnmdMafXYv86SWqfxkc7qdDvWS38vsjaEtv8e0vGOUQrAiMBLpQ==
+  integrity sha512-0IDJYhgU8xDv1KY6+VgUwuQkVtmYzRwu+dMjnmdMafXYv86SWqfxkc7qdvwS38vsjaEtv8e0vGOUQrAiMBLpQ==
   dependencies:
     postcss-value-parser "^4.2.0"
 
@@ -8513,7 +8513,7 @@ postcss-modules-extract-imports@^3.0.0:
 postcss-modules-local-by-default@^4.0.4:
   version "4.0.4"
   resolved "https://registry.npmjs.org/postcss-modules-local-by-default/-/postcss-modules-local-by-default-4.0.4.tgz"
-  integrity sha512-L4QzMnOdVwRm1Qb8m4x8jsZzKAaPAgrUF1r/hjDR2Xj7R+8Zsf97jAlSQzWtKx5YNiNGN8QxmPFIc/sh+RQl+Q==
+  integrity sha512-L4QzMnOvwRm1Qb8m4x8jsZzKAaPAgrUF1r/hjDR2Xj7R+8Zsf97jAlSQzWtKx5YNiNGN8QxmPFIc/sh+RQl+Q==
   dependencies:
     icss-utils "^5.0.0"
     postcss-selector-parser "^6.0.2"

@@ -1,5 +1,5 @@
 .App {
-    height: 100dvh;
+    height: 100vh;
 
     display: flex;
     justify-content: center;
@@ -18,8 +18,8 @@
 }
 
 .not-loading-page {
-    min-height: "100dvh";
-    min-width: "100dvw";
+    min-height: "100vh";
+    min-width: "100vw";
     display: 'flex';
     flex-direction: "column";
     justify-content: "center";
@@ -32,27 +32,31 @@
 
     resize: none;
 
-    padding: 0.9dvh 0.5dvh;
+    padding: 0.9vh 0.5vh;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     outline: none;
     border: none;
 
     background: #fafafa;
 
-    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+    border: solid 0.1vh rgba(146, 146, 146, 0.719);
 
-    font-size: 2dvh;
+    font-size: 2vh;
 
     color: #212121;
 }
 
 .centralized-container {
-    min-height: 100dvh;
-    min-width: 100dvw;
+    min-height: 100vh;
+    min-width: 100vw;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 5dvh;
+    gap: 5vh;
+}
+
+.material-symbols-rounded {
+    font-size: 120%;
 }

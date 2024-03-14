@@ -18,8 +18,8 @@
 
     max-width: 1200px;
 
-    border: solid 0.15dvw rgba(180, 180, 180, 0.812);
-    border-radius: 1vh;
+    border: solid 0.15vw rgba(180, 180, 180, 0.812);
+    border-radius: 8px;
 }
 
 .transpiled-text-container {
@@ -43,15 +43,15 @@
 
     display: flex;
 
-    height: 100dvh;
+    height: 100vh;
 
-    max-width: 100dvw;
-    max-height: 100dvh;
+    max-width: 100vw;
+    max-height: 100vh;
     pointer-events: none;
 }
 
 .code-editor {
-    width: 51.5dvh;
+    width: 51.5vh;
 
     padding: 2vh 0;
     display: flex;
@@ -76,7 +76,7 @@
 
     display: flex;
     flex-direction: column;
-    gap: 1dvh;
+    gap: 1vh;
 
     pointer-events: all;
 }
@@ -98,12 +98,12 @@
 
     margin: 0 2vh;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     outline: none;
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #212121;
 
-    font-size: max(75%, 2dvh);
+    font-size: max(75%, 2vh);
 
     cursor: pointer;
 
@@ -111,10 +111,15 @@
     user-select: none;
 }
 
+.close-button {
+    text-align: center;
+    vertical-align: middle;
+}
+
 form {
     display: flex;
     flex-direction: column;
-    gap: 1dvh
+    gap: 1vh
 }
 
 form :is(input, textarea) {
@@ -123,17 +128,17 @@ form :is(input, textarea) {
 
     resize: none;
 
-    padding: 0.9dvh 0.5dvh;
+    padding: 0.9vh 0.5vh;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     outline: none;
     border: none;
 
     background: #fafafa;
 
-    border: solid 0.1dvh rgba(146, 146, 146, 0.719);
+    border: solid 0.1vh rgba(146, 146, 146, 0.719);
 
-    font-size: 2dvh;
+    font-size: 2vh;
     color: #212121;
 }
 
@@ -142,16 +147,16 @@ form :is(input, textarea) {
     cursor: pointer;
     background-color: #3b3b3b;
     transition: transform 0.2s;
-    transform: translateY(-0.2dvh);
+    transform: translateY(-0.2vh);
 }
 
 .close-button:focus-visible {
     background-color: #3b3b3b;
-    outline: solid 0.4dvh #9f9f9f;
+    outline: solid 0.4vh #9f9f9f;
 }
 
 .close-button:active {
-    transform: translateY(0.1dvh);
+    transform: translateY(0.1vh);
 }
 
 .not-found * {
@@ -161,8 +166,8 @@ form :is(input, textarea) {
 
 @media (max-width: 640px) {
     .project-visualizer {
-        margin: 2dvh 3dvh;
-        padding: 2dvh;
+        margin: 2vh 3vh;
+        padding: 2vh;
 
         width: 100%;
     }
@@ -176,7 +181,7 @@ form :is(input, textarea) {
     .code-editor {
         flex-direction: column;
         height: 40%;
-        width: 100dvw;
+        width: 100vw;
     }
 
     .editor-buttons {
@@ -187,7 +192,7 @@ form :is(input, textarea) {
         /* left: initial; */
         /* bottom: 44vh; */
 
-        gap: 1dvh;
+        gap: 1vh;
         flex-direction: row;
         justify-content: center;
     }
@@ -198,8 +203,8 @@ form :is(input, textarea) {
 }
 
 .mobile .project-visualizer {
-    margin: 1dvh;
-    padding: 1dvh;
+    margin: 1vh;
+    padding: 1vh;
 
     border: none;
 
@@ -217,7 +222,7 @@ form :is(input, textarea) {
 .mobile>* .code-editor {
     flex-direction: column;
     height: 40%;
-    width: 100dvw;
+    width: 100vw;
 }
 
 .mobile>* .editor-buttons {
@@ -228,7 +233,7 @@ form :is(input, textarea) {
     left: initial;
     /* bottom: 44vh; */
 
-    gap: 1dvh;
+    gap: 1vh;
     flex-direction: row;
     justify-content: center;
 }

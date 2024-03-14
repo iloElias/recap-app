@@ -71,7 +71,7 @@ body {
     #project-editor {
         display: grid;
         place-items: center;
-        max-width: 100dvw;
+        max-width: 100vw;
     }
 
     #project-visualizer {

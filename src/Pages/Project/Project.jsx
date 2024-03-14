@@ -76,14 +76,14 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     // Code editor animations
     const editorSideAnimation = useSpring({
-        transform: openEditor ? `translateX(0dvw)` : `translateX(-24.75dvw)`,
+        transform: openEditor ? `translateX(0vw)` : `translateX(-24.75vw)`,
     });
     const editorBottomAnimation = useSpring({
         transform: openEditor ? 'translateY(0%)' : 'translateY(44%)',
     });
     const codeEditorAnimation = useSpring({
-        width: openEditor && fullScreen ? '95dvw' : '24.75dvw',
-        maxWidth: 'calc(100dvw - max(33px, 5dvh))'
+        width: openEditor && fullScreen ? '95vw' : '24.75vw',
+        maxWidth: 'calc(100vw - max(33px, 5vh))'
     });
 
     const codeEditorAnimationMobile = useSpring({
@@ -92,7 +92,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     // Project visualizer animations
     const editorVisualizerAnimation = useSpring({
-        marginLeft: openEditor ? 'max(calc(24.75dvw + 9dvh) ,calc(24.75dvw + (4dvh + 33px)))' : 'max(calc(0dvw + 9dvh) ,calc(0dvw + (4dvh + 33px)))',
+        marginLeft: openEditor ? 'max(calc(24.75vw + 9vh) ,calc(24.75vw + (4vh + 33px)))' : 'max(calc(0vw + 9vh) ,calc(0vw + (4vh + 33px)))',
         border: (projectAccess === 'guest') && 'none'
     });
 
@@ -361,7 +361,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: '#fafafa',
             color: 'rgba(0, 0, 0, 0.87)',
-            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
+            border: 'solid 0.1vh rgba(146, 146, 146, 0.719)',
             fontFamily: 'Inter',
             fontSize: '2vh',
             padding: '1vh'
@@ -432,38 +432,38 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                         </animated.div>
 
                         <div id="editor-buttons-container" className="editor-buttons" style={{
-                            paddingTop: (!isMobile && !userForceMobile) ? "2dvh" : "0",
+                            paddingTop: (!isMobile && !userForceMobile) ? "2vh" : "0",
                         }}>
                             <BootstrapTooltip title={messages.legend_hide_code_editor} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
                                     localStorage.setItem("recap@preferEditorOpen", !openEditor);
                                     setOpenEditor(!openEditor);
-                                }}><animated.div style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}><i className="bi bi-arrow-bar-left"></i></animated.div></button>
+                                }}><animated.span className="material-symbols-rounded" style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}>left_panel_open</animated.span></button>
                             </BootstrapTooltip>
 
                             <BootstrapTooltip title={messages.legend_toggle_fullscreen} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
                                 <button className="close-button rotate-button" onClick={() => {
                                     setFullScreen(!fullScreen);
-                                }}>{fullScreen ? <i className="bi bi-fullscreen-exit"></i> : <i className="bi bi-fullscreen"></i>}</button>
+                                }}>{fullScreen ? <span className="material-symbols-rounded">fullscreen_exit</span> : <span className="material-symbols-rounded">fullscreen</span>}</button>
                             </BootstrapTooltip>
 
                             <BootstrapTooltip title={messages.legend_reload_view} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button className="close-button" onClick={() => { handleReload(markdownText) }}><i className="bi bi-arrow-clockwise"></i></button>
+                                <button className="close-button" onClick={() => { handleReload(markdownText) }}><span className="material-symbols-rounded">replay</span></button>
                             </BootstrapTooltip>
 
                             {(projectAccess === 'own' || projectAccess === 'manage') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button className="close-button" onClick={() => { !isSilentlyLoading && handleFileSave() }}>{isSilentlyLoading ? (<CircularProgress color="inherit" size={"50%"} />) : (<i className="bi bi-floppy"></i>)}</button>
+                                <button className="close-button" onClick={() => { !isSilentlyLoading && handleFileSave() }}>{isSilentlyLoading ? (<CircularProgress color="inherit" size={"50%"} />) : (<span className="material-symbols-rounded">save</span>)}</button>
                             </BootstrapTooltip>)}
 
                             {!explodeMinSize() &&
                                 <BootstrapTooltip title={messages.legend_toggle_mobile_desktop} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                    <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<i className="bi bi-phone"></i>) : (<i className="bi bi-window-fullscreen"></i>)}</button>
+                                    <button className="close-button" onClick={toggleMobile}>{(!isMobile && !userForceMobile) ? (<span className="material-symbols-rounded">smartphone</span>) : (<span className="material-symbols-rounded">computer</span>)}</button>
                                 </BootstrapTooltip>}
                             <BootstrapTooltip title={messages.go_back_home} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button onClick={(projectAccess === 'own' ? exitProjectHandler : () => { navigate('/projects') })} className="close-button"><i className="bi bi-door-open"></i></button>
+                                <button onClick={(projectAccess === 'own' ? exitProjectHandler : () => { navigate('/projects') })} className="close-button"><span className="material-symbols-rounded">logout</span></button>
                             </BootstrapTooltip>
                             {(projectAccess === 'own') && (<BootstrapTooltip title={messages.legend_delete_this_project} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><i className="bi bi-trash3"></i></button>
+                                <button onClick={deleteProjectHandler} style={{ color: "red" }} className="close-button"><span className="material-symbols-rounded">delete</span></button>
                             </BootstrapTooltip>)}
 
                             {isMobile && <BottomOptions />}
@@ -484,7 +484,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                         display: 'flex',
                                         flexDirection: 'column',
                                         maxWidth: '20rem',
-                                        padding: '2.5dvh 4dvh',
+                                        padding: '2.5vh 4vh',
                                         gap: '1vh'
                                     }} >
                                         {modalContent === "delete" ?

@@ -4,7 +4,7 @@
     color: #334455;
     font-family: Inter;
     font-weight: 300;
-    font-size: clamp(120%, 4dvh, 175%);
+    font-size: clamp(120%, 4vh, 175%);
 
     overflow: hidden;
     text-overflow: ellipsis;

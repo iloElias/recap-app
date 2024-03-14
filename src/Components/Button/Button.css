@@ -1,5 +1,5 @@
 .component-button {
-    width: 30dvh;
+    width: 30vh;
     min-width: 55px;
 
     display: flex;
@@ -7,39 +7,39 @@
     justify-content: center;
     align-items: center;
 
-    gap: 1.2dvh;
-    padding: 1dvh 3.4dvh;
+    gap: 1.2vh;
+    padding: 1vh 3.4vh;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     outline: none;
     background: #212121;
 
-    font-size: clamp(2dvh, 12px, 14px);
+    font-size: clamp(2vh, 12px, 14px);
 
     color: #FAFAFA;
     user-select: none;
 }
 
 .component-button-disabled {
-    width: 30dvh;
+    width: 30vh;
 
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
 
-    gap: 1.2dvh;
-    padding: 1dvh 3.4dvh;
+    gap: 1.2vh;
+    padding: 1vh 3.4vh;
 
     cursor: not-allowed;
 
-    border-radius: 1dvh;
+    border-radius: 8px;
     outline: none;
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #575757;
 
-    font-size: 2dvh;
+    font-size: 2vh;
 
     color: #ffffff;
     user-select: none;
@@ -49,29 +49,49 @@
     cursor: pointer;
     background: #3b3b3b;
     transition: transform 0.2s;
-    transform: translateY(-0.2dvh);
+    transform: translateY(-0.2vh);
 }
 
 .component-button:active {
-    transform: translateY(0.1dvh);
+    transform: translateY(0.1vh);
 }
 
 .component-button:focus-visible {
     background-color: #3b3b3b;
-    outline: solid 0.4dvh #9f9f9f;
+    outline: solid 0.4vh #9f9f9f;
 }
 
 .option-button {
     width: 100%;
-    /* height: 5dvh; */
+    /* height: 5vh; */
     min-height: 33px;
 
-    font-size: clamp(2dvh, 12px, 14px);
+    font-size: clamp(2vh, 12px, 14px);
 
     justify-content: flex-start;
 
-    padding: 0.5dvh 1dvh;
+    padding: 0.5vh 1vh;
     color: #bcbcbc;
+}
+
+.option-button div {
+    position: relative;
+    aspect-ratio: 1/1;
+    height: clamp(2vh, 12px, 14px);
+    min-width: min-content;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.option-button div img {
+    aspect-ratio: 1/1;
+    position: absolute;
+
+    height: 130%;
+    border-radius: 50%;
+    outline: solid 0.2vh #9f9f9f;
 }
 
 .selected-button {
@@ -85,21 +105,21 @@
 
     text-align: start;
     justify-content: flex-start;
-    padding: 0.5dvh;
+    padding: 0.5vh;
 }
 
 .file-export-button:hover {
     cursor: pointer;
     background: #dadada;
     transition: transform 0.2s;
-    transform: translateY(-0.2dvh);
+    transform: translateY(-0.2vh);
 }
 
 .file-export-button:active {
-    transform: translateY(0.1dvh);
+    transform: translateY(0.1vh);
 }
 
 .file-export-button:focus-visible {
     background-color: #ededed;
-    outline: solid 0.4dvh #bebebe;
+    outline: solid 0.4vh #bebebe;
 }

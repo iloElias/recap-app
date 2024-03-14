@@ -16,7 +16,7 @@ function OptionsMenu({ showCategory, children }) {
     const optionsAnimation = useSpring({
         opacity: showCategory ? 1 : 0,
         transform: showCategory ? "translateY(0%)" : "translateY(125%)",
-        gap: showCategory ? "1dvh" : "0dvh",
+        gap: showCategory ? "1vh" : "0vh",
 
         config: showCategory ? {
             mass: 0.1,
@@ -217,7 +217,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                         display: 'flex',
                                         flexDirection: 'column',
                                         width: '18rem',
-                                        margin: '1.5dvh',
+                                        margin: '1.5vh',
                                         gap: '1vh'
                                     }}>
                                         {usersSearched !== 'anyFound' ?
@@ -232,8 +232,8 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                 </animated.div>)}
                 <div className="hide-bottom-modal" style={{
                     position: "fixed",
-                    height: "100dvh",
-                    width: "100dvw",
+                    height: "100vh",
+                    width: "100vw",
                     right: "0",
                     bottom: "0",
                     pointerEvents: showCategory ? "auto" : "none",
@@ -244,10 +244,12 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     zIndex: showCategory ? '20' : '10',
                     textAlign: "center"
                 }} id="bottom-button" onClick={toggleCategories}>
-                    <TreeDotsIcon />
+                    <span className="material-symbols-rounded">
+                        more_vert
+                    </span>
                 </Button>
                 <OptionsMenu showCategory={showCategory} setShowCategory={setShowCategory}>
-                    <Option optionName={messages.languages_button_title} optionIcon={<i className="bi bi-globe2"></i>} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
+                    <Option optionName={messages.languages_button_title} optionIcon={<span className="material-symbols-rounded">language</span>} onClick={() => { hideAllPanels(); setShowLanguagePanel(!showLanguagePanel) }} selected={showLanguagePanel}>
                         <OptionPanel showPanel={showLanguagePanel} title={messages.languages_button_title}>
                             <select onChange={onLanguageChange} value={language}>
                                 <option value="en">English</option>
@@ -257,12 +259,12 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     </Option>
                     {urlParam.id && (
                         <>
-                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.styles_button_title} optionIcon={<i className="bi bi-palette-fill"></i>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
+                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.styles_button_title} optionIcon={<span className="material-symbols-rounded">palette</span>} onClick={() => { hideAllPanels(); setShowStylePanel(!showStylePanel) }}>
                                 <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title}>
 
                                 </OptionPanel>
                             </Option>)}
-                            <Option optionName={messages.export_project_button_title} optionIcon={<i className="bi bi-download"></i>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
+                            <Option optionName={messages.export_project_button_title} optionIcon={<span className="material-symbols-rounded">download</span>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel) }}>
                                 <OptionPanel showPanel={showExportPanel} >
                                     <Button onClick={() => {
                                         exportComponentAsPNG(exportRef, {
@@ -272,11 +274,11 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                                 },
                                             },
                                         })
-                                    }} className={'file-export-button'}><i className="bi bi-file-earmark-image-fill"></i>{messages.export_file_as_png}</Button>
-                                    <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><i className="bi bi-file-earmark-pdf-fill"></i>{messages.export_file_as_pdf}</Button>
+                                    }} className={'file-export-button'}><span className="material-symbols-rounded">image</span>{messages.export_file_as_png}</Button>
+                                    <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }) }} className={'file-export-button'}><span className="material-symbols-rounded">description</span>{messages.export_file_as_pdf}</Button>
                                 </OptionPanel>
                             </Option>
-                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.share_project_button_title} optionIcon={<i className="bi bi-share-fill"></i>} onClick={() => {
+                            {(actualProjectPermission && (actualProjectPermission === "own" || actualProjectPermission === "manage")) && (<Option optionName={messages.share_project_button_title} optionIcon={<span className="material-symbols-rounded">share</span>} onClick={() => {
                                 hideAllPanels();
                                 setShowCategory(false);
                                 setShowSharePanel(!showSharePanel)
@@ -288,7 +290,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                         <Option onClick={() => {
                             logoutHandler();
                             hideOptions();
-                        }} optionName={messages.account_logout_button_title} optionIcon={<i className="bi bi-door-open"></i>} />
+                        }} optionName={messages.account_logout_button_title} optionIcon={<div><img src={profile.picture_path} alt="" /></div>} />
                     )}
                 </OptionsMenu>
             </div>
@@ -349,7 +351,7 @@ function UserInformationItem({ profile, name, userId, projectId, nick, email, pi
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: '#fafafa',
             color: 'rgba(0, 0, 0, 0.87)',
-            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
+            border: 'solid 0.1vh rgba(146, 146, 146, 0.719)',
 
             fontSize: '10px',
             textAlign: 'center',

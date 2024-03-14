@@ -168,9 +168,9 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
         <>
             <div className="flex-column">
                 <RecapLogo style={{
-                    marginTop: "3.75dvh",
+                    marginTop: "3.75vh",
                     minHeight: "min-content",
-                    height: "max(34px, 4.5dvh)"
+                    height: "max(34px, 4.5vh)"
                 }} />
                 <div className="cards-page">
                     <h2 className="cards-page-title">{messages.cards_page_title}</h2>
@@ -188,7 +188,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                 <Modal >
                     <animated.div style={containerAnimation} onClick={e => e.stopPropagation()}>
                         <Paper className="create-card-container">
-                            <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7dvh", userSelect: "none" }}>{messages.form_title_new_card}</div>
+                            <div style={{ minWidth: "100%", textAlign: "start", fontSize: "2.7vh", userSelect: "none" }}>{messages.form_title_new_card}</div>
                             <form onSubmit={e => { e.preventDefault() }}>
                                 <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
                                 <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
@@ -242,7 +242,7 @@ export function Card({ cardTitle, cardId, cardSynopsis, onClick, isCreate, isLin
         [`& .${tooltipClasses.tooltip}`]: {
             backgroundColor: '#fafafa',
             color: 'rgba(0, 0, 0, 0.87)',
-            border: 'solid 0.1dvh rgba(146, 146, 146, 0.719)',
+            border: 'solid 0.1vh rgba(146, 146, 146, 0.719)',
 
             fontSize: '10px',
             minWidth: '170px',

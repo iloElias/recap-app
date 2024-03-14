@@ -1,16 +1,16 @@
 .container-login {
     display: flex;
-    padding-top: 30dvh;
+    padding-top: 30vh;
 }
 
 .login-static-message {
-    margin: 1dvh 0 3.8dvh;
+    margin: 1vh 0 3.8vh;
     color: #9E9E9E;
 
     user-select: none;
 
     font-family: Inter;
-    font-size: 1.7dvh;
+    font-size: 1.7vh;
     font-style: normal;
 }
 
@@ -21,16 +21,16 @@
 
     overflow: visible;
 
-    width: 7.5dvh;
-    height: 7.5dvh;
+    width: 7.5vh;
+    height: 7.5vh;
 }
 
 .network-static-message {
-    margin: 2dvh 5dvh 3.8dvh;
+    margin: 2vh 5vh 3.8vh;
     color: #9E9E9E;
 
     font-family: Inter;
-    font-size: 1.7dvh;
+    font-size: 1.7vh;
     text-align: center;
     font-style: normal;
 }
