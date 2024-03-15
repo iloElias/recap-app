@@ -10,7 +10,7 @@
     gap: 1.2vh;
     padding: 1vh 3.4vh;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     outline: none;
     background: #212121;
@@ -34,7 +34,7 @@
 
     cursor: not-allowed;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #575757;

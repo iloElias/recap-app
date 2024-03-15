@@ -117,10 +117,10 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
 
     // eslint-disable-next-line
     const autoSave = useCallback(
-        // eslint-disable-next-line
         debounce((fileValue, projectId) => {
             if (projectAccess === 'own' || projectAccess === 'manage') {
                 if (fileValue === lastSavedValue) {
+                    console.log(fileValue === lastSavedValue);
                     return;
                 }
                 setIsSilentlyLoading(true);
@@ -438,7 +438,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                 <button className="close-button rotate-button" onClick={() => {
                                     localStorage.setItem("recap@preferEditorOpen", !openEditor);
                                     setOpenEditor(!openEditor);
-                                }}><animated.span className="material-symbols-rounded" style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}>left_panel_open</animated.span></button>
+                                }}><animated.span className="material-symbols-rounded" style={(!isMobile && !userForceMobile) ? editorButtonAnimation : editorButtonMobileAnimation}>right_panel_open</animated.span></button>
                             </BootstrapTooltip>
 
                             <BootstrapTooltip title={messages.legend_toggle_fullscreen} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >

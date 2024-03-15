@@ -28,11 +28,11 @@ if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile');
 
-function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler, exportRef, projectName, actualProjectPermission }) {
+function PageTemplate({ children, profile, language, messages, setLanguage, logoutHandler, exportRef, projectName, actualProjectPermission, setIsLoading }) {
     return (
         <>
             {children}
-            <BottomOptions profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={projectName} actualProjectPermission={actualProjectPermission} />
+            <BottomOptions setIsLoading={setIsLoading} profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={projectName} actualProjectPermission={actualProjectPermission} />
         </>
     );
 }
@@ -277,17 +277,17 @@ function App() {
                         <Routes>
                             <Route path='/'>
                                 <Route index element={<Navigate to='/projects' ></Navigate>} />
-                                <Route path='/projects' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                <Route path='/projects' element={<PageTemplate setIsLoading={setIsLoading} profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Cards userId={profile && profile.id} messages={messages} setLoading={setIsLoading} logoutHandler={logoutHandler} />
                                 </PageTemplate>} />
-                                <Route path='login' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                <Route path='login' element={<PageTemplate setIsLoading={setIsLoading} profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <Login messages={messages} loginHandler={login} />
                                 </PageTemplate>} />
                                 <Route path='project/:id' element={
                                     <Project BottomOptions={
-                                        ({ ref }) => { return (<BottomOptions ref={ref} profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} />) }
+                                        ({ ref }) => { return (<BottomOptions ref={ref} setIsLoading={setIsLoading} profile={profile} language={language} onClick={(e) => e.stopPropagation()} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler} exportRef={exportRef} projectName={actualProjectName} actualProjectPermission={actualProjectPermission} />) }
                                     } messages={messages} setLoading={setIsLoading} exportRef={exportRef} setCurrentProjectAccess={setActualProjectPermission} setProjectName={setActualProjectName} profile={profile} />} />
-                                <Route path='*' element={<PageTemplate profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
+                                <Route path='*' element={<PageTemplate setIsLoading={setIsLoading} profile={profile} language={language} messages={messages} setLanguage={setLanguage} logoutHandler={logoutHandler}>
                                     <NotFound>
                                         <p>{messages.not_found_page}</p>
                                         <Link to='/'>{messages.go_back_home}</Link>

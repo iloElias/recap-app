@@ -1,11 +1,12 @@
+:root {
+    --button-generic-border-radius: clamp(6px, 1vh, 5vh);
+}
+
 * {
     margin: 0;
     padding: 0;
     min-width: 0;
     background: transparent;
-
-    scrollbar-width: 10px;
-    scrollbar-base-color: black;
 
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
     /* outline: dashed 1px red; */

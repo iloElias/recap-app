@@ -1,4 +1,3 @@
-import { TreeDotsIcon } from "../Icons/Icons";
 import { useSpring, animated } from "react-spring";
 import React, { useEffect, useState } from "react";
 import Button from "../Button/Button";
@@ -18,13 +17,10 @@ function OptionsMenu({ showCategory, children }) {
         transform: showCategory ? "translateY(0%)" : "translateY(125%)",
         gap: showCategory ? "1vh" : "0vh",
 
-        config: showCategory ? {
+        config: {
             mass: 0.1,
             tension: 314
-        } : {
-            mass: 0.1,
-            tension: 197
-        }
+        },
     });
 
     return (
@@ -79,7 +75,7 @@ function Option({ optionName, optionIcon, onClick, children, selected }) {
     );
 }
 
-export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission, bottomModalContainerRef }) {
+export default function BottomOptions({ messages, language, setLanguage, profile, logoutHandler, exportRef, projectName, actualProjectPermission, setIsLoading }) {
     const urlParam = useParams('/project/:id');
     const api = getApi();
 
@@ -88,6 +84,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
     const [showStylePanel, setShowStylePanel] = useState(false);
     const [showExportPanel, setShowExportPanel] = useState(false);
     const [showSharePanel, setShowSharePanel] = useState(false);
+    const [showExitPanel, setShowExitPanel] = useState(false);
 
     const [usersSearched, setUsersSearched] = useState("search");
     const [lockSearch, setLockSearch] = useState(false);
@@ -137,6 +134,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
         setShowStylePanel(false);
         setShowExportPanel(false);
         setShowSharePanel(false);
+        setShowExitPanel(false);
     };
 
     const hideAllPanels = () => {
@@ -144,6 +142,7 @@ export default function BottomOptions({ messages, language, setLanguage, profile
         setShowStylePanel(false);
         setShowExportPanel(false);
         setShowSharePanel(false);
+        setShowExitPanel(false);
     };
 
     const onLanguageChange = (event) => {
@@ -287,10 +286,28 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                     )}
 
                     {profile && (
-                        <Option onClick={() => {
-                            logoutHandler();
-                            hideOptions();
-                        }} optionName={messages.account_logout_button_title} optionIcon={<div><img src={profile.picture_path} alt="" /></div>} />
+                        <Option optionName={messages.account_logout_button_title} optionIcon={<span className="material-symbols-rounded">logout</span>} onClick={() => { hideAllPanels(); setShowExitPanel(!showExitPanel) }} >
+                            <OptionPanel showPanel={showExitPanel}>
+                                <form action="" onSubmit={(e) => {
+                                    e.preventDefault();
+                                    if (email !== "") {
+                                        setUsersSearched('search');
+                                    }
+                                }}>
+                                    <div className="user-profile-image"><img src={profile.picture_path} alt="" /><p>{messages.logout_confirmation_message}?</p></div>
+                                    <div className="form-two-buttons-row">
+                                        <input type="button" value={messages.logout_confirmation_button} onClick={() => {
+                                            setIsLoading(true);
+                                            setTimeout(() => {
+                                                logoutHandler();
+                                                hideOptions();
+                                            }, 1500);
+                                        }} />
+                                        <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowExitPanel(false); }} />
+                                    </div>
+                                </form>
+                            </OptionPanel>
+                        </Option>
                     )}
                 </OptionsMenu>
             </div>

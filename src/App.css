@@ -34,7 +34,7 @@
 
     padding: 0.9vh 0.5vh;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: none;
 

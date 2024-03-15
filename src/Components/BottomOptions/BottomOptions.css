@@ -40,6 +40,8 @@
     right: max(20vh, 115px);
     padding: 0 1vh 1vh 1vh;
 
+    max-width: 40vw;
+
     overflow: visible;
     /* overflow-x: clip; */
 }
@@ -84,7 +86,7 @@
     width: 25vh;
     height: min-content;
 
-    min-width: 120px;
+    min-width: min(40vw, 120px);
     max-width: 40vw;
     min-height: fit-content;
 
@@ -97,7 +99,7 @@
     user-select: none;
     touch-action: none;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: none;
 
@@ -301,7 +303,7 @@ form label {
     align-items: center;
 
     background-color: #c8c8c886;
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
 
     width: 100%;
     height: 100%;
@@ -335,4 +337,46 @@ form label {
 
 .disable-pointer-event * {
     pointer-events: none !important;
+}
+
+.user-profile-image {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    width: 100%;
+
+    font-size: 100%;
+    text-transform: none;
+    text-align: center;
+}
+
+.user-profile-image img {
+    aspect-ratio: 1/1;
+    width: max(25px, 4vh);
+
+    object-fit: contain;
+    border-radius: 100%;
+}
+
+.user-profile-image p {
+    font-size: max(2vh, 70%);
+}
+
+.form-two-buttons-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+    gap: 4px;
+}
+
+.form-two-buttons-row input[type="button"] {
+    font-size: 100%;
+    padding: 0.5vh 0.2vh !important;
+}
+
+.form-two-buttons-row input[type="button"]:hover {
+    cursor: pointer;
+    background: #f5f5f5;
+    border-color: #212121;
 }

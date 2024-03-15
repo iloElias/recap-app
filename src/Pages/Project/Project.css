@@ -19,7 +19,7 @@
     max-width: 1200px;
 
     border: solid 0.15vw rgba(180, 180, 180, 0.812);
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
 }
 
 .transpiled-text-container {
@@ -98,7 +98,7 @@
 
     margin: 0 2vh;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: solid 0.2vh rgba(255, 255, 255, 0.25);
     background: #212121;
@@ -130,7 +130,7 @@ form :is(input, textarea) {
 
     padding: 0.9vh 0.5vh;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: none;
 

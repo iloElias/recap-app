@@ -152,7 +152,7 @@
     max-height: 90vh;
 
     background-color: #fafafa;
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
 }
 
 .create-card-container form {
@@ -169,7 +169,7 @@
 
     padding: 0.9vh 0.5vh;
 
-    border-radius: 8px;
+    border-radius: var(--button-generic-border-radius);
     outline: none;
     border: none;
 
@@ -192,7 +192,7 @@
         word-break: break-all;
 
         font-family: 'Covered By Your Grace', cursive;
-        font-size: clamp(100%, 4vh, 200%);
+        font-size: clamp(100%, 25.41px, 200%);
         line-height: 25px;
         color: #212121;
 
