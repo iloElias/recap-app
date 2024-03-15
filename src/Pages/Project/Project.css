@@ -276,3 +276,9 @@ form :is(input, textarea) {
 .editor-buttons .bottom-options-modal-container .modal-body {
     top: -44%;
 }
+
+.silent-loading-button div {
+    overflow: visible;
+    height: 50%;
+    width: 50%;
+}

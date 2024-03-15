@@ -452,7 +452,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                             </BootstrapTooltip>
 
                             {(projectAccess === 'own' || projectAccess === 'manage') && (<BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? "right" : "top"} arrow leaveDelay={100} >
-                                <button className="close-button" onClick={() => { !isSilentlyLoading && handleFileSave() }}>{isSilentlyLoading ? (<CircularProgress color="inherit" size={"50%"} />) : (<span className="material-symbols-rounded">save</span>)}</button>
+                                <button className="close-button silent-loading-button" onClick={() => { !isSilentlyLoading && handleFileSave() }}>{isSilentlyLoading ? (<CircularProgress thickness={5} color="inherit" size={"40%"} />) : (<span className="material-symbols-rounded">save</span>)}</button>
                             </BootstrapTooltip>)}
 
                             {!explodeMinSize() &&

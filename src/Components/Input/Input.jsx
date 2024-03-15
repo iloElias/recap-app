@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Input.css";
 import { useSpring, animated } from "react-spring";
+import ReactTextareaAutosize from "react-textarea-autosize";
 
 export default function Input({ type, required, onSubmit, placeholder, minSize, submitRule, value, update, resetValue }) {
     const [inputValue, setInputValue] = useState(value || '');
@@ -71,7 +72,7 @@ export function TextArea({ required, onSubmit, placeholder, value, minSize, subm
 
     return (
         <div className="input-container">
-            <textarea value={inputValue} className="form-input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
+            <ReactTextareaAutosize value={inputValue} className="form-input" onChange={(e) => { inputSubmitHandler(e.target.value); update(e.target.value) }} placeholder={placeholder} />
             <animated.div style={requiredAnimation} className="display-error-message">{("*" + invalidMessage).replace(':str', minSize)}</animated.div>
         </div>
     );

@@ -58,6 +58,10 @@
     transform: scale(1.05);
 }
 
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
 .card-paper-text {
     max-width: 150px;
     max-height: 150px;

@@ -9,11 +9,12 @@ import { Alert, Paper, Snackbar, Tooltip, tooltipClasses } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import styled from "@emotion/styled";
 import getApi from "../../Api/api";
+import debounce from "lodash.debounce";
 
-const api = getApi();
 
 export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     const authenticationToken = localStorage.getItem('recap@localUserProfile');
+    const api = getApi();
 
     const [showModal, setShowModal] = useState(false);
     const [required, setRequired] = useState(false);
@@ -21,6 +22,8 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     const [userCards, setUserCards] = useState();
     const [cardName, setCardName] = useState('');
     const [cardSynopses, setCardSynopses] = useState('');
+    const [cardColor, setCardColor] = useState('#fafafa');
+
 
     const [resetValues, setResetValues] = useState();
 
@@ -65,13 +68,14 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
 
     const toggleResetValues = useCallback(() => {
         setResetValues(!resetValues);
+        setCardColor("#fafafa");
     }, [resetValues, setResetValues]);
 
     const onCreateCardHandler = () => {
         setRequired(true)
         if (cardName !== "" && `${cardName}`.length >= 4 && cardSynopses !== "" && `${cardSynopses}`.length >= 4) {
             setLoading(true);
-            setNewCard({ name: cardName, synopsis: cardSynopses });
+            setNewCard({ name: cardName, synopsis: cardSynopses, color: cardColor });
 
             setCardName(null);
             setCardSynopses(null);
@@ -79,6 +83,11 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
             setRequired(false);
         }
     }
+
+    // eslint-disable-next-line
+    const setNewCardColor = useCallback(debounce((value) => {
+        setCardColor(value);
+    }, 10), [setCardColor]);
 
     useEffect(() => {
         if (userDataWasLoaded) return
@@ -114,7 +123,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
             }
         }
         fetchUserCards();
-    }, [userId, setLoading, setNotificationMessage, openAlert, authenticationToken, userDataWasLoaded, setUserDataWasLoaded, logoutHandler, messages]);
+    }, [userId, setLoading, setNotificationMessage, openAlert, api, authenticationToken, userDataWasLoaded, setUserDataWasLoaded, logoutHandler, messages]);
 
 
     useEffect(() => {
@@ -130,7 +139,10 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
             setShowModal(false);
             try {
                 const project = await api.post('/project/', [{
-                    card: { synopsis: newCardRef.synopsis },
+                    card: {
+                        synopsis: newCardRef.synopsis,
+                        color: newCardRef.color
+                    },
                     project: { name: newCardRef.name },
                     user: { id: userId }
                 }], {
@@ -140,7 +152,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                 });
 
                 setAlertSeverity('success');
-                setUserCards([...userCards, { id: project.data.id, name: newCardRef.name, synopsis: newCardRef.synopsis }])
+                setUserCards([...userCards, { id: project.data.id, name: newCardRef.name, synopsis: newCardRef.synopsis, color: newCardRef.color }])
                 setAlertMessage(messages.item_new_created.replace(':str', messages.card));
             } catch (err) {
                 if (err.response.status === 401) {
@@ -159,7 +171,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
         };
 
         createCardAndProject();
-    }, [newCard, userCards, authenticationToken, navigate, toggleResetValues, logoutHandler, setLoading, userId, messages]);
+    }, [newCard, userCards, authenticationToken, api, navigate, toggleResetValues, logoutHandler, setLoading, userId, messages]);
 
 
 
@@ -178,7 +190,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                         <Card messages={messages} cardTitle={"+ " + (messages.card_item_new_card)} isCreate onClick={toggleModal} />
 
                         {userCards && userCards.map((card) => {
-                            return (<Card key={card.id} messages={messages} cardId={card.id} isLink={card.id} cardTitle={card.name} cardSynopsis={card.synopsis} />);
+                            return (<Card key={card.id} messages={messages} cardId={card.id} isLink={card.id} cardTitle={card.name} cardSynopsis={card.synopsis} color={card.color} />);
                         })}
                     </div>
                 </div>
@@ -192,6 +204,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                             <form onSubmit={e => { e.preventDefault() }}>
                                 <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
                                 <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><p>Chose card color:</p><input value={cardColor} style={{ display: "flex", padding: "0", backgroundColor: cardColor }} type="color" onChange={(e) => { setNewCardColor(e.target.value) }} /></div>
                                 <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
                             </form>
                         </Paper>
@@ -221,7 +234,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
     );
 }
 
-export function Card({ cardTitle, cardId, cardSynopsis, onClick, isCreate, isLink, messages }) {
+export function Card({ cardTitle, cardId, cardSynopsis, color, onClick, isCreate, isLink, messages }) {
     const navigate = useNavigate();
 
     const HtmlTooltip = styled(({ className, ...props }) => (
@@ -275,7 +288,7 @@ export function Card({ cardTitle, cardId, cardSynopsis, onClick, isCreate, isLin
                     )}>
                         <div className="card-container" onClick={onClick}>
                             <div className="card-paper-shadow"></div>
-                            <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                            <div className="card-paper" style={{ backgroundColor: color }}><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
                         </div>
                     </HtmlTooltip>
                 </button>
