@@ -39,6 +39,7 @@ function OptionPanel({ showPanel, title, children }) {
     const panelAnimation = useSpring({
         opacity: showPanel ? 1 : 0,
         transform: showPanel ? "translateX(0%)" : "translateX(100%)",
+        pointerEvents: showPanel ? "auto" : "none",
         config: showPanel ? {
             mass: 0.1,
             tension: 514

@@ -1,0 +1,52 @@
+{
+    "project_name": "Teste de renderização 3",
+    "project_synopsis": "Teste de renderização para links e codigos",
+    "subjects": [
+        {
+            "subject_title": "Link",
+            "cards": [
+                {
+                    "card_title": "Testando links",
+                    "body": [
+                        "Link home remota: http://localhost:3000/projects",
+                        "Link home remota: https://ipeweb-recap.vercel.app/projects"
+                    ],
+                    "footer": "Os links devem ser renderizados",
+                    "header": ""
+                }
+            ]
+        },
+        {
+            "subject_title": "Codigos",
+            "cards": [
+                {
+                    "card_title": "Teste",
+                    "body": [
+                        "Para que os codigos sejam renderizados, deve-se escreve-lo da seguinte forma",
+                        "Texto que vem antes do codigo. [codigo=linguagem]...codigo aqui[fimDoCodigo]",
+                        "Teste de renderização: [code=javascript]console.log('Hello world');[endOfCode]"
+                    ],
+                    "footer": "O codigo deve ser renderizado"
+                },
+                {
+                    "card_title": "",
+                    "body": [
+                        "Teste de codigo com multiplas linhas: [code=javascript]function showMessage(message) {console.log(message);}[endOfCode]"
+                    ],
+                    "footer": "O codigo deve ser renderizado"
+                },
+                {
+                    "card_title": "Teste quebra de linha",
+                    "body": [
+                        "Teste de quebra de linhas\n[code=javascript]function showMessage(message) {\n    console.log(message);\n}\n\nconst message = 'Hello world';\nshowMessage(message);[endOfCode]"
+                    ],
+                    "footer": "O codigo deve ser renderizado com quebra de linha"
+                }
+            ]
+        },
+        {
+            "subject_title": "Code link",
+            "cards": []
+        }
+    ]
+}

@@ -37,17 +37,13 @@
 
 .vertical-visibility-container {
     position: absolute;
-    right: max(20vh, 115px);
+    right: 100%;
     padding: 0 1vh 1vh 1vh;
 
-    max-width: 40vw;
+    max-width: 45vw;
 
     overflow: visible;
     /* overflow-x: clip; */
-}
-
-.vertical-visibility-container div {
-    pointer-events: all;
 }
 
 #bottom-button {
@@ -72,6 +68,8 @@
 }
 
 .option {
+    position: relative;
+
     display: flex;
     flex-direction: row;
 
@@ -341,7 +339,7 @@ form label {
 
 .user-profile-image {
     display: flex;
-    justify-content: space-between;
+    gap: max(5px, 1vh);
     align-items: center;
 
     width: 100%;

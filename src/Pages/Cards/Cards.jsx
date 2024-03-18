@@ -1,6 +1,7 @@
 import { RecapLogo } from "../../Components/Icons/Icons";
 import React, { useCallback, useEffect, useState } from "react";
 import "./Cards.css"
+import { contrastColor } from "contrast-color";
 import Modal from "../../Components/Modal/Modal";
 import { useSpring, animated } from "react-spring";
 import Button from "../../Components/Button/Button";
@@ -173,9 +174,6 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
         createCardAndProject();
     }, [newCard, userCards, authenticationToken, api, navigate, toggleResetValues, logoutHandler, setLoading, userId, messages]);
 
-
-
-
     return (
         <>
             <div className="flex-column">
@@ -237,6 +235,12 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
 export function Card({ cardTitle, cardId, cardSynopsis, color, onClick, isCreate, isLink, messages }) {
     const navigate = useNavigate();
 
+    const colorContrast = contrastColor({
+        bgColor: color,
+        fgDarkColor: "#212121",
+        fgLightColor: "#fafafa"
+    });
+
     const HtmlTooltip = styled(({ className, ...props }) => (
         <Tooltip arrow {...props} placement="bottom" enterDelay={500} classes={{ popper: className }} slotProps={{
             popper: {
@@ -288,7 +292,7 @@ export function Card({ cardTitle, cardId, cardSynopsis, color, onClick, isCreate
                     )}>
                         <div className="card-container" onClick={onClick}>
                             <div className="card-paper-shadow"></div>
-                            <div className="card-paper" style={{ backgroundColor: color }}><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                            <div className="card-paper" style={{ backgroundColor: color }}><div className="card-paper-text" style={{ color: colorContrast }}>{cardTitle}</div></div>
                         </div>
                     </HtmlTooltip>
                 </button>
@@ -299,7 +303,7 @@ export function Card({ cardTitle, cardId, cardSynopsis, color, onClick, isCreate
                     )}>
                         <div className="card-container" onClick={onClick}>
                             <div className="card-paper-shadow"></div>
-                            <div className="card-paper"><div className="card-paper-text" style={isCreate && { color: "#989898" }}>{cardTitle}</div></div>
+                            <div className="card-paper"><div className="card-paper-text" style={{ color: "#989898" }} >{cardTitle}</div></div>
                         </div>
                     </HtmlTooltip>
                 </button>
