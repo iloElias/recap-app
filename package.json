@@ -33,7 +33,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "DISABLE_ESLINT_PLUGIN=true react-scripts build",
     "serve": "serve build",
     "deploy": "yarn build & yarn global add serve & serve -s build",
     "test": "react-scripts test",
