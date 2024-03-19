@@ -397,7 +397,8 @@ export default function Project({
 
   return (
     <>
-      {!isMobile && <BottomOptions />}
+      <p>Teste</p>
+      {!isMobile && BottomOptions}
 
       {!notFoundProject ? (
         <div id="project-editor" className={`${!isMobile && !userForceMobile ? '' : 'mobile '}project-editor-container`}>
@@ -531,7 +532,7 @@ export default function Project({
                   </BootstrapTooltip>
                 )}
 
-                {isMobile && <BottomOptions />}
+                {isMobile && BottomOptions}
               </div>
             </animated.div>
           )}

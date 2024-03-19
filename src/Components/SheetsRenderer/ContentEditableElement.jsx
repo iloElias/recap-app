@@ -39,7 +39,9 @@ export default function ContentEditableElement({
   const onBlur = (e) => {
     e.target.contentEditable = false;
     applyChanges(e);
-    onFocusLost();
+    if (onFocusLost) {
+      onFocusLost();
+    }
   };
   const onKeyDown = (e) => {
     if (e.key === 'Enter') {
@@ -52,13 +54,16 @@ export default function ContentEditableElement({
       e.target.focus();
     }
   };
-  const allProperties = {
+  const allProperties = allowEditable ? {
     onBlur: (e) => { onBlur(e); },
     onKeyDown: (e) => { onKeyDown(e); },
     onDoubleClick: (e) => { onDoubleClick(e); },
     contentEditable: false,
     className,
     style: allowEditable ? { cursor: 'copy' } : { cursor: 'auto' },
+  } : {
+    className,
+    contentEditable: false,
   };
   allPropertiesRef.current = allProperties;
 

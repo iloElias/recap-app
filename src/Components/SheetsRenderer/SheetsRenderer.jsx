@@ -73,18 +73,18 @@ export default function SheetsRenderer({
             <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={3}>
               {subject.cards?.map((card, cardIndex) => (
                 (card.card_title || card.header || card.body[0] || card.footer) && (
-                <Paper suppressContentEditableWarning id={`subject-${subjectIndex}-card-${cardIndex}`} key={cardIndex} className="rendered-card">
-                  {card.card_title && (
-                  <ContentEditableElement tag="h3" className="rendered-card-title" editWhat="card_title" value={card.card_title} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
-                  {card.header && (
-                  <ContentEditableElement tag="p" className="rendered-card-header" editWhat="header" value={card.header} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
-                  <div className="rendered-card-body">
-                    {card.body?.map((item, itemIndex) => (
-                      item && (<RenderText key={`sub:${subjectIndex}&card:${cardIndex}&item:${itemIndex}`} render={item} editWhat="header" value={['body', itemIndex]} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)
-                    ))}
-                    {card.footer && (<ContentEditableElement tag="h4" className="rendered-card-footer" editWhat="footer" value={card.footer} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
-                  </div>
-                </Paper>
+                  <Paper suppressContentEditableWarning id={`subject-${subjectIndex}-card-${cardIndex}`} key={cardIndex} className="rendered-card">
+                    {card.card_title && (
+                      <ContentEditableElement tag="h3" className="rendered-card-title" editWhat="card_title" value={card.card_title} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
+                    {card.header && (
+                      <ContentEditableElement tag="p" className="rendered-card-header" editWhat="header" value={card.header} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
+                    <div className="rendered-card-body">
+                      {card.body?.map((item, itemIndex) => (
+                        item && (<RenderText key={`sub:${subjectIndex}&card:${cardIndex}&item:${itemIndex}`} render={item} editWhat="header" value={['body', itemIndex]} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)
+                      ))}
+                      {card.footer && (<ContentEditableElement tag="h4" className="rendered-card-footer" editWhat="footer" value={card.footer} allowEditable={(userPermission === 'own' || userPermission === 'manage')} card={card} render={render} setRender={setRender} setCurrentTextOnEditor={setCurrentTextOnEditor} />)}
+                    </div>
+                  </Paper>
                 )
               ))}
               {(userPermission === 'own' || userPermission === 'manage') && (<AddCardHologram messages={messages} subjectIndex={subjectIndex} key={subjectIndex} onAddNewCard={handleNewCard} />)}
@@ -98,9 +98,44 @@ export default function SheetsRenderer({
     );
 }
 
-function RenderText(props) {
-  const { render } = props;
+function Highlighter({ text }) {
+  const regex = /(.*)\[hl](.*?)\[hl](.*)/s;
+  const highlightMatch = regex.exec(text);
 
+  if (highlightMatch) {
+    const beforeText = highlightMatch[1];
+    const highlightedText = highlightMatch[2];
+    const afterText = highlightMatch[3];
+
+    return (
+      <>
+        {beforeText
+          && (
+            <span key={0}>
+              <AutoLinkText text={beforeText} />
+            </span>
+          )}
+        {highlightedText
+          && (
+            <span key={1} className="highlighted">{highlightedText}</span>
+          )}
+        {afterText
+          && (
+            <span key={2}>
+              <AutoLinkText text={afterText} />
+            </span>
+          )}
+      </>
+    );
+  }
+  return (
+    <span key={0}>
+      <AutoLinkText text={text} />
+    </span>
+  );
+}
+
+function RenderText({ render }) {
   const codeRegex = /(.*)\[code=(.*?)\](.*?)\[endOfCode\]/s;
   const match = codeRegex.exec(render);
 
@@ -109,11 +144,9 @@ function RenderText(props) {
     const language = match[2];
     const code = match[3];
 
-    // console.log(match);
-
     return (
       <div>
-        <p>{beforeText}</p>
+        <p><Highlighter text={beforeText} /></p>
         <SyntaxHighlighter
           wrapLines
           language={language}
@@ -124,9 +157,10 @@ function RenderText(props) {
       </div>
     );
   }
+
   return (
     <p>
-      <AutoLinkText text={render} />
+      <Highlighter text={render} />
     </p>
   );
 }

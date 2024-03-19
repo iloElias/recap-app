@@ -342,3 +342,8 @@
 .subject-hologram-container form {
     max-width: min(100%, 350px);
 }
+
+.highlighted {
+    background-color: yellow;
+    word-break: break-all;
+}
