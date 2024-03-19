@@ -397,7 +397,6 @@ export default function Project({
 
   return (
     <>
-      <p>Teste</p>
       {!isMobile && BottomOptions}
 
       {!notFoundProject ? (
