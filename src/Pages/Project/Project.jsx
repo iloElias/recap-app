@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 import "./Project.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSpring, animated } from "react-spring";
@@ -115,8 +115,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         immediate: (key) => key === (showModal ? "zIndex" : "")
     });
 
-    // eslint-disable-next-line
-    const autoSave = useCallback(
+    const autoSave = useRef(
         debounce((fileValue, projectId) => {
             if (projectAccess === 'own' || projectAccess === 'manage') {
                 if (fileValue === lastSavedValue) {
@@ -138,7 +137,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 })
             }
             return;
-        }, 5000), [projectAccess, markdownText]);
+        }, 5000)).current;
 
     const saveHandle = useCallback((fileValue, projectId) => {
         if (fileValue === lastSavedValue) {
@@ -512,8 +511,10 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                                                         {messages.save_than_leave}
                                                     </Button>
                                                     <Button onClick={() => {
+                                                        setShowModal(false);
+                                                        setLoading(true);
                                                         setTimeout(() => {
-                                                            setLoading(true);
+                                                            setLoading(false);
                                                             navigate('/projects');
                                                         }, 1500);
                                                     }} style={{

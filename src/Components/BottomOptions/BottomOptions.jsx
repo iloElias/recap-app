@@ -299,9 +299,10 @@ export default function BottomOptions({ messages, language, setLanguage, profile
                                     <div className="form-two-buttons-row">
                                         <input type="button" value={messages.logout_confirmation_button} onClick={() => {
                                             setIsLoading(true);
+                                            hideOptions();
                                             setTimeout(() => {
+                                                setIsLoading(false);
                                                 logoutHandler();
-                                                hideOptions();
                                             }, 1500);
                                         }} />
                                         <input type="button" value={messages.add_card_hologram_cancel} onClick={() => { setShowExitPanel(false); }} />

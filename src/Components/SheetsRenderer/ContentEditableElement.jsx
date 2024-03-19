@@ -5,6 +5,7 @@ export default function ContentEditableElement({ tag, value, onFocusLost, classN
 
     const applyChanges = (e) => {
         if (e.target.textContent === previousValue) {
+            e.target.contentEditable = false;
             return;
         }
         value = e.target.textContent;
@@ -31,6 +32,7 @@ export default function ContentEditableElement({ tag, value, onFocusLost, classN
     }
     const onKeyDown = (e) => {
         if (e.key === "Enter") {
+            console.log(e);
             applyChanges(e);
         }
     }

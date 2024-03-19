@@ -40,7 +40,7 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
         const renderTextJson = JSON.stringify(projectData);
 
         setRender(renderTextJson);
-        setCurrentTextOnEditor(projectData);
+        setCurrentTextOnEditor(renderTextJson);
     }
 
     return (render && render.project_name && render.project_synopsis) ?
@@ -210,9 +210,9 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                 </animated.div>
                 <animated.button onClick={() => { setShowFields(true) }} className="hologram card-hologram" style={buttonFadeAnimation}>
                     <div style={{
-                        fontSize: "30px",
-                        fontWeight: "350"
-                    }}>+</div>
+                        fontSize: "16px",
+                        fontWeight: "400"
+                    }}>{messages.add_card_hologram_button}</div>
                 </animated.button>
             </div>
         </ClickAwayListener >
@@ -258,7 +258,7 @@ function AddSubjectHologram({ messages, addNewSubject }) {
                             <input type="button" value={messages.add_subject_hologram_add_subject} onClick={() => {
                                 if (!subjectTitle || subjectTitle === '') return;
                                 addNewSubject({
-                                    subject_title: `${subjectTitle}`,
+                                    subject_title: subjectTitle,
                                     cards: []
                                 });
                                 resetFields();
@@ -269,9 +269,9 @@ function AddSubjectHologram({ messages, addNewSubject }) {
                 </animated.div>
                 <animated.button onClick={() => { setShowFields(true) }} className="hologram subject-hologram" style={buttonFadeAnimation}>
                     <div style={{
-                        fontSize: "30px",
-                        fontWeight: "350"
-                    }}>+</div>
+                        fontSize: "16px",
+                        fontWeight: "400"
+                    }}>{messages.add_subject_hologram_button}</div>
                 </animated.button>
             </div>
         </ClickAwayListener >
@@ -283,7 +283,6 @@ function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
 
     const [projectTitle, setProjectTitle] = useState(render.project_name ?? '');
     const [projectSynopsis, setProjectSynopsis] = useState(render.project_synopsis ?? '');
-
 
     const fieldsContainerAnimation = useSpring({
         display: showFields ? "flex" : "none",
@@ -314,8 +313,8 @@ function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
                             <input type="button" value={messages.add_project} onClick={() => {
                                 if (!projectTitle || projectTitle === '' || !projectSynopsis || projectSynopsis === '') return;
                                 handleNewProjectInfo({
-                                    project_name: `${projectTitle}`,
-                                    project_synopsis: `${projectSynopsis}`,
+                                    project_name: projectTitle,
+                                    project_synopsis: projectSynopsis,
                                     subjects: []
                                 });
                             }} />
@@ -325,9 +324,9 @@ function AddProjectInfo({ render, messages, handleNewProjectInfo }) {
                 </animated.div>
                 <animated.button onClick={() => { setShowFields(true) }} className="hologram subject-hologram" style={buttonFadeAnimation}>
                     <div style={{
-                        fontSize: "30px",
-                        fontWeight: "350"
-                    }}>+</div>
+                        fontSize: "16px",
+                        fontWeight: "400"
+                    }}>{messages.add_top_info_hologram_button}</div>
                 </animated.button>
             </div>
         </ClickAwayListener >

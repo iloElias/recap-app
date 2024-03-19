@@ -202,7 +202,7 @@ export default function Cards({ userId, messages, setLoading, logoutHandler }) {
                             <form onSubmit={e => { e.preventDefault() }}>
                                 <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardName} />
                                 <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => { return `${value}`.length < 4 ? messages.invalid_synopsis_length : true }} update={setCardSynopses} />
-                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><p>Chose card color:</p><input value={cardColor} style={{ display: "flex", padding: "0", backgroundColor: cardColor }} type="color" onChange={(e) => { setNewCardColor(e.target.value) }} /></div>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: "2vh" }}><p>{messages.label_card_color}:</p><input value={cardColor} style={{ display: "flex", padding: "0", backgroundColor: cardColor }} type="color" onChange={(e) => { setNewCardColor(e.target.value) }} /></div>
                                 <Button style={{ minWidth: "100%" }} onClick={() => { onCreateCardHandler() }} >{messages.form_button_new_card}</Button>
                             </form>
                         </Paper>
