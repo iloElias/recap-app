@@ -115,11 +115,10 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         immediate: (key) => key === (showModal ? "zIndex" : "")
     });
 
-    const autoSave = useRef(
+    const autoSave = useCallback(
         debounce((fileValue, projectId) => {
             if (projectAccess === 'own' || projectAccess === 'manage') {
                 if (fileValue === lastSavedValue) {
-                    console.log(fileValue === lastSavedValue);
                     return;
                 }
                 setIsSilentlyLoading(true);
@@ -130,14 +129,13 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 }).then(() => {
                     setLastSavedTime(Date.now());
                     setLastSavedValue(fileValue);
-
                 }).catch().finally(() => {
                     setIsSilentlyLoading(false);
                     setLocalMarkdownText(JSON.parse(fileValue));
                 })
             }
             return;
-        }, 5000)).current;
+        }, 5000), []);
 
     const saveHandle = useCallback((fileValue, projectId) => {
         if (fileValue === lastSavedValue) {
@@ -380,10 +378,6 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
         }
     }
 
-    useEffect(() => {
-
-    }, [isMobile]);
-
     return (
         <>
             {!isMobile && <BottomOptions />}
@@ -392,7 +386,7 @@ export default function Project({ messages, setLoading, exportRef, setProjectNam
                 <div id="project-editor" className={(!isMobile && !userForceMobile ? '' : 'mobile ') + "project-editor-container"}>
                     <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null} >
                         <div ref={exportRef} id="text-container" className="transpiled-text-container">
-                            <SheetsRenderer render={localMarkdownText} userPermission={projectAccess} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />
+                            <SheetsRenderer autoSave={autoSave} render={localMarkdownText} userPermission={projectAccess} messages={messages} setRender={handleReload} setCurrentTextOnEditor={setMarkdownText} />
                         </div>
                     </animated.div>
 

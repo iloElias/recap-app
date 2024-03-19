@@ -1,4 +1,5 @@
 import { React, useState } from "react";
+import { useParams } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 import { ClickAwayListener, Paper } from '@mui/material';
 import SyntaxHighlighter from 'react-syntax-highlighter';
@@ -17,7 +18,9 @@ const globalSpringConfig = {
     velocity: 0.005
 }
 
-export default function SheetsRenderer({ render, messages, setRender, setCurrentTextOnEditor, userPermission }) {
+export default function SheetsRenderer({ autoSave, render, messages, setRender, setCurrentTextOnEditor, userPermission }) {
+    const urlParam = useParams('/project/:id');
+
     const handleNewSubject = (newSubject) => {
         render.subjects.push(newSubject);
 
@@ -25,6 +28,8 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
 
         setRender(renderTextJson);
         setCurrentTextOnEditor(renderTextJson);
+
+        autoSave(renderTextJson, urlParam.id);
     }
 
     const handleNewCard = (subjectIndex, newCard) => {
@@ -34,6 +39,8 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
 
         setRender(renderTextJson);
         setCurrentTextOnEditor(renderTextJson);
+
+        autoSave(renderTextJson, urlParam.id);
     }
 
     const handleProjectEdit = (projectData) => {
@@ -41,6 +48,8 @@ export default function SheetsRenderer({ render, messages, setRender, setCurrent
 
         setRender(renderTextJson);
         setCurrentTextOnEditor(renderTextJson);
+
+        autoSave(renderTextJson, urlParam.id);
     }
 
     return (render && render.project_name && render.project_synopsis) ?
