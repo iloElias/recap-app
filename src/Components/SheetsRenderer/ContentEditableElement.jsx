@@ -1,65 +1,75 @@
-import React from "react";
+import React, { useRef } from 'react';
 
-export default function ContentEditableElement({ tag, value, onFocusLost, className, allowEditable, card, render, setRender, editWhat, setCurrentTextOnEditor, suppressContentEditableWarning }) {
-    let previousValue = value;
+export default function ContentEditableElement({
+  tag,
+  value,
+  onFocusLost,
+  className,
+  allowEditable,
+  card,
+  render,
+  setRender,
+  editWhat,
+  setCurrentTextOnEditor,
+}) {
+  let previousValue = value;
+  const allPropertiesRef = useRef();
 
-    const applyChanges = (e) => {
-        if (e.target.textContent === previousValue) {
-            e.target.contentEditable = false;
-            return;
-        }
-        value = e.target.textContent;
-        previousValue = value;
+  const applyChanges = (e) => {
+    if (e.target.textContent === previousValue) {
+      e.target.contentEditable = false;
+      return;
+    }
+    value = e.target.textContent;
+    previousValue = value;
 
-        e.target.contentEditable = false;
+    e.target.contentEditable = false;
 
-        if (typeof editWhat === "string") {
-            card[editWhat] = e.target.textContent;
-        }
-        if (Array.isArray(editWhat)) {
-            card[editWhat[0]][editWhat[1]] = e.target.textContent;
-            console.log(editWhat);
-        }
-
-        setRender(JSON.stringify(render));
-        setCurrentTextOnEditor(JSON.stringify(render));
+    if (typeof editWhat === 'string') {
+      card[editWhat] = e.target.textContent;
+    }
+    if (Array.isArray(editWhat)) {
+      card[editWhat[0]][editWhat[1]] = e.target.textContent;
     }
 
-    const onBlur = (e) => {
-        e.target.contentEditable = false;
-        applyChanges(e);
-        onFocusLost && onFocusLost();
-    }
-    const onKeyDown = (e) => {
-        if (e.key === "Enter") {
-            console.log(e);
-            applyChanges(e);
-        }
-    }
-    const onDoubleClick = (e) => {
-        if (allProperties) {
-            e.target.contentEditable = true;
-            e.target.focus()
-        }
-    }
+    setRender(JSON.stringify(render));
+    setCurrentTextOnEditor(JSON.stringify(render));
+  };
 
-    const allProperties = {
-        onBlur: onBlur,
-        onKeyDown: onKeyDown,
-        onDoubleClick: onDoubleClick,
-        contentEditable: false,
-        className: className,
-        style: allowEditable ? { cursor: "copy" } : { cursor: "auto" },
+  const onBlur = (e) => {
+    e.target.contentEditable = false;
+    applyChanges(e);
+    onFocusLost();
+  };
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      applyChanges(e);
     }
-
-    const tags = {
-        h1: (<h1 {...allProperties} >{value}</h1>),
-        h2: (<h2 {...allProperties} >{value}</h2>),
-        h3: (<h3 {...allProperties} >{value}</h3>),
-        h4: (<h4 {...allProperties} >{value}</h4>),
-        h5: (<h5 {...allProperties} >{value}</h5>),
-        p: (<p {...allProperties} >{value}</p>)
+  };
+  const onDoubleClick = (e) => {
+    if (allPropertiesRef.current) {
+      e.target.contentEditable = true;
+      e.target.focus();
     }
+  };
+  const allProperties = {
+    onBlur: (e) => { onBlur(e); },
+    onKeyDown: (e) => { onKeyDown(e); },
+    onDoubleClick: (e) => { onDoubleClick(e); },
+    contentEditable: false,
+    className,
+    style: allowEditable ? { cursor: 'copy' } : { cursor: 'auto' },
+  };
+  allPropertiesRef.current = allProperties;
 
-    return (tags[tag ?? "p"])
+  const tags = {
+    h1: (<h1 {...allProperties}>{value}</h1>),
+    h2: (<h2 {...allProperties}>{value}</h2>),
+    h3: (<h3 {...allProperties}>{value}</h3>),
+    h4: (<h4 {...allProperties}>{value}</h4>),
+    h5: (<h5 {...allProperties}>{value}</h5>),
+    p: (<p {...allProperties}>{value}</p>),
+  };
+
+  return (tags[tag ?? 'p']);
 }
