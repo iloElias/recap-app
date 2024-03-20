@@ -80,7 +80,7 @@ export default function SheetsRenderer({
           <div className="card-outer-container" key={subjectIndex}>
             {subject.subject_title && (<h2 className="subject-name" id={`subject-${subjectIndex}`}>{subject.subject_title}</h2>)}
             <Masonry
-              columns={print ? { xs: 1, md: 2, lg: 3 } : { xs: 3, md: 3, lg: 3 }}
+              columns={!print ? { xs: 1, md: 2, lg: 3 } : { xs: 3, md: 3, lg: 3 }}
               spacing={3}
             >
               {subject.cards?.map((card, cardIndex) => (
