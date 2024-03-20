@@ -343,6 +343,10 @@
     max-width: min(100%, 350px);
 }
 
+.token-line :first-child {
+    display: none;
+}
+
 .highlighted {
     background-color: yellow;
     word-break: break-all;

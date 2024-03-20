@@ -1,9 +1,11 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { React, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 import { ClickAwayListener, Paper } from '@mui/material';
-import SyntaxHighlighter from 'react-syntax-highlighter';
-import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+// import SyntaxHighlighter from 'react-syntax-highlighter';
+// import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
+import { Highlight, themes } from 'prism-react-renderer';
 import AutoLinkText from 'react-autolink-text2';
 import { Masonry } from '@mui/lab';
 import './SheetsRenderer.css';
@@ -111,49 +113,63 @@ function Highlighter({ text }) {
       <>
         {beforeText
           && (
-            <span key={0}>
-              <AutoLinkText text={beforeText} />
-            </span>
+            <Highlighter text={beforeText} />
           )}
         {highlightedText
           && (
-            <span key={1} className="highlighted">{highlightedText}</span>
+            <span className="highlighted">{highlightedText}</span>
           )}
         {afterText
           && (
-            <span key={2}>
-              <AutoLinkText text={afterText} />
-            </span>
+            <Highlighter text={afterText} />
           )}
       </>
     );
   }
   return (
-    <span key={0}>
+    <span>
       <AutoLinkText text={text} />
     </span>
   );
 }
 
 function RenderText({ render }) {
-  const codeRegex = /(.*)\[code=(.*?)\](.*?)\[endOfCode\]/s;
+  const codeRegex = /(.*)\[code=(.*?)\](.*?)\[endOfCode\](.*?)/s;
   const match = codeRegex.exec(render);
 
   if (match) {
     const beforeText = match[1];
     const language = match[2];
     const code = match[3];
+    const afterText = match[4];
 
     return (
       <div>
         <p><Highlighter text={beforeText} /></p>
-        <SyntaxHighlighter
-          wrapLines
+        <Highlight
           language={language}
-          style={docco}
+          code={code}
+          theme={themes.duotoneLight}
         >
-          {code}
-        </SyntaxHighlighter>
+          {({
+            style,
+            tokens,
+            getLineProps,
+            getTokenProps,
+          }) => (
+            <pre style={style}>
+              {tokens.map((line, i) => (
+                <div key={i} {...getLineProps({ line })}>
+                  <span>{i + 1}</span>
+                  {line.map((token, key) => (
+                    <span key={key} {...getTokenProps({ token })} />
+                  ))}
+                </div>
+              ))}
+            </pre>
+          )}
+        </Highlight>
+        {afterText && (<p><Highlighter text={afterText} /></p>)}
       </div>
     );
   }
