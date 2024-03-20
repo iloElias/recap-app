@@ -27,10 +27,8 @@
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
     "react-spring": "^9.7.3",
-    "react-syntax-highlighter": "^15.5.0",
     "react-textarea-autosize": "^8.5.3",
     "react-to-pdf": "^1.0.1",
-    "react-transition-group": "^4.4.5",
     "web-vitals": "^2.1.0",
     "yarn": "^1.22.21"
   },
