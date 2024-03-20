@@ -22,7 +22,13 @@ const globalSpringConfig = {
 };
 
 export default function SheetsRenderer({
-  autoSave, render, messages, setRender, setCurrentTextOnEditor, userPermission,
+  autoSave,
+  render,
+  messages,
+  setRender,
+  setCurrentTextOnEditor,
+  userPermission,
+  print,
 }) {
   const urlParam = useParams('/project/:id');
 
@@ -61,18 +67,22 @@ export default function SheetsRenderer({
 
   return (render && render.project_name && render.project_synopsis)
     ? (
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1.5rem',
-      }}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem',
+        }}
       >
         {render.project_name && (<h1 className="project-name">{render.project_name}</h1>)}
         {render.project_synopsis && (<p className="project-synopsis">{render.project_synopsis}</p>)}
         {render.subjects?.map((subject, subjectIndex) => (
           <div className="card-outer-container" key={subjectIndex}>
             {subject.subject_title && (<h2 className="subject-name" id={`subject-${subjectIndex}`}>{subject.subject_title}</h2>)}
-            <Masonry columns={{ xs: 1, md: 2, lg: 3 }} spacing={3}>
+            <Masonry
+              columns={print ? { xs: 1, md: 2, lg: 3 } : { xs: 3, md: 3, lg: 3 }}
+              spacing={3}
+            >
               {subject.cards?.map((card, cardIndex) => (
                 (card.card_title || card.header || card.body[0] || card.footer) && (
                   <Paper suppressContentEditableWarning id={`subject-${subjectIndex}-card-${cardIndex}`} key={cardIndex} className="rendered-card">
@@ -89,14 +99,14 @@ export default function SheetsRenderer({
                   </Paper>
                 )
               ))}
-              {(userPermission === 'own' || userPermission === 'manage') && (<AddCardHologram messages={messages} subjectIndex={subjectIndex} key={subjectIndex} onAddNewCard={handleNewCard} />)}
+              {((userPermission === 'own' || userPermission === 'manage') && !print) && (<AddCardHologram messages={messages} subjectIndex={subjectIndex} key={subjectIndex} onAddNewCard={handleNewCard} />)}
             </Masonry>
           </div>
         ))}
-        {(userPermission === 'own' || userPermission === 'manage') && (<AddSubjectHologram messages={messages} addNewSubject={handleNewSubject} />)}
+        {((userPermission === 'own' || userPermission === 'manage') && !print) && (<AddSubjectHologram messages={messages} addNewSubject={handleNewSubject} />)}
       </div>
     ) : (
-      (userPermission === 'own' || userPermission === 'manage') && (<AddProjectInfo render={render} messages={messages} handleNewProjectInfo={handleProjectEdit} />)
+      ((userPermission === 'own' || userPermission === 'manage') && !print) && (<AddProjectInfo render={render} messages={messages} handleNewProjectInfo={handleProjectEdit} />)
     );
 }
 
@@ -144,8 +154,8 @@ function RenderText({ render }) {
     const afterText = match[4];
 
     return (
-      <div>
-        <p><Highlighter text={beforeText} /></p>
+      <div className="code-renderer">
+        {beforeText && (<p><Highlighter text={beforeText} /></p>)}
         <Highlight
           language={language}
           code={code}

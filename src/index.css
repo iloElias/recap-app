@@ -1,5 +1,6 @@
 :root {
     --button-generic-border-radius: clamp(6px, 1vh, 5vh);
+    --timeout: 500ms
 }
 
 * {
@@ -51,6 +52,14 @@
 
 body {
     background: #F0F0F0;
+}
+
+.printable-content {
+    display: none;
+}
+
+.not-printable-content {
+    display: block;
 }
 
 @media print {

@@ -362,7 +362,20 @@ export default function BottomOptions({
                   <span className="material-symbols-rounded">image</span>
                   {messages.export_file_as_png}
                 </Button>
-                <Button onClick={() => { generatePDF(exportRef, { filename: `${projectName ?? 'document'}.pdf`, page: { margin: Margin.SMALL } }); }} className="file-export-button">
+                <Button
+                  onClick={() => {
+                    generatePDF(
+                      exportRef,
+                      {
+                        filename: `${projectName ?? 'document'}.pdf`,
+                        page: { margin: Margin.SMALL },
+                        canvas: { mimeType: 'image/png' },
+                        resolution: 3,
+                      },
+                    );
+                  }}
+                  className="file-export-button"
+                >
                   <span className="material-symbols-rounded">description</span>
                   {messages.export_file_as_pdf}
                 </Button>

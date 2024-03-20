@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, { useCallback, useEffect, useState } from 'react';
 import './Cards.css';
 import { contrastColor } from 'contrast-color';
@@ -76,7 +77,7 @@ export default function Cards({
 
   const onCreateCardHandler = () => {
     setRequired(true);
-    if (cardName !== '' && `${cardName}`.length >= 4 && cardSynopses !== '' && `${cardSynopses}`.length >= 4) {
+    if (cardName && cardName !== '' && `${cardName}`.length >= 4 && cardSynopses && cardSynopses !== '' && `${cardSynopses}`.length >= 4) {
       setLoading(true);
       setNewCard({ name: cardName, synopsis: cardSynopses, color: cardColor });
 
@@ -213,19 +214,20 @@ export default function Cards({
         />
         <div className="cards-page">
           <h2 className="cards-page-title">{messages.cards_page_title}</h2>
+          {/* <div className="cards-container"> */}
           <div className="cards-container">
             <Card messages={messages} cardTitle={`+ ${messages.card_item_new_card}`} isCreate onClick={toggleModal} />
 
             {userCards && userCards.map(
-              (card) => (
+              (card, index) => (
                 <Card
-                  key={card.id}
                   messages={messages}
                   cardId={card.id}
                   isLink={card.id}
                   cardTitle={card.name}
                   cardSynopsis={card.synopsis}
                   color={card.color}
+                  enterDelay={index}
                 />
               ),
             )}
@@ -296,7 +298,7 @@ export default function Cards({
 }
 
 export function Card({
-  cardTitle, cardId, cardSynopsis, color, onClick, isLink, messages,
+  cardTitle, cardId, cardSynopsis, color, onClick, isLink, messages, enterDelay,
 }) {
   const navigate = useNavigate();
 
@@ -304,6 +306,18 @@ export function Card({
     bgColor: color,
     fgDarkColor: '#212121',
     fgLightColor: '#fafafa',
+  });
+
+  const appearAnimation = useSpring({
+    from: {
+      opacity: 0,
+      transform: isLink ? 'scale(0) translateX(-50%) translateY(-50%)' : '',
+    },
+    to: {
+      opacity: 1,
+      transform: isLink ? 'scale(1) translateX(0%) translateY(0%)' : '',
+    },
+    delay: ((enterDelay + 1) * 100) ?? 0,
   });
 
   const HtmlTooltip = styled(({ className, ...props }) => (
@@ -341,8 +355,9 @@ export function Card({
   return (
     <div>
       {isLink ? (
-        <button
+        <animated.button
           type="button"
+          style={appearAnimation}
           onClick={() => { navigate(cardId ? (`/project/${cardId}`) : '/'); }}
         >
           <HtmlTooltip title={(
@@ -367,9 +382,12 @@ export function Card({
               <div className="card-paper" style={{ backgroundColor: color }}><div className="card-paper-text" style={{ color: colorContrast }}>{cardTitle}</div></div>
             </div>
           </HtmlTooltip>
-        </button>
+        </animated.button>
       ) : (
-        <button type="button">
+        <animated.button
+          type="button"
+          style={appearAnimation}
+        >
           <HtmlTooltip title={(
             <div>
               <h2>{messages.tooltip_create_card_label}</h2>
@@ -382,7 +400,7 @@ export function Card({
               <div className="card-paper"><div className="card-paper-text" style={{ color: '#989898' }}>{cardTitle}</div></div>
             </div>
           </HtmlTooltip>
-        </button>
+        </animated.button>
       )}
     </div>
   );

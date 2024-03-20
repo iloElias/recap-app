@@ -410,6 +410,7 @@ export default function Project({
                 messages={messages}
                 setRender={handleReload}
                 setCurrentTextOnEditor={setMarkdownText}
+                print={false}
               />
             </div>
           </animated.div>
