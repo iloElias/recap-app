@@ -3,8 +3,6 @@ import { React, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 import { ClickAwayListener, Paper } from '@mui/material';
-// import SyntaxHighlighter from 'react-syntax-highlighter';
-// import { docco } from 'react-syntax-highlighter/dist/esm/styles/hljs';
 import { Highlight, themes } from 'prism-react-renderer';
 import AutoLinkText from 'react-autolink-text2';
 import { Masonry } from '@mui/lab';

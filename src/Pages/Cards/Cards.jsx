@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import './Cards.css';
 import { contrastColor } from 'contrast-color';
 import { useSpring, animated } from 'react-spring';
+import { motion } from 'framer-motion';
 import {
   Alert, Paper, Snackbar, Tooltip, tooltipClasses,
 } from '@mui/material';
@@ -166,12 +167,13 @@ export default function Cards({
         });
 
         setAlertSeverity('success');
-        setUserCards([...userCards, {
+        setUserCards([{
           id: project.data.id,
           name: newCardRef.name,
           synopsis: newCardRef.synopsis,
           color: newCardRef.color,
-        }]);
+          enterDelay: 1,
+        }, ...userCards]);
         setAlertMessage(messages.item_new_created.replace(':str', messages.card));
       } catch (err) {
         if (err.response.status === 401) {
@@ -214,14 +216,19 @@ export default function Cards({
         />
         <div className="cards-page">
           <h2 className="cards-page-title">{messages.cards_page_title}</h2>
-          {/* <div className="cards-container"> */}
-          <div className="cards-container">
+          <motion.div
+            className="cards-container"
+            animate={{
+              gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+            }}
+          >
             <Card messages={messages} cardTitle={`+ ${messages.card_item_new_card}`} isCreate onClick={toggleModal} />
 
             {userCards && userCards.map(
               (card, index) => (
                 <Card
                   messages={messages}
+                  key={card.id}
                   cardId={card.id}
                   isLink={card.id}
                   cardTitle={card.name}
@@ -231,7 +238,7 @@ export default function Cards({
                 />
               ),
             )}
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -312,12 +319,14 @@ export function Card({
     from: {
       opacity: 0,
       transform: isLink ? 'scale(0) translateX(-50%) translateY(-50%)' : '',
+      pointerEvent: 'none',
     },
     to: {
       opacity: 1,
       transform: isLink ? 'scale(1) translateX(0%) translateY(0%)' : '',
+      pointerEvent: 'all',
     },
-    delay: ((enterDelay + 1) * 100) ?? 0,
+    delay: ((enterDelay + 1) * 75) ?? 0,
   });
 
   const HtmlTooltip = styled(({ className, ...props }) => (
@@ -349,11 +358,12 @@ export function Card({
       fontSize: '10px',
       minWidth: '170px',
       maxWidth: '170px',
+      pointerEvent: 'none',
     },
   }));
 
   return (
-    <div>
+    <motion.div layout="position" animate={{ x: 0 }}>
       {isLink ? (
         <animated.button
           type="button"
@@ -402,6 +412,6 @@ export function Card({
           </HtmlTooltip>
         </animated.button>
       )}
-    </div>
+    </motion.div>
   );
 }

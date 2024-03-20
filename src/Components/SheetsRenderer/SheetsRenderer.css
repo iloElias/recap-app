@@ -98,7 +98,7 @@
     border-bottom: 1px solid #bbbbbb;
 }
 
-.rendered-card>*> :last-child {
+.rendered-card *> :last-child {
     border-radius: 0 0 4px 4px;
 }
 
@@ -144,6 +144,10 @@
 
 .rendered-card h4 {
     font-size: 75%;
+}
+
+.project-synopsis {
+    height: max-content;
 }
 
 .rendered-card-footer {
@@ -372,7 +376,7 @@
 }
 
 .code-renderer pre :last-child {
-    padding: 0 10px;
+    padding: 0 10px 0 0;
 }
 
 .rendered-card-body div pre> {

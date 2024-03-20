@@ -32,7 +32,6 @@
 
     display: grid;
     gap: 2rem;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
 
 .card-container {
