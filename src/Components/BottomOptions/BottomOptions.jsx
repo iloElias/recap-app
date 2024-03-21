@@ -18,6 +18,7 @@ import {
   UserAccountProvider,
   UserMessageProvider,
 } from '../../App';
+import getMessages from '../../Internationalization/emergencyMessages';
 
 function OptionsMenu({ showCategory, children }) {
   const optionsAnimation = useSpring({
@@ -118,6 +119,9 @@ export default function BottomOptions() {
 
   const {
     setIsLoading,
+    setAlertMessage,
+    setAlert,
+    setAlertSeverity,
   } = useContext(UserMessageProvider);
 
   const [usersSearched, setUsersSearched] = useState('search');
@@ -154,7 +158,14 @@ export default function BottomOptions() {
         }
 
         setUsersSearched(data.data);
-      }).catch(() => {
+      }).catch((e) => {
+        if (e.response?.status === 401) {
+          setAlertSeverity('error');
+          setAlertMessage(getMessages()[profile?.preferred_lang].error_on_language_set
+            ?? getMessages().en.error_on_language_set);
+          setAlert(true);
+          logoutHandler();
+        }
       }).finally(() => {
         setLockSearch(false);
       });
@@ -268,49 +279,49 @@ export default function BottomOptions() {
                   }}
                   >
                     <div style={{
-                      display: 'flex',
-                      flexDirection: 'column',
                       width: '18rem',
                       margin: '1.5vh',
-                      gap: '1vh',
                     }}
                     >
-                      {
-                        (usersSearched !== 'anyFound') ? (
-                          <div>
-                            {typeof usersSearched === 'string' ? (
-                              <UserInformationItem messages={messages} />
-                            ) : (
-                              usersSearched?.map((user) => (
-                                <UserInformationItem
-                                  profile={profile}
-                                  messages={messages}
-                                  key={user.id}
-                                  userId={user.id}
-                                  projectId={urlParam.id}
-                                  name={user.name}
-                                  email={user.email}
-                                  nick={user.username}
-                                  picturePath={user.picture_path}
-                                  lockSearch={lockSearch}
-                                  setLockSearch={setLockSearch}
-                                  alreadyInvited={!!((user.user_permissions && user.user_permissions !== 'none'))}
-                                />
-                              ))
-                            )}
-                          </div>
-                        ) : (
-                          <p style={{
-                            display: 'flex',
-                            width: '100%',
-                            textAlign: 'center',
-                            fontSize: '85%',
-                          }}
-                          >
-                            {`${messages.any_user_found_with_email}  ${searchUsedText}`}
-                          </p>
-                        )
-                      }
+                      {(usersSearched !== 'anyFound') ? (
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '1vh',
+                        }}
+                        >
+                          {typeof usersSearched === 'string' ? (
+                            <UserInformationItem messages={messages} />
+                          ) : (
+                            usersSearched?.map((user) => (
+                              <UserInformationItem
+                                profile={profile}
+                                messages={messages}
+                                key={user.id}
+                                userId={user.id}
+                                projectId={urlParam.id}
+                                name={user.name}
+                                email={user.email}
+                                nick={user.username}
+                                picturePath={user.picture_path}
+                                lockSearch={lockSearch}
+                                setLockSearch={setLockSearch}
+                                alreadyInvited={!!((user.user_permissions && user.user_permissions !== 'none'))}
+                              />
+                            ))
+                          )}
+                        </div>
+                      ) : (
+                        <p style={{
+                          display: 'flex',
+                          width: '100%',
+                          textAlign: 'center',
+                          fontSize: '85%',
+                        }}
+                        >
+                          {`${messages.any_user_found_with_email}  ${searchUsedText}`}
+                        </p>
+                      )}
                     </div>
                   </Paper>
                 )}
@@ -487,8 +498,13 @@ function UserInformationItem({
   }, [sendInvite, api, setLockSearch, lockSearch, projectId, userId]);
 
   const animation = useSpring({
-    left: confirmChoice ? '110%' : '10%',
+    zIndex: '5',
+    width: '100%',
+    display: 'grid',
+    placeContent: 'center',
+    transform: confirmChoice ? 'translateY(-50%)' : 'translateY(-25%)',
     opacity: confirmChoice ? '1' : '0',
+    pointerEvents: confirmChoice ? 'all' : 'none',
   });
 
   const inviteAnimation = useSpring({
@@ -554,11 +570,17 @@ function UserInformationItem({
         </div>
       </div>
     ) : (
-      <div style={{ position: 'relative' }}>
-        <div onClick={() => { if (confirmChoice) { setConfirmChoice(false); } }}>
+      <div
+        style={{
+          position: 'relative',
+        }}
+      >
+        <div style={{ display: 'grid', placeContent: 'center' }} onClick={() => { if (confirmChoice) { setConfirmChoice(false); } }}>
           <animated.div className="invite-this-user" onClick={(e) => e.stopPropagation()} style={animation}>
-            <Paper className="paper">
-
+            <Paper
+              className="paper"
+              elevation={3}
+            >
               <form action="" onSubmit={(e) => e.preventDefault()}>
                 <p>
                   {messages.invite_this_user}
