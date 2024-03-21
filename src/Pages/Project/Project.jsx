@@ -375,7 +375,7 @@ export default function Project({
           setNotFoundProject('notAllowed');
           return;
         }
-        if (e.response?.status === 404) {
+        if (e.response?.status === 404 || e.response?.status === 500) {
           setNotFoundProject('notFound');
           return;
         }

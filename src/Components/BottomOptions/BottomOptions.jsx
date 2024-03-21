@@ -371,43 +371,47 @@ export default function BottomOptions() {
                 <OptionPanel showPanel={showStylePanel} title={messages.styles_button_title} />
               </Option>
             )}
-            <Option optionName={messages.export_project_button_title} optionIcon={<span className="material-symbols-rounded">download</span>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel); }}>
-              <OptionPanel showPanel={showExportPanel}>
-                <Button
-                  onClick={() => {
-                    exportComponentAsPNG(exportRef, {
-                      fileName: `${actualProjectName ?? 'document'}.png`,
-                      html2CanvasOptions: {
-                        onclone: (clonedDoc) => {
-                          clonedDoc.getElementById('project-visualizer').style.margin = '40px 60px 60px 40px';
-                        },
-                      },
-                    });
-                  }}
-                  className="file-export-button"
-                >
-                  <span className="material-symbols-rounded">image</span>
-                  {messages.export_file_as_png}
-                </Button>
-                <Button
-                  onClick={() => {
-                    generatePDF(
-                      exportRef,
-                      {
-                        filename: `${actualProjectName ?? 'document'}.pdf`,
-                        page: { margin: Margin.SMALL },
-                        canvas: { mimeType: 'image/png' },
-                        resolution: 3,
-                      },
-                    );
-                  }}
-                  className="file-export-button"
-                >
-                  <span className="material-symbols-rounded">description</span>
-                  {messages.export_file_as_pdf}
-                </Button>
-              </OptionPanel>
-            </Option>
+            {exportRef.current
+              ? (
+                <Option optionName={messages.export_project_button_title} optionIcon={<span className="material-symbols-rounded">download</span>} onClick={() => { hideAllPanels(); setShowExportPanel(!showExportPanel); }}>
+                  <OptionPanel showPanel={showExportPanel}>
+                    <Button
+                      onClick={() => {
+                        exportComponentAsPNG(exportRef, {
+                          fileName: `${actualProjectName ?? 'document'}.png`,
+                          html2CanvasOptions: {
+                            onclone: (clonedDoc) => {
+                              clonedDoc.getElementById('project-visualizer').style.margin = '40px 60px 60px 40px';
+                            },
+                          },
+                        });
+                      }}
+                      className="file-export-button"
+                    >
+                      <span className="material-symbols-rounded">image</span>
+                      {messages.export_file_as_png}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        generatePDF(
+                          exportRef,
+                          {
+                            filename: `${actualProjectName ?? 'document'}.pdf`,
+                            page: { margin: Margin.SMALL },
+                            canvas: { mimeType: 'image/png' },
+                            resolution: 3,
+                          },
+                        );
+                      }}
+                      className="file-export-button"
+                    >
+                      <span className="material-symbols-rounded">description</span>
+                      {messages.export_file_as_pdf}
+                    </Button>
+                  </OptionPanel>
+                </Option>
+              )
+              : null}
             {(actualProjectPermission && (actualProjectPermission === 'own' || actualProjectPermission === 'manage')) && (
               <Option
                 optionName={messages.share_project_button_title}

@@ -220,6 +220,9 @@ export default function Cards() {
     <>
       <div className="flex-column">
         <RecapLogo style={{
+          position: 'absolute',
+          left: '50%',
+          transform: 'translateX(-50%)',
           marginTop: '3.75vh',
           minHeight: 'min-content',
           height: 'max(34px, 4.5vh)',

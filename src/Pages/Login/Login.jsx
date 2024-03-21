@@ -13,7 +13,7 @@ export default function Login() {
   } = useContext(LanguageProvider);
 
   const {
-    loginHandler,
+    login,
   } = useContext(UserAccountProvider);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export default function Login() {
     <div className="container container-login">
       <RecapLogo />
       <p className="login-static-message">{messages.login_static_message}</p>
-      <Button onClick={loginHandler}>
+      <Button onClick={login}>
         <GoogleIcon />
         <div>{messages.login_button_message}</div>
       </Button>
