@@ -1,5 +1,6 @@
+/* eslint-disable react/jsx-no-constructed-context-values */
 import {
-  React, useCallback, useEffect, useRef, useState,
+  React, createContext, useCallback, useEffect, useRef, useState,
 } from 'react';
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
 import {
@@ -31,38 +32,24 @@ if (localStorage.getItem('recap@localUserProfile') === 'undefined') {
 const localDefinedLanguage = localStorage.getItem('recap@definedLanguage') || (navigator.language || navigator.userLanguage);
 const localUserProfile = localStorage.getItem('recap@localUserProfile');
 
+export const UserMessageProvider = createContext();
+export const UserAccountProvider = createContext();
+export const LocalStorageProvider = createContext();
+export const LanguageProvider = createContext();
+export const ProjectInfoProvider = createContext();
+
 function PageTemplate({
   children,
-  profile,
-  language,
-  messages,
-  setLanguage,
-  logoutHandler,
-  exportRef,
-  projectName,
-  actualProjectPermission,
-  setIsLoading,
 }) {
   return (
     <>
       {children}
-      <BottomOptions
-        setIsLoading={setIsLoading}
-        profile={profile}
-        language={language}
-        onClick={(e) => e.stopPropagation()}
-        messages={messages}
-        setLanguage={setLanguage}
-        logoutHandler={logoutHandler}
-        exportRef={exportRef}
-        projectName={projectName}
-        actualProjectPermission={actualProjectPermission}
-      />
+      <BottomOptions />
     </>
   );
 }
 
-function App() {
+export default function App() {
   const navigate = useNavigate();
   const exportRef = useRef();
   const api = getApi();
@@ -82,7 +69,7 @@ function App() {
     }
   });
   const [alertMessage, setAlertMessage] = useState();
-  const [alert, openAlert] = useState();
+  const [alert, setAlert] = useState();
   const [alertSeverity, setAlertSeverity] = useState('success');
   const [notification, setNotification] = useState();
   const [notificationMessage, setNotificationMessage] = useState();
@@ -115,7 +102,7 @@ function App() {
     onError: () => {
       setAlertSeverity('error');
       setAlertMessage(messages.redirect_login_fail_message);
-      openAlert(true);
+      setAlert(true);
     },
   });
 
@@ -171,8 +158,12 @@ function App() {
       })
         .catch(() => {
           setAlertSeverity('error');
-          setAlertMessage(messages.reauthenticate_static_error);
-          openAlert(true);
+          setAlertMessage(
+            messages.reauthenticate_static_error
+            ?? getMessages()[localDefinedLanguage].reauthenticate_token_message,
+          );
+          setAlert(true);
+          logoutHandler();
         })
         .finally(() => {
           setIsLoading(false);
@@ -185,7 +176,7 @@ function App() {
       if (previousSessionMessage.message && previousSessionMessage.severity) {
         setAlertSeverity(previousSessionMessage.severity);
         setAlertMessage(previousSessionMessage.message);
-        openAlert(true);
+        setAlert(true);
       }
       if (previousSessionMessage.notification) {
         setNotificationMessage(previousSessionMessage.notification);
@@ -200,7 +191,7 @@ function App() {
         setAlertSeverity('error');
         setAlertMessage(getMessages()[localDefinedLanguage].error_on_language_set
           ?? getMessages().en.error_on_language_set);
-        openAlert(true);
+        setAlert(true);
       });
 
     localStorage.setItem('recap@definedLanguage', language);
@@ -264,7 +255,7 @@ function App() {
     } catch (e) {
       setAlertSeverity('error');
       setAlertMessage(messages.something_went_wrong);
-      openAlert(true);
+      setAlert(true);
       logoutHandler();
     }
   }, [profile, token, navigate, logoutHandler, messages]);
@@ -286,181 +277,163 @@ function App() {
     immediate: (key) => key === (isLoading ? 'zIndex' : ''),
   });
 
+  const ProjectRelatedProvider = {
+    actualProjectName,
+    setActualProjectName,
+    actualProjectPermission,
+    setActualProjectPermission,
+    exportRef,
+  };
+
+  const languageRelatedProvider = {
+    messages,
+    language,
+    setLanguage,
+  };
+
+  const accountMethodsProvider = {
+    profile,
+    login,
+    logoutHandler,
+  };
+
+  const notificationMethodsProvider = {
+    setNotification,
+    setNotificationMessage,
+    setAlert,
+    setAlertSeverity,
+    setAlertMessage,
+    setIsLoading,
+  };
+
   return (
-    <>
-      {(messages.loaded) ? (
-        <>
-          <div id="App-root-container" className="App">
-            <Routes>
-              <Route path="/">
-                <Route index element={<Navigate to="/projects" />} />
-                <Route
-                  path="/projects"
-                  element={(
-                    <PageTemplate
-                      setIsLoading={setIsLoading}
-                      profile={profile}
-                      language={language}
-                      messages={messages}
-                      setLanguage={setLanguage}
-                      logoutHandler={logoutHandler}
-                    >
-                      <Cards
-                        userId={profile && profile.id}
-                        messages={messages}
-                        setLoading={setIsLoading}
-                        logoutHandler={logoutHandler}
+    <ProjectInfoProvider.Provider value={ProjectRelatedProvider}>
+      <LanguageProvider.Provider value={languageRelatedProvider}>
+        <UserAccountProvider.Provider value={accountMethodsProvider}>
+          <UserMessageProvider.Provider value={notificationMethodsProvider}>
+            {(messages.loaded) ? (
+              <>
+                <div id="App-root-container" className="App">
+                  <Routes>
+                    <Route path="/">
+                      <Route index element={<Navigate to="/projects" />} />
+                      <Route
+                        path="/projects"
+                        element={(
+                          <PageTemplate>
+                            <Cards />
+                          </PageTemplate>
+                        )}
                       />
-                    </PageTemplate>
-                  )}
-                />
-                <Route
-                  path="login"
-                  element={(
-                    <PageTemplate
-                      setIsLoading={setIsLoading}
-                      profile={profile}
-                      language={language}
-                      messages={messages}
-                      setLanguage={setLanguage}
-                      logoutHandler={logoutHandler}
-                    >
-                      <Login
-                        messages={messages}
-                        loginHandler={login}
+                      <Route
+                        path="login"
+                        element={(
+                          <PageTemplate>
+                            <Login />
+                          </PageTemplate>
+                        )}
                       />
-                    </PageTemplate>
-                  )}
-                />
-                <Route
-                  path="project/:id"
-                  element={(
-                    <Project
-                      BottomOptions={(
-                        <BottomOptions
-                          setIsLoading={setIsLoading}
-                          profile={profile}
-                          language={language}
-                          onClick={(e) => e.stopPropagation()}
-                          messages={messages}
-                          setLanguage={setLanguage}
-                          logoutHandler={logoutHandler}
-                          exportRef={exportRef}
-                          projectName={actualProjectName}
-                          actualProjectPermission={actualProjectPermission}
-                        />
-                      )}
-                      messages={messages}
-                      setLoading={setIsLoading}
-                      exportRef={exportRef}
-                      setCurrentProjectAccess={setActualProjectPermission}
-                      setProjectName={setActualProjectName}
-                      profile={profile}
+                      <Route
+                        path="project/:id"
+                        element={(
+                          <Project
+                            BottomOptions={(
+                              <BottomOptions
+                                onClick={(e) => e.stopPropagation()}
+                                projectName={actualProjectName}
+                                actualProjectPermission={actualProjectPermission}
+                              />
+                            )}
+                          />
+                        )}
+                      />
+                      <Route
+                        path="*"
+                        element={(
+                          <PageTemplate>
+                            <NotFound>
+                              <p>{messages.not_found_page}</p>
+                              <Link to="/">{messages.go_back_home}</Link>
+                            </NotFound>
+                          </PageTemplate>
+                        )}
+                      />
+
+                    </Route>
+                  </Routes>
+                </div>
+
+                <div style={{ display: 'none' }}>
+                  {(!token && !profile) && (
+                    <GoogleLogin
+                      onSuccess={(credentialResponse) => {
+                        oneTapLogin(credentialResponse);
+                      }}
+                      onError={() => {
+                        setAlertSeverity('error');
+                        setAlertMessage(messages.one_tap_login_fail_message);
+                        setAlert(true);
+                      }}
+                      useOneTap
                     />
                   )}
-                />
-                <Route
-                  path="*"
-                  element={(
-                    <PageTemplate
-                      setIsLoading={setIsLoading}
-                      profile={profile}
-                      language={language}
-                      messages={messages}
-                      setLanguage={setLanguage}
-                      logoutHandler={logoutHandler}
-                    >
-                      <NotFound>
-                        <p>{messages.not_found_page}</p>
-                        <Link to="/">{messages.go_back_home}</Link>
-                      </NotFound>
-                    </PageTemplate>
+                </div>
+                {isLoading
+                  && (
+                    <animated.div style={loadingAnimation}>
+                      <Modal style={{ position: 'fixed', zIndex: '100' }}>
+                        <CircularProgress
+                          color="info"
+                          variant="indeterminate"
+                        />
+                      </Modal>
+                    </animated.div>
                   )}
-                />
-
-              </Route>
-            </Routes>
-          </div>
-
-          <div style={{ display: 'none' }}>
-            {(!token && !profile) && (
-              <GoogleLogin
-                onSuccess={(credentialResponse) => {
-                  oneTapLogin(credentialResponse);
-                }}
-                onError={() => {
-                  setAlertSeverity('error');
-                  setAlertMessage(messages.one_tap_login_fail_message);
-                  openAlert(true);
-                }}
-                useOneTap
-              />
+              </>
+            ) : (
+              <div className="centralized-container">
+                <div className="loading-container">
+                  <ReactLoading type="spinningBubbles" color="#bbbbbb" height="75%" width="75%" />
+                </div>
+                <animated.div style={maybeAnError} className="network-static-message">
+                  {
+                    getMessages()[localDefinedLanguage].request_timeout_excide
+                    ?? getMessages().en.request_timeout_excide
+                  }
+                </animated.div>
+              </div>
             )}
-          </div>
-          {isLoading
-            && (
-              <animated.div style={loadingAnimation}>
-                <Modal style={{ position: 'fixed', zIndex: '100' }}>
-                  <CircularProgress
-                    color="info"
-                    variant="indeterminate"
-                  />
-                </Modal>
-              </animated.div>
-            )}
-        </>
-      ) : (
-        <div className="centralized-container">
-          <div className="loading-container">
-            <ReactLoading type="spinningBubbles" color="#bbbbbb" height="75%" width="75%" />
-          </div>
-          <animated.div style={maybeAnError} className="network-static-message">
-            {
-              getMessages()[localDefinedLanguage].request_timeout_excide
-              ?? getMessages().en.request_timeout_excide
-            }
-          </animated.div>
-        </div>
-      )}
-      <Snackbar
-        open={notification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={5000}
-        onClose={() => {
-          setNotification(false);
-          if (previousSessionMessage) {
-            sessionStorage.removeItem('recap@previousSessionError');
-          }
-        }}
-        message={notificationMessage}
-      />
+            <Snackbar
+              open={notification}
+              anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+              autoHideDuration={5000}
+              onClose={() => {
+                setNotification(false);
+              }}
+              message={notificationMessage}
+            />
 
-      <Snackbar
-        open={alert}
-        autoHideDuration={5000}
-        onClose={() => {
-          openAlert(false);
-          if (previousSessionMessage) {
-            sessionStorage.removeItem('recap@previousSessionError');
-          }
-        }}
-      >
-        <Alert
-          onClose={() => {
-            openAlert(false);
-            if (previousSessionMessage) {
-              sessionStorage.removeItem('recap@previousSessionError');
-            }
-          }}
-          severity={alertSeverity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {alertMessage}
-        </Alert>
-      </Snackbar>
-    </>
+            <Snackbar
+              open={alert}
+              autoHideDuration={5000}
+              onClose={() => {
+                setAlert(false);
+              }}
+            >
+              <Alert
+                onClose={() => {
+                  setAlert(false);
+                }}
+                severity={alertSeverity}
+                variant="filled"
+                sx={{ width: '100%' }}
+              >
+                {alertMessage}
+              </Alert>
+            </Snackbar>
+          </UserMessageProvider.Provider>
+        </UserAccountProvider.Provider>
+      </LanguageProvider.Provider>
+    </ProjectInfoProvider.Provider>
   );
 }
-
-export default App;

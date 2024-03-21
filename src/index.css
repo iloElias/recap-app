@@ -54,12 +54,8 @@ body {
     background: #F0F0F0;
 }
 
-.printable-content {
-    display: none;
-}
-
-.not-printable-content {
-    display: block;
+div .really-specific-class-name {
+    pointer-events: none !important;
 }
 
 @media print {

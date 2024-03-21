@@ -1,6 +1,5 @@
-/* eslint-disable react/prop-types */
 import { useSpring, animated } from 'react-spring';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './BottomOptions.css';
 import { useParams } from 'react-router-dom';
 
@@ -13,6 +12,12 @@ import styled from '@emotion/styled';
 import Modal from '../Modal/Modal';
 import getApi from '../../Api/api';
 import Button from '../Button/Button';
+import {
+  LanguageProvider,
+  ProjectInfoProvider,
+  UserAccountProvider,
+  UserMessageProvider,
+} from '../../App';
 
 function OptionsMenu({ showCategory, children }) {
   const optionsAnimation = useSpring({
@@ -83,17 +88,7 @@ function Option({
   );
 }
 
-export default function BottomOptions({
-  messages,
-  language,
-  setLanguage,
-  profile,
-  logoutHandler,
-  exportRef,
-  projectName,
-  actualProjectPermission,
-  setIsLoading,
-}) {
+export default function BottomOptions() {
   const urlParam = useParams('/project/:id');
   const api = getApi();
 
@@ -103,6 +98,27 @@ export default function BottomOptions({
   const [showExportPanel, setShowExportPanel] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
   const [showExitPanel, setShowExitPanel] = useState(false);
+
+  const {
+    messages,
+    language,
+    setLanguage,
+  } = useContext(LanguageProvider);
+
+  const {
+    exportRef,
+    actualProjectName,
+    actualProjectPermission,
+  } = useContext(ProjectInfoProvider);
+
+  const {
+    profile,
+    logoutHandler,
+  } = useContext(UserAccountProvider);
+
+  const {
+    setIsLoading,
+  } = useContext(UserMessageProvider);
 
   const [usersSearched, setUsersSearched] = useState('search');
   const [lockSearch, setLockSearch] = useState(false);
@@ -349,7 +365,7 @@ export default function BottomOptions({
                 <Button
                   onClick={() => {
                     exportComponentAsPNG(exportRef, {
-                      fileName: `${projectName ?? 'document'}.png`,
+                      fileName: `${actualProjectName ?? 'document'}.png`,
                       html2CanvasOptions: {
                         onclone: (clonedDoc) => {
                           clonedDoc.getElementById('project-visualizer').style.margin = '40px 60px 60px 40px';
@@ -367,7 +383,7 @@ export default function BottomOptions({
                     generatePDF(
                       exportRef,
                       {
-                        filename: `${projectName ?? 'document'}.pdf`,
+                        filename: `${actualProjectName ?? 'document'}.pdf`,
                         page: { margin: Margin.SMALL },
                         canvas: { mimeType: 'image/png' },
                         resolution: 3,

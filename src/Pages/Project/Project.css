@@ -29,7 +29,6 @@
 .unification {
     position: "absolute";
 
-
     display: "flex";
     flex-direction: "row"
 }
@@ -146,8 +145,8 @@ form :is(input, textarea) {
 .close-button:focus-visible {
     cursor: pointer;
     background-color: #3b3b3b;
-    transition: transform 0.2s;
     transform: translateY(-0.2vh);
+    transition: transform 0.2s;
 }
 
 .close-button:focus-visible {
@@ -281,4 +280,21 @@ form :is(input, textarea) {
     overflow: visible;
     height: 50%;
     width: 50%;
+}
+
+.deactivated:hover,
+.deactivated:focus-visible {
+    cursor: not-allowed;
+    background-color: #3b3b3b;
+    transition: none;
+    transform: none;
+}
+
+.deactivated:focus-visible {
+    background-color: #3b3b3b;
+    outline: solid 0.4vh #b57676;
+}
+
+.deactivated:active {
+    transform: none;
 }

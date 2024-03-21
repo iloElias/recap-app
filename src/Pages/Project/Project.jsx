@@ -1,22 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import './Project.css';
+import React, {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 
 import {
-  Alert, Paper, Snackbar, Tooltip, tooltipClasses, Grow, CircularProgress,
+  Paper, Tooltip, tooltipClasses, Grow, CircularProgress,
 } from '@mui/material';
 import styled from '@emotion/styled';
 import { Editor } from '@monaco-editor/react';
 import NotFound from '../../Components/NotFound/NotFound';
 
+import './Project.css';
 import getApi from '../../Api/api';
 import Modal from '../../Components/Modal/Modal';
 import Button from '../../Components/Button/Button';
 import Input from '../../Components/Input/Input';
-
 import SheetsRenderer from '../../Components/SheetsRenderer/SheetsRenderer';
 import useDebounce from '../../Functions/useDebouce';
+import {
+  LanguageProvider,
+  ProjectInfoProvider,
+  UserAccountProvider,
+  UserMessageProvider,
+} from '../../App';
+import getMessages from '../../Internationalization/emergencyMessages';
 
 const getWindowSize = () => ({ height: window.innerHeight, width: window.innerWidth });
 
@@ -31,7 +39,7 @@ document.getElementById('page-title').innerText = 'Recap - Project';
 const saveMarkdownWaitTime = 5000;
 
 export default function Project({
-  messages, setLoading, exportRef, setProjectName, setCurrentProjectAccess, profile, BottomOptions,
+  BottomOptions,
 }) {
   const localDefinedPreferEditorOpen = localStorage.getItem('recap@preferEditorOpen') === 'true';
   const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileState') === 'true';
@@ -46,6 +54,30 @@ export default function Project({
 
   const [fullScreen, setFullScreen] = useState(false);
 
+  const {
+    profile,
+    logoutHandler,
+  } = useContext(UserAccountProvider);
+
+  const {
+    messages,
+  } = useContext(LanguageProvider);
+
+  const {
+    setActualProjectName,
+    setActualProjectPermission,
+    exportRef,
+  } = useContext(ProjectInfoProvider);
+
+  const {
+    setAlertMessage,
+    setAlert,
+    setAlertSeverity,
+    setNotification,
+    setNotificationMessage,
+    setIsLoading,
+  } = useContext(UserMessageProvider);
+
   const [deleteValue, setDeleteValue] = useState();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [required, setRequired] = useState(false);
@@ -53,12 +85,6 @@ export default function Project({
   const [modalContent, setModalContent] = useState();
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-
-  const [alertMessage, setAlertMessage] = useState();
-  const [alert, openAlert] = useState();
-  const [alertSeverity, setAlertSeverity] = useState('success');
-  const [notification, setNotification] = useState();
-  const [notificationMessage, setNotificationMessage] = useState();
 
   const [notFoundProject, setNotFoundProject] = useState();
 
@@ -72,6 +98,7 @@ export default function Project({
   const urlParam = useParams('/project/:id');
   const [projectData, setProjectData] = useState({ pre_id: urlParam.id });
   const [projectAccess, setProjectAccess] = useState();
+  const [blockSaveRequests, setBlockSaveRequests] = useState(false);
   const [isSilentlyLoading, setIsSilentlyLoading] = useState(false);
 
   window.addEventListener('resize', () => { setIsMobile(explodeMinSize()); });
@@ -118,11 +145,12 @@ export default function Project({
   });
 
   const autoSave = useDebounce((fileValue, projectId) => {
-    if (projectAccess === 'own' || projectAccess === 'manage') {
+    if ((projectAccess === 'own' || projectAccess === 'manage') && !blockSaveRequests) {
       if (fileValue === lastSavedValue) {
         return;
       }
       setIsSilentlyLoading(true);
+      setBlockSaveRequests(true);
       getApi().put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('recap@localUserProfile')}`,
@@ -130,10 +158,20 @@ export default function Project({
       }).then(() => {
         setLastSavedTime(Date.now());
         setLastSavedValue(fileValue);
-      }).catch()
+      })
+        .catch((e) => {
+          if (e.response?.status === 401) {
+            setAlertSeverity('error');
+            setAlertMessage(getMessages()[profile?.preferred_lang].error_on_language_set
+              ?? getMessages().en.error_on_language_set);
+            setAlert(true);
+            logoutHandler();
+          }
+        })
         .finally(() => {
           setIsSilentlyLoading(false);
           setLocalMarkdownText(JSON.parse(fileValue));
+          setBlockSaveRequests(false);
         });
     }
   }, 5000);
@@ -144,12 +182,12 @@ export default function Project({
         setShowModal(false);
         setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
         setAlertSeverity('success');
-        openAlert(true);
+        setAlert(true);
         setShowModal(false);
-        setLoading(true);
+        setIsLoading(true);
 
         setTimeout(() => {
-          setLoading(false);
+          setIsLoading(false);
           navigate('/projects');
         }, 2000);
       }
@@ -162,68 +200,75 @@ export default function Project({
     }
 
     const receivedToken = localStorage.getItem('recap@localUserProfile');
+    if (!blockSaveRequests) {
+      setBlockSaveRequests(true);
+      setShowModal(false);
+      setIsLoading(true);
+      getApi().put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
+        headers: {
+          Authorization: `Bearer ${receivedToken}`,
+        },
+      }).then(() => {
+        setLastSavedTime(Date.now());
+        setLastSavedValue(fileValue);
+        if (goHome) {
+          setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
+          setAlertSeverity('success');
+          setAlert(true);
 
-    setShowModal(false);
-    setLoading(true);
-    getApi().put(`/project/?project_id=${projectId}`, [{ imd: fileValue }], {
-      headers: {
-        Authorization: `Bearer ${receivedToken}`,
-      },
-    }).then(() => {
-      setLastSavedTime(Date.now());
-      setLastSavedValue(fileValue);
-      if (goHome) {
-        setAlertMessage(`${messages.item_updated_returning_home}`.replace(':str', messages.card));
-        setAlertSeverity('success');
-        openAlert(true);
-
-        setTimeout(() => {
-          navigate('/projects');
-        }, 2000);
-      } else {
-        openAlert(true);
-        setAlertSeverity('success');
-        setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
-        setLoading(false);
-      }
-    }).catch((e) => {
-      setLoading(false);
-      if (e.response.status === 400) {
-        setAlertMessage(`${messages.item_update_error}`.replace(':str', messages.card));
-        setAlertSeverity('error');
-      } else if (e.response.status === 405) {
-        setAlertMessage(messages.not_allowed_to_edit);
-        setAlertSeverity('error');
-      } else if (e.response.status === 404) {
-        setNotFoundProject(true);
-      } else if (e.response.status === 500) {
-        setAlertMessage(`${messages.item_update_error}`.replace(':str', messages.card));
-        setAlertSeverity('error');
-      }
-      openAlert(true);
-    });
+          setTimeout(() => {
+            navigate('/projects');
+          }, 2000);
+        } else {
+          setAlertSeverity('success');
+          setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
+          setIsLoading(false);
+          setAlert(true);
+        }
+      })
+        .catch((e) => {
+          setIsLoading(false);
+          if (e.response?.status === 400) {
+            setAlertMessage(`${messages.item_update_error}`.replace(':str', messages.card));
+            setAlertSeverity('error');
+          } else if (e.response?.status === 405) {
+            setAlertMessage(messages.not_allowed_to_edit);
+            setAlertSeverity('error');
+          } else if (e.response?.status === 404) {
+            setNotFoundProject(true);
+          } else if (e.response?.status === 500) {
+            setAlertMessage(`${messages.item_update_error}`.replace(':str', messages.card));
+            setAlertSeverity('error');
+          }
+          setAlert(true);
+        })
+        .finally(() => {
+          setBlockSaveRequests(false);
+        });
+    }
   }, [
     messages,
     goHome,
     lastSavedValue,
     lastSavedTime,
+    blockSaveRequests,
     setAlertMessage,
+    setAlertSeverity,
+    setAlert,
+    setIsLoading,
     setLastSavedTime,
     setLastSavedValue,
-    setAlertSeverity,
-    openAlert,
     navigate,
-    setLoading,
   ]);
 
   const deleteHandle = useCallback((projectId, newProfile) => {
     if (deleteValue === projectData.name) {
       setShowModal(false);
-      setLoading(true);
+      setIsLoading(true);
       getApi().delete(`/project/?project_id=${projectId}&user_id=${newProfile.id}`).then(() => {
         setAlertMessage(`${messages.delete_project_success}`);
         setAlertSeverity('success');
-        openAlert(true);
+        setAlert(true);
 
         setTimeout(() => {
           navigate('/projects');
@@ -232,7 +277,7 @@ export default function Project({
     } else {
       setConfirmDelete(false);
     }
-  }, [deleteValue, messages, projectData, navigate, setLoading]);
+  }, [deleteValue, messages, projectData, navigate, setIsLoading]);
 
   const exitProjectHandler = useCallback((fileValue) => {
     if (fileValue === lastSavedValue) {
@@ -293,7 +338,7 @@ export default function Project({
     if (projectData.pre_id) {
       setNotificationMessage(messages.loading_your_project);
       setNotification(true);
-      setLoading(true);
+      setIsLoading(true);
 
       const receivedToken = localStorage.getItem('recap@localUserProfile');
 
@@ -312,19 +357,19 @@ export default function Project({
           setMarkdownText(receivedData[0].imd);
           handleReload(receivedData[0].imd);
           setProjectAccess(receivedData[0].user_permissions);
-          setCurrentProjectAccess(receivedData[0].user_permissions);
+          setActualProjectPermission(receivedData[0].user_permissions);
 
           // eslint-disable-next-line
           let fileName = `${receivedData[0].name}`.toLowerCase().replace(/[^\x00-\x7F]/g, "").replaceAll(' ', '_');
           document.getElementById('page-title').innerText = `Recap - ${receivedData[0].name}`;
-          setProjectName(fileName);
+          setActualProjectName(fileName);
 
           if (editorInstance) {
             editorInstance.getAction('editor.action.formatDocument').run();
           }
         }
 
-        setLoading(false);
+        setIsLoading(false);
       }).catch((e) => {
         if (e.response?.status === 403) {
           setNotFoundProject('notAllowed');
@@ -339,21 +384,21 @@ export default function Project({
         }
       })
         .finally(() => {
-          setLoading(false);
+          setIsLoading(false);
         });
     }
   }, [
     projectData,
     editorInstance,
     messages,
-    setProjectName,
-    setCurrentProjectAccess,
+    setActualProjectName,
+    setActualProjectPermission,
     setLastSavedValue,
     setProjectData,
     setLocalMarkdownText,
     setMarkdownText,
     handleReload,
-    setLoading,
+    setIsLoading,
   ]);
 
   const handleFileSave = () => {
@@ -404,7 +449,11 @@ export default function Project({
           <animated.div id="project-visualizer" className="project-visualizer" style={(!isMobile && !userForceMobile) ? editorVisualizerAnimation : null}>
             <div ref={exportRef} id="text-container" className="transpiled-text-container">
               <SheetsRenderer
-                autoSave={autoSave}
+                autoSave={() => {
+                  if (!blockSaveRequests) {
+                    autoSave();
+                  }
+                }}
                 render={localMarkdownText}
                 userPermission={projectAccess}
                 messages={messages}
@@ -426,7 +475,9 @@ export default function Project({
                   theme="vs-dark"
                   onChange={(value) => {
                     setMarkdownText(value);
-                    autoSave(value, urlParam.id);
+                    if (!blockSaveRequests) {
+                      autoSave(value, urlParam.id);
+                    }
                   }}
                   onMount={editorDidMount}
                   options={{
@@ -490,7 +541,7 @@ export default function Project({
                   <BootstrapTooltip title={messages.legend_save_current_state} placement={(!isMobile && !userForceMobile) ? 'right' : 'top'} arrow leaveDelay={100}>
                     <button
                       type="button"
-                      className="close-button silent-loading-button"
+                      className={`close-button silent-loading-button ${isSilentlyLoading ? 'deactivated' : ''}`}
                       onClick={!isSilentlyLoading ? handleFileSave : null}
                     >
                       {isSilentlyLoading ? (<CircularProgress thickness={5} color="inherit" size="40%" />) : (<span className="material-symbols-rounded">save</span>)}
@@ -603,9 +654,9 @@ export default function Project({
                           <Button
                             onClick={() => {
                               setShowModal(false);
-                              setLoading(true);
+                              setIsLoading(true);
                               setTimeout(() => {
-                                setLoading(false);
+                                setIsLoading(false);
                                 navigate('/projects');
                               }, 1500);
                             }}
@@ -631,25 +682,6 @@ export default function Project({
       {
         renderSwitch()
       }
-
-      <Snackbar
-        open={notification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={4000}
-        onClose={() => { setNotification(false); }}
-        message={notificationMessage}
-      />
-
-      <Snackbar open={alert} autoHideDuration={5000} onClose={() => { openAlert(false); }}>
-        <Alert
-          onClose={() => { openAlert(false); }}
-          severity={alertSeverity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {alertMessage}
-        </Alert>
-      </Snackbar>
     </>
   );
 }

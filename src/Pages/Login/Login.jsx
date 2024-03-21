@@ -1,11 +1,20 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GoogleIcon, RecapLogo } from '../../Components/Icons/Icons';
 import Button from '../../Components/Button/Button';
 import './Login.css';
+import { LanguageProvider, UserAccountProvider } from '../../App';
 
-export default function Login({ messages, loginHandler }) {
+export default function Login() {
   const navigate = useNavigate();
+
+  const {
+    messages,
+  } = useContext(LanguageProvider);
+
+  const {
+    loginHandler,
+  } = useContext(UserAccountProvider);
 
   useEffect(() => {
     if (localStorage.getItem('recap@localUserProfile')) {

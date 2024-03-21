@@ -1,24 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import React, { useCallback, useEffect, useState } from 'react';
-import './Cards.css';
+import React, {
+  useCallback, useContext, useEffect, useState,
+} from 'react';
 import { contrastColor } from 'contrast-color';
 import { useSpring, animated } from 'react-spring';
 import { motion } from 'framer-motion';
-import {
-  Alert, Paper, Snackbar, Tooltip, tooltipClasses,
-} from '@mui/material';
+import { Paper, Tooltip, tooltipClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import debounce from 'lodash.debounce';
+
+import './Cards.css';
 import getApi from '../../Api/api';
 import { RecapLogo } from '../../Components/Icons/Icons';
 import Input, { TextArea } from '../../Components/Input/Input';
 import Button from '../../Components/Button/Button';
 import Modal from '../../Components/Modal/Modal';
+import { LanguageProvider, UserAccountProvider, UserMessageProvider } from '../../App';
+import useDebounce from '../../Functions/useDebouce';
 
-export default function Cards({
-  userId, messages, setLoading, logoutHandler,
-}) {
+export default function Cards() {
   const authenticationToken = localStorage.getItem('recap@localUserProfile');
   const api = getApi();
 
@@ -35,11 +35,23 @@ export default function Cards({
   const [newCard, setNewCard] = useState();
   const [userDataWasLoaded, setUserDataWasLoaded] = useState(false);
 
-  const [alertMessage, setAlertMessage] = useState();
-  const [alert, openAlert] = useState();
-  const [alertSeverity, setAlertSeverity] = useState('success');
-  const [notification, setNotification] = useState();
-  const [notificationMessage, setNotificationMessage] = useState();
+  const {
+    messages,
+  } = useContext(LanguageProvider);
+
+  const {
+    profile,
+    logoutHandler,
+  } = useContext(UserAccountProvider);
+
+  const {
+    setAlertMessage,
+    setAlert,
+    setAlertSeverity,
+    setNotification,
+    setNotificationMessage,
+    setIsLoading,
+  } = useContext(UserMessageProvider);
 
   const navigate = useNavigate();
 
@@ -79,7 +91,7 @@ export default function Cards({
   const onCreateCardHandler = () => {
     setRequired(true);
     if (cardName && cardName !== '' && `${cardName}`.length >= 4 && cardSynopses && cardSynopses !== '' && `${cardSynopses}`.length >= 4) {
-      setLoading(true);
+      setIsLoading(true);
       setNewCard({ name: cardName, synopsis: cardSynopses, color: cardColor });
 
       setCardName(null);
@@ -89,21 +101,20 @@ export default function Cards({
     }
   };
 
-  // eslint-disable-next-line
-  const setNewCardColor = useCallback(debounce((value) => {
+  const setNewCardColor = useDebounce((value) => {
     setCardColor(value);
-  }, 10), [setCardColor]);
+  }, 10);
 
   useEffect(() => {
     if (userDataWasLoaded) return;
     const fetchUserCards = async () => {
-      if (!userId) return;
+      if (!profile?.id) return;
       setNotificationMessage(messages.loading_your_cards);
       setNotification(true);
-      setLoading(true);
+      setIsLoading(true);
 
       try {
-        const userCardsData = await api.get(`/project/?field=user_id:${userId}`, {
+        const userCardsData = await api.get(`/project/?field=user_id:${profile?.id}`, {
           headers: {
             Authorization: `Bearer ${authenticationToken}`,
           },
@@ -111,7 +122,7 @@ export default function Cards({
 
         setUserCards(userCardsData.data);
         setNotification(false);
-        setLoading(false);
+        setIsLoading(false);
         setUserDataWasLoaded(true);
       } catch (err) {
         if (err?.response?.status === 401) {
@@ -120,19 +131,19 @@ export default function Cards({
         }
 
         setNotification(false);
-        openAlert(true);
+        setAlert(true);
         setAlertSeverity('error');
 
         setAlertMessage(messages.problem_when_loading);
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     fetchUserCards();
   }, [
-    userId,
-    setLoading,
+    profile?.id,
+    setIsLoading,
     setNotificationMessage,
-    openAlert,
+    setAlert,
     api,
     authenticationToken,
     userDataWasLoaded,
@@ -159,7 +170,7 @@ export default function Cards({
             color: newCardRef.color,
           },
           project: { name: newCardRef.name },
-          user: { id: userId },
+          user: { id: profile?.id },
         }], {
           headers: {
             Authorization: `Bearer ${authenticationToken}`,
@@ -186,8 +197,8 @@ export default function Cards({
         setAlertMessage(messages.item_creation_error.replace(':str', messages.card));
       } finally {
         toggleResetValues();
-        setLoading(false);
-        openAlert(true);
+        setIsLoading(false);
+        setAlert(true);
       }
     };
 
@@ -200,8 +211,8 @@ export default function Cards({
     navigate,
     toggleResetValues,
     logoutHandler,
-    setLoading,
-    userId,
+    setIsLoading,
+    profile?.id,
     messages,
   ]);
 
@@ -281,25 +292,6 @@ export default function Cards({
           </animated.div>
         </Modal>
       </animated.div>
-
-      <Snackbar
-        open={notification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        autoHideDuration={5000}
-        onClose={() => { setNotification(false); }}
-        message={notificationMessage}
-      />
-
-      <Snackbar open={alert} autoHideDuration={5000} onClose={() => { openAlert(false); }}>
-        <Alert
-          onClose={() => { openAlert(false); }}
-          severity={alertSeverity}
-          variant="filled"
-          sx={{ width: '100%' }}
-        >
-          {alertMessage}
-        </Alert>
-      </Snackbar>
     </>
   );
 }
@@ -358,7 +350,6 @@ export function Card({
       fontSize: '10px',
       minWidth: '170px',
       maxWidth: '170px',
-      pointerEvent: 'none',
     },
   }));
 
@@ -370,22 +361,23 @@ export function Card({
           style={appearAnimation}
           onClick={() => { navigate(cardId ? (`/project/${cardId}`) : '/'); }}
         >
-          <HtmlTooltip title={(
-            <div>
-              <h2>
-                {messages.label_card_name}
-                :
-              </h2>
-              <p>{cardTitle}</p>
-              <p>
-                <strong>
-                  {messages.label_card_synopsis}
+          <HtmlTooltip
+            title={(
+              <div>
+                <h2>
+                  {messages.label_card_name}
                   :
-                </strong>
-              </p>
-              <p>{cardSynopsis}</p>
-            </div>
-          )}
+                </h2>
+                <p>{cardTitle}</p>
+                <p>
+                  <strong>
+                    {messages.label_card_synopsis}
+                    :
+                  </strong>
+                </p>
+                <p>{cardSynopsis}</p>
+              </div>
+            )}
           >
             <div className="card-container" onClick={onClick}>
               <div className="card-paper-shadow" />
@@ -398,12 +390,13 @@ export function Card({
           type="button"
           style={appearAnimation}
         >
-          <HtmlTooltip title={(
-            <div>
-              <h2>{messages.tooltip_create_card_label}</h2>
-              <p>{messages.tooltip_create_card_synopsis_label}</p>
-            </div>
-          )}
+          <HtmlTooltip
+            title={(
+              <div>
+                <h2>{messages.tooltip_create_card_label}</h2>
+                <p>{messages.tooltip_create_card_synopsis_label}</p>
+              </div>
+            )}
           >
             <div className="card-container" onClick={onClick}>
               <div className="card-paper-shadow" />

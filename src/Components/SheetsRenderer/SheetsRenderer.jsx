@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable import/no-extraneous-dependencies */
 import { React, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -238,18 +239,18 @@ function AddCardHologram({ subjectIndex, messages, onAddNewCard }) {
                     setContentList([...contentList]);
                   }}
                 />
-                <input
-                  className="bi bi-trash3"
+                <button
                   type="button"
                   tabIndex={-2}
                   onClick={(e) => {
                     if (e.type === 'click') {
                       const actualListRef = contentList;
-
                       setContentList([...unsetArrayPosition(actualListRef, index)]);
                     }
                   }}
-                />
+                >
+                  <i className="bi bi-trash3" />
+                </button>
               </div>
             ) : null))}
             <input
