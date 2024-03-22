@@ -102,44 +102,52 @@ export default function Cards() {
     }
   };
 
-  const fetchUserCards = useCallback(() => {
-    api.get(`/project/?field=user_id:${profile?.id}`, {
-      headers: {
-        Authorization: `Bearer ${authenticationToken}`,
-      },
-    }).then((data) => {
-      setUserCards(data.data);
-      setNotification(false);
-      setIsLoading(false);
-      setUserDataWasLoaded(true);
-    }).catch((e) => {
-      if (e?.response?.status === 401) {
-        setAlertSeverity('error');
-        setAlertMessage(
-          messages.reauthenticate_static_error
-          ?? getMessages()[language].reauthenticate_token_message,
-        );
-        setAlert(true);
-        logoutHandler();
-      }
-
-      setNotification(false);
-      setAlert(true);
-      setAlertSeverity('error');
-
-      setAlertMessage(messages.problem_when_loading);
-      setIsLoading(false);
-    });
-  });
-
   useEffect(() => {
-    if (userDataWasLoaded || !userCards || !profile?.id) return;
-    setNotificationMessage(messages.loading_your_cards);
-    setNotification(true);
-    setIsLoading(true);
+    if (userDataWasLoaded) return;
+    const fetchUserCards = async () => {
+      if (!profile?.id) return;
+      setNotificationMessage(messages.loading_your_cards);
+      setNotification(true);
+      setIsLoading(true);
 
+      try {
+        const userCardsData = await api.get(`/project/?field=user_id:${profile?.id}`, {
+          headers: {
+            Authorization: `Bearer ${authenticationToken}`,
+          },
+        });
+
+        setUserCards(userCardsData.data);
+        setNotification(false);
+        setIsLoading(false);
+        setUserDataWasLoaded(true);
+      } catch (err) {
+        if (err?.response?.status === 401) {
+          sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ message: messages.reauthenticate_token_message, severity: 'error' }));
+          logoutHandler();
+        }
+
+        setNotification(false);
+        setAlert(true);
+        setAlertSeverity('error');
+
+        setAlertMessage(messages.problem_when_loading);
+        setIsLoading(false);
+      }
+    };
     fetchUserCards();
-  }, []);
+  }, [
+    profile?.id,
+    setIsLoading,
+    setNotificationMessage,
+    setAlert,
+    api,
+    authenticationToken,
+    userDataWasLoaded,
+    setUserDataWasLoaded,
+    logoutHandler,
+    messages,
+  ]);
 
   useEffect(() => {
     const createCardAndProject = async () => {
