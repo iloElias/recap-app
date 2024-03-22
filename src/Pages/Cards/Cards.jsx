@@ -133,7 +133,7 @@ export default function Cards() {
   });
 
   useEffect(() => {
-    if (userDataWasLoaded || userCards || !profile?.id) return;
+    if (userDataWasLoaded || !userCards || !profile?.id) return;
     setNotificationMessage(messages.loading_your_cards);
     setNotification(true);
     setIsLoading(true);
