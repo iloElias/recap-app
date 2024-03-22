@@ -1,6 +1,6 @@
 .component-button {
     width: 30vh;
-    min-width: 55px;
+    min-width: max-content;
 
     display: flex;
     flex-direction: row;
@@ -15,7 +15,7 @@
     outline: none;
     background: #212121;
 
-    font-size: clamp(2vh, 12px, 14px);
+    font-size: clamp(2.4vh, 120%, 2.8vh);
 
     color: #FAFAFA;
     user-select: none;

@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React, {
   useCallback, useContext, useEffect, useState,
 } from 'react';
@@ -8,7 +7,6 @@ import { motion } from 'framer-motion';
 import { Paper, Tooltip, tooltipClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { useCallOnce } from '@straw-hat/react-hooks';
 
 import './Cards.css';
 import getApi from '../../Api/api';
@@ -17,7 +15,7 @@ import Input, { TextArea } from '../../Components/Input/Input';
 import Button from '../../Components/Button/Button';
 import Modal from '../../Components/Modal/Modal';
 import { LanguageProvider, UserAccountProvider, UserMessageProvider } from '../../App';
-import ColorPicker from '../../Components/ColorPicker/ColorPicker';
+import ColorPicker, { colors } from '../../Components/ColorPicker/ColorPicker';
 import getMessages from '../../Internationalization/emergencyMessages';
 
 export default function Cards() {
@@ -89,7 +87,6 @@ export default function Cards() {
 
   const toggleResetValues = useCallback(() => {
     setResetValues(!resetValues);
-    setCardColor('#fafafa');
   }, [resetValues, setResetValues]);
 
   const onCreateCardHandler = () => {
@@ -105,7 +102,7 @@ export default function Cards() {
     }
   };
 
-  const fetchUserCards = useCallOnce(() => {
+  const fetchUserCards = useCallback(() => {
     api.get(`/project/?field=user_id:${profile?.id}`, {
       headers: {
         Authorization: `Bearer ${authenticationToken}`,
@@ -133,22 +130,10 @@ export default function Cards() {
       setAlertMessage(messages.problem_when_loading);
       setIsLoading(false);
     });
-  }, [
-    profile?.id,
-    setIsLoading,
-    setNotificationMessage,
-    setAlert,
-    api,
-    authenticationToken,
-    userDataWasLoaded,
-    setUserDataWasLoaded,
-    logoutHandler,
-    messages,
-  ]);
+  });
 
   useEffect(() => {
-    if (userDataWasLoaded || userCards) return;
-    if (!profile?.id) return;
+    if (userDataWasLoaded || userCards || !profile?.id) return;
     setNotificationMessage(messages.loading_your_cards);
     setNotification(true);
     setIsLoading(true);
@@ -227,7 +212,7 @@ export default function Cards() {
           position: 'absolute',
           left: '50%',
           transform: 'translateX(-50%)',
-          marginTop: '3.75vh',
+          marginTop: 'min(2vw, 3vh)',
           minHeight: 'min-content',
           height: 'max(34px, 4.5vh)',
         }}
@@ -273,7 +258,11 @@ export default function Cards() {
               <form onSubmit={(e) => { e.preventDefault(); }}>
                 <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => (`${value}`.length < 4 ? messages.invalid_synopsis_length : true)} update={setCardName} />
                 <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => (`${value}`.length < 4 ? messages.invalid_synopsis_length : true)} update={setCardSynopses} />
-                <ColorPicker selectMessage={messages.label_card_color} onChange={setCardColor} />
+                <ColorPicker
+                  selectMessage={messages.label_card_color}
+                  onChange={setCardColor}
+                  starterColor={colors[Math.floor(Math.random() * colors.length)]}
+                />
                 <Button style={{ minWidth: '100%' }} onClick={() => { onCreateCardHandler(); }}>{messages.form_button_new_card}</Button>
               </form>
             </Paper>

@@ -13,7 +13,6 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './App.css';
 import { Alert, CircularProgress, Snackbar } from '@mui/material';
-import { useCallOnce } from '@straw-hat/react-hooks';
 
 import BottomOptions from './Components/BottomOptions/BottomOptions';
 import Modal from './Components/Modal/Modal';
@@ -123,6 +122,7 @@ export default function App() {
     setProfile(null);
     setToken(null);
     setUser(null);
+    setUserCards(null);
 
     navigate('/login');
     setPreviousSessionMessage(JSON.parse(sessionStorage.getItem('recap@previousSessionError')) || null);
@@ -137,7 +137,7 @@ export default function App() {
     picture_path: givenProfile.picture,
   }), []);
 
-  const handleUser = useCallOnce((data) => {
+  const handleUser = useCallback((data) => {
     const response = data.data;
     const userData = response.answer;
 

@@ -9,7 +9,7 @@
     height: min-content;
     text-align: start;
 
-    margin: 5.65vh 0 0 0;
+    margin: max(5.65vh, 20px) 0 0 0;
 
     font-size: clamp(2.7vh, 12px, 14px);
 }

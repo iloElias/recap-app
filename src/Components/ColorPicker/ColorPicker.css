@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 2vh;
+  font-size: clamp(2.4vh, 120%, 2.8vh);
   min-height: max-content;
 }
 
@@ -31,7 +31,7 @@
   outline: solid 1px #929292b7;
   border: none;
   background: #fafafa;
-  font-size: 2vh;
+  font-size: clamp(2.4vh, 120%, 2.8vh);
   color: #212121;
 }
 

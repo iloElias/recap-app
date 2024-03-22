@@ -171,7 +171,7 @@ export default function Project({ BottomOptions }) {
     }
   }, 5000);
 
-  const saveHandle = useCallOnce((fileValue, projectId) => {
+  const saveHandle = useCallback((fileValue, projectId) => {
     if (fileValue === lastSavedValue) {
       if (goHome) {
         setShowModal(false);
@@ -215,6 +215,7 @@ export default function Project({ BottomOptions }) {
             navigate('/projects');
           }, 2000);
         } else {
+          setLocalMarkdownText(JSON.parse(fileValue));
           setAlertSeverity('success');
           setAlertMessage(`${messages.item_updated}`.replace(':str', messages.card));
           setIsLoading(false);
