@@ -1,0 +1,69 @@
+.color-picker {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 2vh;
+  min-height: max-content;
+}
+
+.label-button-center {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  width: 100%;
+}
+
+.picker-button {
+  width: 25%;
+  height: 3.8vh;
+
+  user-select: none;
+  touch-action: none;
+
+  resize: none;
+  padding: 0.9vh 0.5vh;
+  border-radius: var(--button-generic-border-radius);
+  outline: solid 1px #929292b7;
+  border: none;
+  background: #fafafa;
+  font-size: 2vh;
+  color: #212121;
+}
+
+.picker-container .twitter-picker div div input {
+  width: 25% !important;
+  font-size: 65% !important;
+  height: 30px !important;
+  padding: 0 0 0 15px;
+}
+
+.picker-button:hover {
+  cursor: pointer;
+  outline: solid 1px #26262687;
+}
+
+.picker-button:focus,
+.picker-button:focus-within {
+  outline: solid 0.1vh #212121;
+}
+
+.picker-container {
+  position: absolute;
+  top: 50%;
+
+  z-index: 5;
+}
+
+.picker-container .twitter-picker div span div {
+  outline: solid 0.1vh #afafafdd;
+}
+
+.picker-container .twitter-picker div span :hover,
+.picker-container .twitter-picker div span :focus-visible {
+  outline: solid 0.2vh #21212167 !important;
+}

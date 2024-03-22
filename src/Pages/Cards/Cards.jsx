@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Paper, Tooltip, tooltipClasses } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { useCallOnce } from '@straw-hat/react-hooks';
 
 import './Cards.css';
 import getApi from '../../Api/api';
@@ -16,7 +17,8 @@ import Input, { TextArea } from '../../Components/Input/Input';
 import Button from '../../Components/Button/Button';
 import Modal from '../../Components/Modal/Modal';
 import { LanguageProvider, UserAccountProvider, UserMessageProvider } from '../../App';
-import useDebounce from '../../Functions/useDebouce';
+import ColorPicker from '../../Components/ColorPicker/ColorPicker';
+import getMessages from '../../Internationalization/emergencyMessages';
 
 export default function Cards() {
   const authenticationToken = localStorage.getItem('recap@localUserProfile');
@@ -25,7 +27,6 @@ export default function Cards() {
   const [showModal, setShowModal] = useState(false);
   const [required, setRequired] = useState(false);
 
-  const [userCards, setUserCards] = useState();
   const [cardName, setCardName] = useState('');
   const [cardSynopses, setCardSynopses] = useState('');
   const [cardColor, setCardColor] = useState('#fafafa');
@@ -36,12 +37,15 @@ export default function Cards() {
   const [userDataWasLoaded, setUserDataWasLoaded] = useState(false);
 
   const {
+    language,
     messages,
   } = useContext(LanguageProvider);
 
   const {
     profile,
     logoutHandler,
+    userCards,
+    setUserCards,
   } = useContext(UserAccountProvider);
 
   const {
@@ -101,44 +105,34 @@ export default function Cards() {
     }
   };
 
-  const setNewCardColor = useDebounce((value) => {
-    setCardColor(value);
-  }, 10);
-
-  useEffect(() => {
-    if (userDataWasLoaded) return;
-    const fetchUserCards = async () => {
-      if (!profile?.id) return;
-      setNotificationMessage(messages.loading_your_cards);
-      setNotification(true);
-      setIsLoading(true);
-
-      try {
-        const userCardsData = await api.get(`/project/?field=user_id:${profile?.id}`, {
-          headers: {
-            Authorization: `Bearer ${authenticationToken}`,
-          },
-        });
-
-        setUserCards(userCardsData.data);
-        setNotification(false);
-        setIsLoading(false);
-        setUserDataWasLoaded(true);
-      } catch (err) {
-        if (err?.response?.status === 401) {
-          sessionStorage.setItem('recap@previousSessionError', JSON.stringify({ message: messages.reauthenticate_token_message, severity: 'error' }));
-          logoutHandler();
-        }
-
-        setNotification(false);
-        setAlert(true);
+  const fetchUserCards = useCallOnce(() => {
+    api.get(`/project/?field=user_id:${profile?.id}`, {
+      headers: {
+        Authorization: `Bearer ${authenticationToken}`,
+      },
+    }).then((data) => {
+      setUserCards(data.data);
+      setNotification(false);
+      setIsLoading(false);
+      setUserDataWasLoaded(true);
+    }).catch((e) => {
+      if (e?.response?.status === 401) {
         setAlertSeverity('error');
-
-        setAlertMessage(messages.problem_when_loading);
-        setIsLoading(false);
+        setAlertMessage(
+          messages.reauthenticate_static_error
+          ?? getMessages()[language].reauthenticate_token_message,
+        );
+        setAlert(true);
+        logoutHandler();
       }
-    };
-    fetchUserCards();
+
+      setNotification(false);
+      setAlert(true);
+      setAlertSeverity('error');
+
+      setAlertMessage(messages.problem_when_loading);
+      setIsLoading(false);
+    });
   }, [
     profile?.id,
     setIsLoading,
@@ -151,6 +145,16 @@ export default function Cards() {
     logoutHandler,
     messages,
   ]);
+
+  useEffect(() => {
+    if (userDataWasLoaded || userCards) return;
+    if (!profile?.id) return;
+    setNotificationMessage(messages.loading_your_cards);
+    setNotification(true);
+    setIsLoading(true);
+
+    fetchUserCards();
+  }, []);
 
   useEffect(() => {
     const createCardAndProject = async () => {
@@ -269,26 +273,7 @@ export default function Cards() {
               <form onSubmit={(e) => { e.preventDefault(); }}>
                 <Input minSize={4} resetValue={resetValues} type="text" messages={messages} placeholder={messages.label_card_name} required={required} submitRule={(value) => (`${value}`.length < 4 ? messages.invalid_synopsis_length : true)} update={setCardName} />
                 <TextArea minSize={4} resetValue={resetValues} messages={messages} placeholder={messages.label_card_synopsis} required={required} submitRule={(value) => (`${value}`.length < 4 ? messages.invalid_synopsis_length : true)} update={setCardSynopses} />
-                <div
-                  className="input-container"
-                  style={{
-                    display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', fontSize: '2vh', minHeight: 'max-content',
-                  }}
-                >
-                  <p>
-                    {messages.label_card_color}
-                    :
-                  </p>
-                  <input
-                    className="form-input"
-                    value={cardColor}
-                    style={{
-                      display: 'flex', width: '25%', height: '3.8vh', padding: '0.9vh 0.5vh', backgroundColor: cardColor,
-                    }}
-                    type="color"
-                    onChange={(e) => { setNewCardColor(e.target.value); }}
-                  />
-                </div>
+                <ColorPicker selectMessage={messages.label_card_color} onChange={setCardColor} />
                 <Button style={{ minWidth: '100%' }} onClick={() => { onCreateCardHandler(); }}>{messages.form_button_new_card}</Button>
               </form>
             </Paper>

@@ -19,6 +19,7 @@
 
     color: #FAFAFA;
     user-select: none;
+    transition: transform 0.2s;
 }
 
 .component-button-disabled {
@@ -48,7 +49,6 @@
 .component-button:hover {
     cursor: pointer;
     background: #3b3b3b;
-    transition: transform 0.2s;
     transform: translateY(-0.2vh);
 }
 

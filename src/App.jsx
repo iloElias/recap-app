@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/jsx-no-constructed-context-values */
 import {
   React, createContext, useCallback, useEffect, useRef, useState,
@@ -12,6 +13,8 @@ import { jwtDecode } from 'jwt-decode';
 import axios from 'axios';
 import './App.css';
 import { Alert, CircularProgress, Snackbar } from '@mui/material';
+import { useCallOnce } from '@straw-hat/react-hooks';
+
 import BottomOptions from './Components/BottomOptions/BottomOptions';
 import Modal from './Components/Modal/Modal';
 import Cards from './Pages/Cards/Cards';
@@ -74,6 +77,7 @@ export default function App() {
   const [notification, setNotification] = useState();
   const [notificationMessage, setNotificationMessage] = useState();
 
+  const [userCards, setUserCards] = useState();
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState();
   const [token, setToken] = useState(() => {
@@ -133,7 +137,7 @@ export default function App() {
     picture_path: givenProfile.picture,
   }), []);
 
-  const handleUser = useCallback((data) => {
+  const handleUser = useCallOnce((data) => {
     const response = data.data;
     const userData = response.answer;
 
@@ -197,40 +201,37 @@ export default function App() {
     localStorage.setItem('recap@definedLanguage', language);
   }, [language]);
 
-  useEffect(
-    () => {
-      if (user && !profile) {
-        let dbUser = null;
-        if (user.access_token) { // Normal redirect Login
-          axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
-            headers: {
-              Authorization: `Bearer ${user.access_token}`,
-              Accept: 'application/json',
-            },
-          }).then((res) => {
-            dbUser = res.data;
-            const preparedData = prepareData(dbUser);
-
-            api.post('user/login/', [preparedData])
-              .then((data) => {
-                handleUser(data);
-              });
-          });
-        } else if (user.credential) { // One tap Login
-          const decodedUserData = jwtDecode(user.credential);
-          dbUser = decodedUserData;
-
+  useEffect(() => {
+    if (user && !profile) {
+      let dbUser = null;
+      if (user.access_token) { // Normal redirect Login
+        axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${user.access_token}`, {
+          headers: {
+            Authorization: `Bearer ${user.access_token}`,
+            Accept: 'application/json',
+          },
+        }).then((res) => {
+          dbUser = res.data;
           const preparedData = prepareData(dbUser);
 
           api.post('user/login/', [preparedData])
             .then((data) => {
               handleUser(data);
             });
-        }
+        });
+      } else if (user.credential) { // One tap Login
+        const decodedUserData = jwtDecode(user.credential);
+        dbUser = decodedUserData;
+
+        const preparedData = prepareData(dbUser);
+
+        api.post('user/login/', [preparedData])
+          .then((data) => {
+            handleUser(data);
+          });
       }
-    },
-    [user, profile, api, handleUser, prepareData],
-  );
+    }
+  }, [user, profile, api, handleUser, prepareData]);
 
   useEffect(() => {
     if (!token && !profile) {
@@ -295,6 +296,8 @@ export default function App() {
     profile,
     login,
     logoutHandler,
+    userCards,
+    setUserCards,
   };
 
   const notificationMethodsProvider = {

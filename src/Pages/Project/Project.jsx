@@ -1,6 +1,8 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import React, {
   useCallback, useContext, useEffect, useState,
 } from 'react';
+import { useCallOnce } from '@straw-hat/react-hooks';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useSpring, animated } from 'react-spring';
 
@@ -27,20 +29,12 @@ import {
 import getMessages from '../../Internationalization/emergencyMessages';
 
 const getWindowSize = () => ({ height: window.innerHeight, width: window.innerWidth });
-
-const explodeMinSize = () => {
-  if (getWindowSize().width <= 640) {
-    return true;
-  }
-  return false;
-};
+const explodeMinSize = () => getWindowSize().width <= 640;
 
 document.getElementById('page-title').innerText = 'Recap - Project';
 const saveMarkdownWaitTime = 5000;
 
-export default function Project({
-  BottomOptions,
-}) {
+export default function Project({ BottomOptions }) {
   const localDefinedPreferEditorOpen = localStorage.getItem('recap@preferEditorOpen') === 'true';
   const localDefinedPreferMobileState = localStorage.getItem('recap@preferMobileState') === 'true';
 
@@ -57,6 +51,7 @@ export default function Project({
   const {
     profile,
     logoutHandler,
+    setUserCards,
   } = useContext(UserAccountProvider);
 
   const {
@@ -176,7 +171,7 @@ export default function Project({
     }
   }, 5000);
 
-  const saveHandle = useCallback((fileValue, projectId) => {
+  const saveHandle = useCallOnce((fileValue, projectId) => {
     if (fileValue === lastSavedValue) {
       if (goHome) {
         setShowModal(false);
@@ -261,7 +256,7 @@ export default function Project({
     navigate,
   ]);
 
-  const deleteHandle = useCallback((projectId, newProfile) => {
+  const deleteHandle = useCallOnce((projectId, newProfile) => {
     if (deleteValue === projectData.name) {
       setShowModal(false);
       setIsLoading(true);
@@ -270,7 +265,9 @@ export default function Project({
         setAlertSeverity('success');
         setAlert(true);
 
+        setUserCards(null);
         setTimeout(() => {
+          setIsLoading(false);
           navigate('/projects');
         }, 2000);
       });
@@ -712,7 +709,3 @@ function NotActiveCase({ messages }) {
     </NotFound>
   );
 }
-
-/*
-
-*/
